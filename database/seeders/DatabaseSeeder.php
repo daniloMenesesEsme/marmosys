@@ -131,5 +131,11 @@ class DatabaseSeeder extends Seeder
             DB::rollBack();
             throw $e;
         }
+
+        $this->call([
+            BudgetMaterialSeeder::class,
+            MaterialSeeder::class,
+            // ... outros seeders
+        ]);
     }
 } 

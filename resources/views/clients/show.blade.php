@@ -131,7 +131,7 @@
                             </tbody>
                         </table>
                         <div class="right-align" style="margin-top: 10px;">
-                            <a href="{{ route('budgets.create', ['client_id' => $client->id]) }}" class="btn waves-effect waves-light blue">
+                            <a href="{{ route('financial.budgets.create', ['client_id' => $client->id]) }}" class="btn waves-effect waves-light blue">
                                 <i class="material-icons left">add</i>Novo Orçamento
                             </a>
                         </div>

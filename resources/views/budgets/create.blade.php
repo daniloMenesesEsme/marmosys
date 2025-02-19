@@ -9,7 +9,7 @@
             <div class="card-content">
                 <span class="card-title">Novo Orçamento</span>
 
-                <form action="{{ route('budgets.store') }}" method="POST" id="budgetForm">
+                <form action="{{ route('financial.budgets.store') }}" method="POST" id="budgetForm">
                     @csrf
                     
                     <div class="row">
@@ -59,7 +59,7 @@
                                 <i class="material-icons left">save</i>
                                 Salvar
                             </button>
-                            <a href="{{ route('budgets.index') }}" class="btn waves-effect waves-light grey">
+                            <a href="{{ route('financial.budgets.index') }}" class="btn waves-effect waves-light grey">
                                 <i class="material-icons left">arrow_back</i>
                                 Voltar
                             </a>

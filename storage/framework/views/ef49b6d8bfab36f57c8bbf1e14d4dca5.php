@@ -10,7 +10,7 @@
 <body class="grey lighten-4">
     <nav class="blue darken-2">
         <div class="nav-wrapper container">
-            <a href="<?php echo e(url('/')); ?>" class="brand-logo"><?php echo e(config('app.name')); ?></a>
+            <a href="<?php echo e(url('/')); ?>" class="brand-logo center"><?php echo e(config('app.name')); ?></a>
         </div>
     </nav>
 

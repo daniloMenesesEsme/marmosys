@@ -78,9 +78,6 @@
         <li><a href="{{ route('financial.goals.index') }}" class="waves-effect">
             <i class="material-icons">flag</i>Metas
         </a></li>
-        <li><a href="{{ route('financial.budgets.index') }}" class="waves-effect">
-            <i class="material-icons">account_balance_wallet</i>Orçamentos
-        </a></li>
         
         <li>
             <div class="divider"></div>
@@ -106,14 +103,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            var elems = document.querySelectorAll('.sidenav');
-            var instances = M.Sidenav.init(elems);
-
-            var dropdowns = document.querySelectorAll('.dropdown-trigger');
-            M.Dropdown.init(dropdowns);
-
-            var selects = document.querySelectorAll('select');
-            M.FormSelect.init(selects);
+            M.AutoInit();
         });
     </script>
     @stack('scripts')

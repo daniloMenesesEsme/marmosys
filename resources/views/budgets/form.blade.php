@@ -9,7 +9,7 @@
             <div class="card-content">
                 <span class="card-title">{{ isset($budget) ? 'Editar Orçamento' : 'Novo Orçamento' }}</span>
 
-                <form action="{{ isset($budget) ? route('budgets.update', $budget) : route('budgets.store') }}" method="POST">
+                <form action="{{ isset($budget) ? route('financial.budgets.update', $budget) : route('financial.budgets.store') }}" method="POST">
                     @csrf
                     @if(isset($budget))
                         @method('PUT')
@@ -109,7 +109,7 @@
                                 <i class="material-icons left">save</i>
                                 Salvar
                             </button>
-                            <a href="{{ route('budgets.index') }}" class="btn waves-effect waves-light grey">
+                            <a href="{{ route('financial.budgets.index') }}" class="btn waves-effect waves-light grey">
                                 <i class="material-icons left">arrow_back</i>
                                 Voltar
                             </a>

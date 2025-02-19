@@ -12,14 +12,13 @@ class Budget extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'client_id',
-        'numero',
-        'valor_total',
-        'desconto',
-        'valor_final',
+        'cliente_id',
         'status',
-        'data_validade',
-        'observacoes'
+        'valor_total',
+        'data_aprovacao',
+        'previsao_entrega',
+        'data_entrega',
+        'convertido_pedido'
     ];
 
     protected $casts = [
@@ -31,17 +30,20 @@ class Budget extends Model
 
     protected $dates = [
         'data',
-        'deleted_at'
+        'deleted_at',
+        'data_aprovacao',
+        'previsao_entrega',
+        'data_entrega'
     ];
-
-    public function client()
-    {
-        return $this->belongsTo(Client::class);
-    }
 
     public function rooms()
     {
         return $this->hasMany(Room::class);
+    }
+
+    public function cliente()
+    {
+        return $this->belongsTo(Cliente::class);
     }
 
     public function order()

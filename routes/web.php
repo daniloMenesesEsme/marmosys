@@ -15,6 +15,7 @@ use App\Http\Controllers\FinancialReconciliationController;
 use App\Http\Controllers\CostCenterController;
 use App\Http\Controllers\CashFlowProjectionController;
 use App\Http\Controllers\FinancialGoalController;
+use App\Http\Controllers\MaterialController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -84,9 +85,20 @@ Route::middleware('auth')->group(function () {
         Route::post('goals/update-status', [FinancialGoalController::class, 'updateStatus'])
             ->name('goals.update-status');
 
-        // Orçamentos
+        // Rotas de Orçamentos
         Route::resource('budgets', BudgetController::class);
-        Route::post('budgets/copy', [BudgetController::class, 'copy'])
-            ->name('budgets.copy');
+        
+        // Se você precisar da rota de cópia, adicione:
+        Route::post('budgets/copy', [BudgetController::class, 'copy'])->name('budgets.copy');
+
+        Route::get('/budgets/{budget}/pdf', [BudgetController::class, 'generatePdf'])->name('budgets.pdf');
+        Route::get('/budgets/{budget}/print', [BudgetController::class, 'printView'])->name('budgets.print');
+    });
+
+    Route::get('/materials/search', [MaterialController::class, 'search'])->name('materials.search');
+
+    // Adicione esta rota dentro do grupo de rotas protegidas
+    Route::prefix('stock')->name('stock.')->group(function () {
+        Route::resource('materials', MaterialController::class);
     });
 }); 

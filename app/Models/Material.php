@@ -4,31 +4,30 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Material extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'category_id',
-        'codigo',
         'nome',
+        'codigo',
         'descricao',
+        'preco_padrao',
         'unidade_medida',
-        'estoque_minimo',
-        'estoque_atual',
-        'preco_custo',
-        'preco_venda',
         'ativo'
     ];
 
     protected $casts = [
-        'estoque_minimo' => 'decimal:2',
-        'estoque_atual' => 'decimal:2',
-        'preco_custo' => 'decimal:2',
-        'preco_venda' => 'decimal:2',
+        'preco_padrao' => 'decimal:2',
         'ativo' => 'boolean'
     ];
+
+    public function budgetItems()
+    {
+        return $this->hasMany(BudgetItem::class);
+    }
 
     public function category()
     {

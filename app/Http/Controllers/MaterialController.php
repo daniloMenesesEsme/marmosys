@@ -64,4 +64,14 @@ class MaterialController extends Controller
         $material->update(['ativo' => false]);
         return redirect()->route('stock.materials.index')->with('success', 'Material desativado com sucesso!');
     }
+
+    public function search(Request $request)
+    {
+        $query = $request->get('q');
+        $materiais = Material::where('nome', 'like', "%{$query}%")
+            ->orWhere('codigo', 'like', "%{$query}%")
+            ->get();
+        
+        return response()->json($materiais);
+    }
 } 
