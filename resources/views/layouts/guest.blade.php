@@ -10,7 +10,7 @@
 <body class="grey lighten-4">
     <nav class="blue darken-2">
         <div class="nav-wrapper container">
-            <a href="{{ url('/') }}" class="brand-logo">{{ config('app.name') }}</a>
+            <a href="{{ url('/') }}" class="brand-logo center">{{ config('app.name') }}</a>
         </div>
     </nav>
 

@@ -10,7 +10,7 @@
 <body>
     <nav class="blue darken-2">
         <div class="nav-wrapper container">
-            <a href="#" class="brand-logo">MarmoSys</a>
+            <a href="#" class="brand-logo center">MarmoSys</a>
         </div>
     </nav>
 

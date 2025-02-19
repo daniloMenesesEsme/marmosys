@@ -13,7 +13,7 @@
         <div class="nav-wrapper">
             <div class="container">
                 <a href="#" data-target="slide-out" class="sidenav-trigger"><i class="material-icons">menu</i></a>
-                <a href="{{ url('/dashboard') }}" class="brand-logo">{{ config('app.name') }}</a>
+                <a href="{{ url('/dashboard') }}" class="brand-logo center">{{ config('app.name') }}</a>
                 <ul class="right hide-on-med-and-down">
                     <li><a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                         <i class="material-icons left">exit_to_app</i>Sair
