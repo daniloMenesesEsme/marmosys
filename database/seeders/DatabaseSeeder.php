@@ -16,16 +16,14 @@ class DatabaseSeeder extends Seeder
 {
     public function run()
     {
+        $this->call([
+            UserSeeder::class,
+            ClientSeeder::class,
+        ]);
+
         try {
             DB::beginTransaction();
             
-            // Criar usuário admin
-            User::create([
-                'name' => 'Administrador',
-                'email' => 'admin@admin.com',
-                'password' => bcrypt('123456')
-            ]);
-
             // Criar categorias financeiras
             $categoriaReceita = FinancialCategory::create([
                 'nome' => 'Vendas',

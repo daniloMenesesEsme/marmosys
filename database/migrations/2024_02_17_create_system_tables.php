@@ -25,6 +25,7 @@ return new class extends Migration
             $table->string('nome');
             $table->string('tipo'); // receita ou despesa
             $table->boolean('ativo')->default(true);
+            $table->text('descricao')->nullable();
             $table->timestamps();
         });
 
@@ -45,6 +46,9 @@ return new class extends Migration
             $table->string('telefone')->nullable();
             $table->string('cpf_cnpj')->nullable();
             $table->text('endereco')->nullable();
+            $table->string('cidade')->nullable();
+            $table->string('estado')->nullable();
+            $table->string('cep')->nullable();
             $table->boolean('ativo')->default(true);
             $table->timestamps();
         });
@@ -56,7 +60,9 @@ return new class extends Migration
             $table->string('nome');
             $table->text('descricao')->nullable();
             $table->decimal('preco_venda', 10, 2);
-            $table->integer('estoque')->default(0);
+            $table->decimal('preco_custo', 10, 2)->default(0);
+            $table->decimal('estoque_minimo', 10, 2)->default(0);
+            $table->decimal('estoque', 10, 2)->default(0);
             $table->boolean('ativo')->default(true);
             $table->timestamps();
         });
@@ -117,6 +123,7 @@ return new class extends Migration
             $table->decimal('valor_atual', 10, 2)->default(0);
             $table->date('data_inicial');
             $table->date('data_final');
+            $table->decimal('percentual', 5, 2)->default(0);
             $table->string('status')->default('em_andamento'); // em_andamento, concluida, cancelada
             $table->text('observacoes')->nullable();
             $table->timestamps();

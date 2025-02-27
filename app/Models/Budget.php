@@ -12,16 +12,22 @@ class Budget extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'cliente_id',
+        'numero',
+        'data',
+        'previsao_entrega',
+        'client_id',
         'status',
         'valor_total',
-        'data_aprovacao',
-        'previsao_entrega',
-        'data_entrega',
-        'convertido_pedido'
+        'desconto',
+        'valor_final',
+        'data_validade',
+        'user_id',
+        'observacoes'
     ];
 
     protected $casts = [
+        'data' => 'date',
+        'previsao_entrega' => 'date',
         'data_validade' => 'date',
         'valor_total' => 'decimal:2',
         'desconto' => 'decimal:2',
@@ -30,25 +36,22 @@ class Budget extends Model
 
     protected $dates = [
         'data',
-        'deleted_at',
-        'data_aprovacao',
-        'previsao_entrega',
-        'data_entrega'
+        'data_validade'
     ];
+
+    public function client()
+    {
+        return $this->belongsTo(Client::class);
+    }
 
     public function rooms()
     {
-        return $this->hasMany(Room::class);
+        return $this->hasMany(BudgetRoom::class);
     }
 
-    public function cliente()
+    public function user()
     {
-        return $this->belongsTo(Cliente::class);
-    }
-
-    public function order()
-    {
-        return $this->hasOne(Order::class);
+        return $this->belongsTo(User::class);
     }
 
     public function getStatusTextAttribute()
@@ -76,7 +79,7 @@ class Budget extends Model
     public function recalcularTotal()
     {
         $this->valor_total = $this->rooms->sum('valor_total');
-        $this->valor_final = $this->valor_total - $this->desconto;
+        $this->valor_final = $this->valor_total - ($this->desconto ?? 0);
         $this->save();
     }
 

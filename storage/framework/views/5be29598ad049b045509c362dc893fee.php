@@ -1,5 +1,3 @@
-
-
 <?php $__env->startSection('title', 'Novo Orçamento'); ?>
 
 <?php $__env->startPush('styles'); ?>
@@ -46,6 +44,17 @@
     .datepicker-done {
         color: #2196f3;
     }
+    .ambiente-total {
+        font-size: 1.2rem;
+        font-weight: bold;
+        margin-right: 1rem;
+    }
+    .remove-item:hover, .remove-ambiente:hover {
+        background-color: #f44336 !important;
+    }
+    .material-select {
+        width: 100% !important;
+    }
 </style>
 <?php $__env->stopPush(); ?>
 
@@ -56,242 +65,239 @@
             <div class="card-content">
                 <span class="card-title">Novo Orçamento</span>
 
-                <form action="<?php echo e(route('financial.budgets.store')); ?>" method="POST" id="budget-form">
+                <?php
+                    \Log::info('Dados do formulário:', request()->all());
+                ?>
+
+                <form id="budget-form" action="<?php echo e(route('financial.budgets.store')); ?>" method="POST">
                     <?php echo csrf_field(); ?>
                     
                     <div class="row">
-                        <div class="input-field col s12 m6">
+                        <div class="input-field col s12 m3">
+                            <input type="text" id="numero" name="numero" value="<?php echo e($numero); ?>" readonly>
+                            <label for="numero">Número do Orçamento</label>
+                        </div>
+
+                        <div class="input-field col s12 m3">
+                            <input type="date" id="data" name="data" value="<?php echo e(date('Y-m-d')); ?>" required>
+                            <label for="data">Data do Orçamento</label>
+                        </div>
+
+                        <div class="input-field col s12 m3">
+                            <input type="date" id="previsao_entrega" name="previsao_entrega" required>
+                            <label for="previsao_entrega">Previsão de Entrega</label>
+                        </div>
+
+                        <div class="input-field col s12 m3">
                             <select name="client_id" id="client_id" required>
                                 <option value="" disabled selected>Selecione o cliente</option>
                                 <?php $__currentLoopData = $clients; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $client): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                    <option value="<?php echo e($client->id); ?>" <?php echo e(old('client_id') == $client->id ? 'selected' : ''); ?>>
+                                    <option value="<?php echo e($client->id); ?>" 
+                                            data-endereco="<?php echo e($client->endereco); ?>"
+                                            data-telefone="<?php echo e($client->telefone); ?>"
+                                            <?php echo e(old('client_id') == $client->id ? 'selected' : ''); ?>>
                                         <?php echo e($client->nome); ?>
 
                                     </option>
                                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </select>
                             <label for="client_id">Cliente*</label>
-                            <?php $__errorArgs = ['client_id'];
-$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
-if ($__bag->has($__errorArgs[0])) :
-if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?> <span class="red-text"><?php echo e($message); ?></span> <?php unset($message);
-if (isset($__messageOriginal)) { $message = $__messageOriginal; }
-endif;
-unset($__errorArgs, $__bag); ?>
                         </div>
-
-                        <div class="input-field col s12 m6">
-                            <input type="text" id="previsao_entrega" name="previsao_entrega" class="datepicker" value="<?php echo e(old('previsao_entrega')); ?>" required>
-                            <label for="previsao_entrega">Previsão de Entrega*</label>
-                            <?php $__errorArgs = ['previsao_entrega'];
-$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
-if ($__bag->has($__errorArgs[0])) :
-if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?> <span class="red-text"><?php echo e($message); ?></span> <?php unset($message);
-if (isset($__messageOriginal)) { $message = $__messageOriginal; }
-endif;
-unset($__errorArgs, $__bag); ?>
-                        </div>
-                    </div>
-
-                    <div id="ambientes-container">
-                        <!-- Os ambientes serão adicionados aqui dinamicamente -->
                     </div>
 
                     <div class="row">
                         <div class="col s12">
-                            <button type="button" id="add-ambiente" class="btn waves-effect waves-light green">
+                            <div id="client-info" style="display: none;">
+                                <p><strong>Endereço:</strong> <span id="client-endereco"></span></p>
+                                <p><strong>Telefone:</strong> <span id="client-telefone"></span></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="rooms-container"></div>
+
+                    <div class="row">
+                        <div class="col s12">
+                            <button type="button" class="btn waves-effect waves-light blue add-room">
                                 <i class="material-icons left">add</i>
                                 Adicionar Ambiente
                             </button>
                         </div>
                     </div>
 
-                    <div class="row">
-                        <div class="col s12">
-                            <button type="submit" class="btn waves-effect waves-light blue">
-                                <i class="material-icons left">save</i>
-                                Salvar Orçamento
-                            </button>
-                            <a href="<?php echo e(route('financial.budgets.index')); ?>" class="btn waves-effect waves-light red">
-                                <i class="material-icons left">cancel</i>
-                                Cancelar
-                            </a>
-                        </div>
+                    <div class="card-action">
+                        <button type="submit" class="btn waves-effect waves-light">
+                            <i class="material-icons left">save</i>
+                            Salvar Orçamento
+                        </button>
+                        
+                        <a href="<?php echo e(route('financial.budgets.index')); ?>" class="btn waves-effect waves-light red">
+                            <i class="material-icons left">cancel</i>
+                            Cancelar
+                        </a>
                     </div>
                 </form>
+
+                <button type="button" onclick="debugForm()">Debug Form</button>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Adicione isso logo após o início do form -->
+<template id="item-template">
+    <div class="item-row">
+        <div class="row">
+            <div class="input-field col s12 m3">
+                <select name="rooms[{ROOM_INDEX}][items][{ITEM_INDEX}][material_id]" class="material-select" required>
+                    <option value="" disabled selected>Selecione o material</option>
+                    <?php $__currentLoopData = $materiais; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $material): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <option value="<?php echo e($material->id); ?>" data-preco="<?php echo e($material->preco_venda); ?>">
+                            <?php echo e($material->nome); ?>
+
+                        </option>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                </select>
+                <label>Material*</label>
+            </div>
+
+            <div class="input-field col s6 m2">
+                <input type="number" name="rooms[{ROOM_INDEX}][items][{ITEM_INDEX}][quantidade]" step="0.001" min="0.001" required>
+                <label>Quantidade*</label>
+            </div>
+
+            <div class="input-field col s6 m1">
+                <select name="rooms[{ROOM_INDEX}][items][{ITEM_INDEX}][unidade]" required>
+                    <option value="m²">m²</option>
+                    <option value="ml">ml</option>
+                    <option value="pç">pç</option>
+                </select>
+                <label>Unid.*</label>
+            </div>
+
+            <div class="input-field col s6 m2">
+                <input type="number" name="rooms[{ROOM_INDEX}][items][{ITEM_INDEX}][largura]" step="0.001" min="0" required>
+                <label>Largura (m)*</label>
+            </div>
+
+            <div class="input-field col s6 m2">
+                <input type="number" name="rooms[{ROOM_INDEX}][items][{ITEM_INDEX}][altura]" step="0.001" min="0" required>
+                <label>Altura (m)*</label>
+            </div>
+
+            <div class="col s12 m2">
+                <button type="button" class="btn-floating red remove-item">
+                    <i class="material-icons">remove</i>
+                </button>
+            </div>
+        </div>
+    </div>
+</template>
 <?php $__env->stopSection(); ?>
 
 <?php $__env->startPush('scripts'); ?>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Inicialização do select e datepicker
-    var selects = document.querySelectorAll('select');
-    M.FormSelect.init(selects);
-
-    var datepicker = document.querySelectorAll('.datepicker');
-    M.Datepicker.init(datepicker, {
-        format: 'dd/mm/yyyy',
-        i18n: {
-            months: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
-            monthsShort: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
-            weekdays: ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'],
-            weekdaysShort: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'],
-            weekdaysAbbrev: ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'],
-            today: 'Hoje',
-            clear: 'Limpar',
-            cancel: 'Cancelar',
-            done: 'OK'
-        }
-    });
-
-    // Função para criar linha de item
-    function createItemRow(ambienteIndex, itemIndex) {
-        return `
-            <div class="row item-row">
-                <input type="hidden" name="rooms[${ambienteIndex}][items][${itemIndex}][id]" value="">
-                
-                <div class="input-field col s12 m3">
-                    <select name="rooms[${ambienteIndex}][items][${itemIndex}][material_id]" required>
-                        <option value="" disabled selected>Selecione o material</option>
-                        <?php $__currentLoopData = $materiais; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $material): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                            <option value="<?php echo e($material['id']); ?>" data-preco="<?php echo e($material['preco_padrao']); ?>">
-                                <?php echo e($material['nome']); ?>
-
-                            </option>
-                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                    </select>
-                    <label>Material*</label>
-                </div>
-
-                <div class="input-field col s6 m2">
-                    <input type="number" name="rooms[${ambienteIndex}][items][${itemIndex}][largura]" 
-                           step="0.01" min="0" required class="validate">
-                    <label>Largura (m)*</label>
-                </div>
-
-                <div class="input-field col s6 m2">
-                    <input type="number" name="rooms[${ambienteIndex}][items][${itemIndex}][altura]" 
-                           step="0.01" min="0" required class="validate">
-                    <label>Altura (m)*</label>
-                </div>
-
-                <div class="input-field col s6 m2">
-                    <input type="number" name="rooms[${ambienteIndex}][items][${itemIndex}][quantidade]" 
-                           min="1" value="1" required class="validate">
-                    <label>Quantidade*</label>
-                </div>
-
-                <div class="input-field col s6 m2">
-                    <input type="number" name="rooms[${ambienteIndex}][items][${itemIndex}][valor_unitario]" 
-                           step="0.01" min="0" required class="validate">
-                    <label>Valor Unitário (R$)*</label>
-                </div>
-
-                <div class="col s12 m1">
-                    <button type="button" class="btn-floating waves-effect waves-light red remove-item">
-                        <i class="material-icons">remove</i>
-                    </button>
-                </div>
-            </div>
-        `;
-    }
-
-    // Função para criar linha de ambiente
-    function createAmbienteRow() {
-        const ambienteDiv = document.createElement('div');
-        ambienteDiv.className = 'ambiente-container card-panel';
-        ambienteDiv.innerHTML = `
-            <div class="row">
-                <div class="input-field col s12 m6">
-                    <input type="text" name="rooms[${ambienteCount}][nome]" required class="validate">
-                    <label>Nome do Ambiente*</label>
-                </div>
-                <div class="col s12 m6 right-align">
-                    <button type="button" class="btn-floating waves-effect waves-light green add-item">
+    let roomIndex = 0;
+    
+    // Adiciona ambiente
+    document.querySelector('.add-room').addEventListener('click', function() {
+        const roomTemplate = `
+            <div class="room-card card">
+                <div class="card-content">
+                    <div class="row">
+                        <div class="input-field col s12">
+                            <input type="text" name="rooms[${roomIndex}][nome]" class="room-name" required>
+                            <label>Nome do Ambiente*</label>
+                        </div>
+                    </div>
+                    <div class="items-container"></div>
+                    <button type="button" class="btn-floating green add-item">
                         <i class="material-icons">add</i>
                     </button>
-                    <button type="button" class="btn-floating waves-effect waves-light red remove-ambiente">
+                </div>
+                <div class="card-action">
+                    <button type="button" class="btn-floating red remove-room">
                         <i class="material-icons">delete</i>
                     </button>
                 </div>
             </div>
-            <div class="items-container"></div>
         `;
-
-        const itemsContainer = ambienteDiv.querySelector('.items-container');
-        let itemCount = 0;
-
-        ambienteDiv.querySelector('.add-item').addEventListener('click', function() {
-            const itemHtml = createItemRow(ambienteCount, itemCount);
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = itemHtml;
-            itemsContainer.appendChild(tempDiv.firstElementChild);
-            
-            // Inicializar novos selects
-            M.FormSelect.init(tempDiv.querySelectorAll('select'));
-            itemCount++;
-        });
-
-        ambienteDiv.querySelector('.remove-ambiente').addEventListener('click', function() {
-            if (confirm('Tem certeza que deseja remover este ambiente?')) {
-                ambienteDiv.remove();
-            }
-        });
-
-        return ambienteDiv;
-    }
-
-    // Adicionar ambiente
-    const addAmbienteButton = document.getElementById('add-ambiente');
-    const ambientesContainer = document.getElementById('ambientes-container');
-    let ambienteCount = 0;
-
-    addAmbienteButton.addEventListener('click', function() {
-        const ambienteDiv = createAmbienteRow();
-        ambientesContainer.appendChild(ambienteDiv);
         
-        // Adicionar primeiro item automaticamente
-        ambienteDiv.querySelector('.add-item').click();
-        
-        ambienteCount++;
+        document.querySelector('.rooms-container').insertAdjacentHTML('beforeend', roomTemplate);
+        M.updateTextFields();
+        roomIndex++;
     });
 
-    // Adicionar primeiro ambiente automaticamente
-    addAmbienteButton.click();
+    // Adiciona item
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.add-item')) {
+            const roomCard = e.target.closest('.room-card');
+            const roomIndex = Array.from(document.querySelectorAll('.room-card')).indexOf(roomCard);
+            const itemsContainer = roomCard.querySelector('.items-container');
+            const itemIndex = itemsContainer.querySelectorAll('.item-row').length;
+            
+            const template = document.getElementById('item-template').innerHTML
+                .replace(/{ROOM_INDEX}/g, roomIndex)
+                .replace(/{ITEM_INDEX}/g, itemIndex);
+            
+            itemsContainer.insertAdjacentHTML('beforeend', template);
+            
+            // Inicializa os selects do novo item
+            M.FormSelect.init(itemsContainer.querySelectorAll('select'));
+            M.updateTextFields();
+        }
+    });
 
-    // Validação do formulário antes de enviar
+    // Remove item/ambiente
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.remove-item')) {
+            e.target.closest('.item-row').remove();
+        } else if (e.target.closest('.remove-room')) {
+            e.target.closest('.room-card').remove();
+        }
+    });
+
+    // Submit do formulário
     document.getElementById('budget-form').addEventListener('submit', function(e) {
         e.preventDefault();
         
-        // Verificar se há pelo menos um ambiente
-        if (document.querySelectorAll('.ambiente-container').length === 0) {
-            M.toast({html: 'Adicione pelo menos um ambiente!'});
-            return false;
+        const rooms = document.querySelectorAll('.room-card');
+        if (rooms.length === 0) {
+            M.toast({html: 'Adicione pelo menos um ambiente'});
+            return;
         }
 
-        // Verificar se todos os campos obrigatórios estão preenchidos
-        const requiredFields = this.querySelectorAll('[required]');
         let valid = true;
-
-        requiredFields.forEach(field => {
-            if (!field.value) {
+        rooms.forEach(room => {
+            const items = room.querySelectorAll('.item-row');
+            if (items.length === 0) {
+                M.toast({html: `O ambiente ${room.querySelector('.room-name').value} precisa ter pelo menos um item`});
                 valid = false;
-                field.classList.add('invalid');
-                M.toast({html: 'Preencha todos os campos obrigatórios!'});
             }
         });
 
-        if (valid) {
-            this.submit();
+        if (!valid) return;
+        if (!this.checkValidity()) {
+            M.toast({html: 'Preencha todos os campos obrigatórios'});
+            return;
         }
+
+        this.submit();
     });
+
+    // Adiciona primeiro ambiente automaticamente
+    document.querySelector('.add-room').click();
 });
+
+function debugForm() {
+    const form = document.getElementById('budget-form');
+    console.log('Form Data:', new FormData(form));
+    console.log('Rooms:', document.querySelectorAll('.room-card').length);
+    console.log('Items:', document.querySelectorAll('.item-row').length);
+    // Tenta enviar o formulário diretamente
+    form.submit();
+}
 </script>
 <?php $__env->stopPush(); ?>
 <?php echo $__env->make('layouts.app', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\laragon\www\marmosys\resources\views/financial/budgets/create.blade.php ENDPATH**/ ?>

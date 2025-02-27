@@ -9,27 +9,15 @@ class BudgetMaterialSeeder extends Seeder
 {
     public function run()
     {
-        $materials = [
-            [
-                'nome' => 'Granito Preto São Gabriel',
-                'preco_padrao' => 350.00,
-                'unidade_medida' => 'm²'
-            ],
-            [
-                'nome' => 'Mármore Branco Carrara',
-                'preco_padrao' => 450.00,
-                'unidade_medida' => 'm²'
-            ],
-            [
-                'nome' => 'Granito Cinza Corumbá',
-                'preco_padrao' => 280.00,
-                'unidade_medida' => 'm²'
-            ],
-            // Adicione mais materiais conforme necessário
-        ];
+        BudgetMaterial::create([
+            'codigo' => 'MAT001',
+            'nome' => 'Granito Preto São Gabriel',
+            'descricao' => 'Granito preto com cristais médios',
+            'preco_venda' => 350.00,
+            'unidade_medida' => 'm²',
+            'ativo' => true
+        ]);
 
-        foreach ($materials as $material) {
-            BudgetMaterial::create($material);
-        }
+        // Adicione mais materiais conforme necessário
     }
 } 

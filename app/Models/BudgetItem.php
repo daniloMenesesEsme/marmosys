@@ -10,20 +10,32 @@ class BudgetItem extends Model
     use HasFactory;
 
     protected $fillable = [
-        'budget_id',
-        'descricao',
+        'budget_room_id',
+        'material_id',
         'quantidade',
         'unidade',
-        'valor_unitario'
+        'descricao',
+        'largura',
+        'altura',
+        'valor_unitario',
+        'valor_total'
     ];
 
     protected $casts = [
-        'quantidade' => 'decimal:2',
-        'valor_unitario' => 'decimal:2'
+        'quantidade' => 'decimal:3',
+        'largura' => 'decimal:3',
+        'altura' => 'decimal:3',
+        'valor_unitario' => 'decimal:2',
+        'valor_total' => 'decimal:2'
     ];
 
-    public function budget()
+    public function room()
     {
-        return $this->belongsTo(Budget::class);
+        return $this->belongsTo(BudgetRoom::class, 'budget_room_id');
+    }
+
+    public function material()
+    {
+        return $this->belongsTo(BudgetMaterial::class, 'material_id');
     }
 } 

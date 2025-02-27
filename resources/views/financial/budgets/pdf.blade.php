@@ -1,140 +1,155 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
-    <meta charset="utf-8">
-    <title>Orçamento #{{ $budget->numero }}</title>
+    <meta charset="UTF-8">
+    <title>Orçamento {{ $budget->numero }}</title>
     <style>
+        @page {
+            margin: 2cm;
+        }
         body {
             font-family: Arial, sans-serif;
-            line-height: 1.6;
-            color: #333;
+            font-size: 12px;
+            line-height: 1.3;
         }
         .header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 10px;
         }
         .logo {
-            max-width: 200px;
+            max-width: 150px;
+            margin-bottom: 10px;
+        }
+        .company-info {
             margin-bottom: 20px;
         }
-        .budget-info {
-            margin-bottom: 30px;
-            padding: 15px;
-            background: #f9f9f9;
-            border-radius: 5px;
-        }
         .client-info {
-            margin-bottom: 30px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            background-color: #f9f9f9;
         }
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
+            page-break-inside: auto;
+        }
+        tr {
+            page-break-inside: avoid;
+            page-break-after: auto;
         }
         th, td {
-            padding: 10px;
-            border: 1px solid #ddd;
+            border: 1px solid #ccc;
+            padding: 5px;
             text-align: left;
+            font-size: 10px;
         }
         th {
-            background-color: #2196f3;
-            color: white;
+            background-color: #f5f5f5;
         }
         .room-title {
-            background-color: #e3f2fd;
-            padding: 10px;
-            margin: 20px 0 10px;
+            background-color: #eee;
+            padding: 5px;
+            margin: 10px 0;
+        }
+        .subtotal {
+            text-align: right;
             font-weight: bold;
         }
         .total {
             text-align: right;
-            font-size: 1.2em;
-            font-weight: bold;
             margin-top: 20px;
+            border-top: 2px solid #000;
+            padding-top: 10px;
         }
         .footer {
-            margin-top: 50px;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
             text-align: center;
-            font-size: 0.9em;
-            color: #666;
-        }
-        .conditions {
-            margin: 30px 0;
-            font-size: 0.9em;
+            font-size: 10px;
+            border-top: 1px solid #ccc;
+            padding-top: 5px;
         }
     </style>
 </head>
 <body>
     <div class="header">
-        <img src="{{ public_path('images/logo.png') }}" class="logo" alt="MarmoSys">
-        <h1>Orçamento #{{ $budget->numero }}</h1>
+        <img src="{{ public_path('images/logo.png') }}" alt="Logo" class="logo">
+        <h2>Angular Granitos - Fábrica</h2>
+        <p>CNPJ: 29.123.952/0001-84</p>
+        <p>RUA QUINTINO CUNHA, 2950 - CAUCAIA - CE</p>
+        <p>Fone: 85 9 9915-2076</p>
+        <p>angulargranitos@outlook.com</p>
     </div>
 
-    <div class="budget-info">
-        <p><strong>Data:</strong> {{ $budget->created_at->format('d/m/Y') }}</p>
-        <p><strong>Previsão de Entrega:</strong> {{ Carbon\Carbon::parse($budget->previsao_entrega)->format('d/m/Y') }}</p>
-        <p><strong>Status:</strong> {{ $budget->status_text }}</p>
+    <div class="company-info">
+        <h3>Orçamento Nº {{ $budget->numero }} - {{ $budget->data->format('d/m/Y') }}</h3>
     </div>
 
     <div class="client-info">
-        <h3>Dados do Cliente</h3>
-        <p><strong>Nome:</strong> {{ $budget->client->nome }}</p>
-        <p><strong>Telefone:</strong> {{ $budget->client->telefone }}</p>
-        <p><strong>Email:</strong> {{ $budget->client->email }}</p>
-        <p><strong>Endereço:</strong> {{ $budget->client->endereco }}</p>
+        <h4>Dados do Cliente</h4>
+        <table>
+            <tr>
+                <td><strong>Nome:</strong> {{ $budget->client->nome }}</td>
+                <td><strong>CPF/CNPJ:</strong> {{ $budget->client->cpf_cnpj ?? 'Não informado' }}</td>
+            </tr>
+            <tr>
+                <td><strong>Endereço:</strong> {{ $budget->client->endereco ?? 'Não informado' }}</td>
+                <td><strong>Telefone:</strong> {{ $budget->client->telefone ?? 'Não informado' }}</td>
+            </tr>
+        </table>
     </div>
 
     @foreach($budget->rooms as $room)
-    <div class="room">
-        <div class="room-title">{{ $room->nome }}</div>
+        <div class="room-title">
+            <h4>{{ $room->nome }}</h4>
+        </div>
         <table>
             <thead>
                 <tr>
-                    <th>Material</th>
-                    <th>Dimensões</th>
-                    <th>Quantidade</th>
-                    <th>Valor Unit.</th>
-                    <th>Total</th>
+                    <th>Qtde</th>
+                    <th>Unid</th>
+                    <th>Descrição do Produto / Serviço</th>
+                    <th>Dimens (m)</th>
+                    <th>Produto</th>
+                    <th>Serviço</th>
+                    <th>Valor Total</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach($room->items as $item)
-                <tr>
-                    <td>{{ $item->material->nome }}</td>
-                    <td>{{ number_format($item->largura, 2, ',', '.') }}m x {{ number_format($item->altura, 2, ',', '.') }}m</td>
-                    <td>{{ $item->quantidade }}</td>
-                    <td>R$ {{ number_format($item->valor_unitario, 2, ',', '.') }}</td>
-                    <td>R$ {{ number_format($item->valor_total, 2, ',', '.') }}</td>
-                </tr>
+                    <tr>
+                        <td>{{ number_format($item->quantidade, 3, ',', '.') }}</td>
+                        <td>{{ $item->unidade }}</td>
+                        <td>{{ $item->material->nome }}</td>
+                        <td>{{ number_format($item->largura, 2, ',', '.') }} x {{ number_format($item->altura, 2, ',', '.') }}</td>
+                        <td>{{ number_format($item->valor_unitario, 2, ',', '.') }}</td>
+                        <td></td>
+                        <td>{{ number_format($item->valor_total, 2, ',', '.') }}</td>
+                    </tr>
                 @endforeach
-            </tbody>
-            <tfoot>
                 <tr>
-                    <td colspan="4" style="text-align: right"><strong>Subtotal do Ambiente:</strong></td>
-                    <td><strong>R$ {{ number_format($room->valor_total, 2, ',', '.') }}</strong></td>
+                    <td colspan="6" class="subtotal">Subtotal:</td>
+                    <td>{{ number_format($room->valor_total, 2, ',', '.') }}</td>
                 </tr>
-            </tfoot>
+            </tbody>
         </table>
-    </div>
     @endforeach
 
     <div class="total">
-        <p>Valor Total: R$ {{ number_format($budget->valor_total, 2, ',', '.') }}</p>
-    </div>
-
-    <div class="conditions">
-        <h3>Condições Gerais</h3>
-        <ul>
-            <li>Validade do orçamento: 15 dias</li>
-            <li>Forma de pagamento: 50% na aprovação e 50% na entrega</li>
-            <li>Prazo de entrega: conforme acordado após aprovação</li>
-        </ul>
+        <p><strong>Valor Total:</strong> R$ {{ number_format($budget->valor_total, 2, ',', '.') }}</p>
+        <p><strong>Desconto:</strong> R$ {{ number_format($budget->desconto, 2, ',', '.') }}</p>
+        <p><strong>Valor Final:</strong> R$ {{ number_format($budget->valor_final, 2, ',', '.') }}</p>
     </div>
 
     <div class="footer">
-        <p>MarmoSys - Excelência em Mármores e Granitos</p>
-        <p>Telefone: (XX) XXXX-XXXX | Email: contato@marmosys.com.br</p>
-        <p>{{ config('app.address', 'Endereço da Empresa') }}</p>
+        <p>Validade do Orçamento: {{ $budget->data_validade->format('d/m/Y') }}</p>
+        <p>Este orçamento foi gerado em {{ now()->format('d/m/Y H:i:s') }}</p>
     </div>
 </body>
 </html> 

@@ -23,59 +23,46 @@
     <div class="col s12">
         <div class="card">
             <div class="card-content">
-                <div class="row">
-                    <div class="col s6">
-                        <span class="card-title">Orçamentos</span>
-                    </div>
-                    <div class="col s6 right-align no-print">
-                        <a href="{{ route('financial.budgets.create') }}" class="btn waves-effect waves-light blue">
-                            <i class="material-icons left">add</i>
-                            Novo Orçamento
-                        </a>
-                    </div>
-                </div>
-
-                <table class="striped">
+                <span class="card-title">Orçamentos</span>
+                
+                <table class="striped responsive-table">
                     <thead>
                         <tr>
-                            <th>Cliente</th>
+                            <th>Número</th>
                             <th>Data</th>
-                            <th>Status</th>
+                            <th>Cliente</th>
+                            <th>Telefone</th>
                             <th>Valor Total</th>
-                            <th class="no-print">Ações</th>
+                            <th>Status</th>
+                            <th>Ações</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($budgets as $budget)
                             <tr>
+                                <td>{{ $budget->numero }}</td>
+                                <td>{{ $budget->data->format('d/m/Y') }}</td>
                                 <td>{{ $budget->client->nome }}</td>
-                                <td>{{ $budget->created_at->format('d/m/Y') }}</td>
+                                <td>{{ $budget->client->telefone }}</td>
+                                <td>R$ {{ number_format($budget->valor_total, 2, ',', '.') }}</td>
                                 <td>
                                     <span class="chip {{ $budget->status_class }}">
                                         {{ $budget->status_text }}
                                     </span>
                                 </td>
-                                <td>R$ {{ number_format($budget->valor_total, 2, ',', '.') }}</td>
-                                <td class="action-buttons no-print">
-                                    <a href="{{ route('financial.budgets.show', $budget) }}" 
+                                <td>
+                                    <a href="{{ route('financial.budgets.show', $budget) }}"
                                        class="btn-floating waves-effect waves-light blue tooltipped"
                                        data-position="top" 
                                        data-tooltip="Visualizar">
                                         <i class="material-icons">visibility</i>
                                     </a>
                                     
-                                    <a href="{{ route('financial.budgets.edit', $budget) }}" 
-                                       class="btn-floating waves-effect waves-light orange tooltipped"
+                                    <a href="{{ route('financial.budgets.edit', $budget) }}"
+                                       class="btn-floating waves-effect waves-light green tooltipped"
                                        data-position="top" 
                                        data-tooltip="Editar">
                                         <i class="material-icons">edit</i>
-                                    </a>
-                                    
-                                    <a href="#" onclick="printBudget({{ $budget->id }})"
-                                       class="btn-floating waves-effect waves-light green tooltipped"
-                                       data-position="top" 
-                                       data-tooltip="Imprimir">
-                                        <i class="material-icons">print</i>
                                     </a>
                                     
                                     <a href="{{ route('financial.budgets.pdf', $budget) }}"
@@ -85,31 +72,37 @@
                                         <i class="material-icons">picture_as_pdf</i>
                                     </a>
                                     
-                                    <a href="mailto:?subject=Orçamento {{ $budget->id }}&body=Segue em anexo o orçamento solicitado."
-                                       class="btn-floating waves-effect waves-light blue-grey tooltipped"
-                                       data-position="top" 
-                                       data-tooltip="Enviar por E-mail">
-                                        <i class="material-icons">email</i>
-                                    </a>
-
-                                    <button type="button" 
-                                            onclick="confirmDelete('{{ $budget->id }}')" 
-                                            class="btn-floating waves-effect waves-light red tooltipped"
-                                            data-position="top" 
-                                            data-tooltip="Excluir">
-                                        <i class="material-icons">delete</i>
-                                    </button>
+                                    <form action="{{ route('financial.budgets.destroy', $budget) }}" 
+                                          method="POST" 
+                                          style="display: inline;"
+                                          onsubmit="return confirm('Tem certeza que deseja excluir este orçamento?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" 
+                                                class="btn-floating waves-effect waves-light red tooltipped"
+                                                data-position="top"
+                                                data-tooltip="Excluir">
+                                            <i class="material-icons">delete</i>
+                                        </button>
+                                    </form>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="center-align">Nenhum orçamento encontrado</td>
+                                <td colspan="7" class="center">Nenhum orçamento encontrado.</td>
                             </tr>
                         @endforelse
                     </tbody>
                 </table>
 
                 {{ $budgets->links() }}
+            </div>
+            <div class="card-action">
+                <a href="{{ route('financial.budgets.create') }}" 
+                   class="btn waves-effect waves-light">
+                    <i class="material-icons left">add</i>
+                    Novo Orçamento
+                </a>
             </div>
         </div>
     </div>

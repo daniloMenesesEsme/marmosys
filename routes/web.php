@@ -1,12 +1,12 @@
 <?php
 
+use App\Http\Controllers\Financial\BudgetController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\ProductController;  // Adicionado
-use App\Http\Controllers\BudgetController;
 use App\Http\Controllers\FinancialCategoryController;
 use App\Http\Controllers\FinancialAccountController;
 use App\Http\Controllers\FinancialReportController;
@@ -85,14 +85,12 @@ Route::middleware('auth')->group(function () {
         Route::post('goals/update-status', [FinancialGoalController::class, 'updateStatus'])
             ->name('goals.update-status');
 
-        // Rotas de Orçamentos
-        Route::resource('budgets', BudgetController::class);
-        
-        // Se você precisar da rota de cópia, adicione:
-        Route::post('budgets/copy', [BudgetController::class, 'copy'])->name('budgets.copy');
-
-        Route::get('/budgets/{budget}/pdf', [BudgetController::class, 'generatePdf'])->name('budgets.pdf');
-        Route::get('/budgets/{budget}/print', [BudgetController::class, 'printView'])->name('budgets.print');
+        // Orçamentos
+        Route::resource('budgets', \App\Http\Controllers\Financial\BudgetController::class);
+        Route::get('budgets/{budget}/pdf', [\App\Http\Controllers\Financial\BudgetController::class, 'generatePdf'])
+            ->name('budgets.pdf');
+        Route::get('budgets/{budget}/print', [\App\Http\Controllers\Financial\BudgetController::class, 'printView'])
+            ->name('budgets.print');
     });
 
     Route::get('/materials/search', [MaterialController::class, 'search'])->name('materials.search');
