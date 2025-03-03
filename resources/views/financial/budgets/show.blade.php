@@ -1,4 +1,3 @@
-
 @extends('layouts.app')
 
 @section('title', 'Detalhes do Orçamento')
@@ -75,39 +74,122 @@
                     </div>
                 </div>
 
-                <div class="card-action">
-                    <a href="{{ route('financial.budgets.edit', $budget) }}" 
-                       class="btn waves-effect waves-light">
+                <div class="card-action" style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <a href="{{ route('financial.budgets.edit', $budget) }}" class="btn waves-effect waves-light teal">
                         <i class="material-icons left">edit</i>
-                        Editar
+                        EDITAR
                     </a>
                     
-                    <a href="{{ route('financial.budgets.pdf', $budget) }}" 
-                       class="btn waves-effect waves-light purple">
+                    <a href="{{ route('financial.budgets.pdf', $budget) }}" class="btn purple waves-effect waves-light">
                         <i class="material-icons left">picture_as_pdf</i>
-                        Gerar PDF
+                        GERAR PDF
                     </a>
                     
-                    <a href="{{ route('financial.budgets.print', $budget) }}" 
-                       class="btn waves-effect waves-light blue-grey">
+                    <button onclick="window.print()" class="btn blue waves-effect waves-light">
                         <i class="material-icons left">print</i>
-                        Imprimir
+                        IMPRIMIR
+                    </button>
+
+                    <a href="#" class="btn red waves-effect waves-light" onclick="event.preventDefault(); if(confirm('Tem certeza?')) document.getElementById('form-delete').submit();">
+                        <i class="material-icons left">delete</i>
+                        EXCLUIR
                     </a>
-                    
-                    <form action="{{ route('financial.budgets.destroy', $budget) }}" 
-                          method="POST" 
-                          style="display: inline;"
-                          onsubmit="return confirm('Tem certeza que deseja excluir este orçamento?')">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn waves-effect waves-light red">
-                            <i class="material-icons left">delete</i>
-                            Excluir
+
+                    @if($budget->status === 'aguardando_aprovacao')
+                        <button type="button" onclick="aprovarOrcamento()" class="btn green waves-effect waves-light">
+                            <i class="material-icons left">check</i>
+                            APROVAR
                         </button>
-                    </form>
+
+                        <button type="button" class="btn red waves-effect waves-light modal-trigger" data-target="modal-rejeitar">
+                            <i class="material-icons left">close</i>
+                            REJEITAR
+                        </button>
+                    @endif
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<form id="form-aprovar" action="{{ route('financial.budgets.approve', $budget) }}" method="POST" style="display: none;">
+    @csrf
+    <input type="hidden" name="action" value="approve">
+</form>
+
+<form id="form-delete" action="{{ route('financial.budgets.destroy', $budget) }}" method="POST" style="display: none;">
+    @csrf
+    @method('DELETE')
+</form>
+
+<script>
+function aprovarOrcamento() {
+    if(confirm('Tem certeza que deseja aprovar este orçamento?')) {
+        document.getElementById('form-aprovar').submit();
+    }
+}
+</script>
+
+<!-- Modal de Rejeição -->
+<div id="modal-rejeitar" class="modal">
+    <form method="POST" action="{{ route('financial.budgets.approve', $budget) }}">
+        @csrf
+        <input type="hidden" name="action" value="reject">
+        <div class="modal-content">
+            <h4>Rejeitar Orçamento</h4>
+            <div class="input-field">
+                <textarea name="motivo_reprovacao" class="materialize-textarea" required></textarea>
+                <label>Motivo da Rejeição</label>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <a href="#!" class="modal-close waves-effect waves-red btn-flat">Cancelar</a>
+            <button type="submit" class="waves-effect waves-light btn red">Confirmar</button>
+        </div>
+    </form>
+</div>
+
+<!-- Adicione este estilo para controlar o que será impresso -->
+<style type="text/css" media="print">
+    /* Oculta elementos desnecessários */
+    .card-action, .sidenav, .navbar-fixed, nav, footer {
+        display: none !important;
+    }
+
+    /* Configura página para retrato */
+    @page {
+        size: portrait;
+        margin: 20mm 15mm;
+    }
+
+    /* Ajusta o conteúdo do orçamento */
+    .container {
+        width: 100% !important;
+        max-width: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    .card {
+        box-shadow: none !important;
+        border: none !important;
+    }
+
+    /* Garante que todo conteúdo seja impresso */
+    .row {
+        page-break-inside: avoid;
+    }
+
+    /* Melhora legibilidade do texto */
+    body {
+        font-size: 12pt;
+        line-height: 1.3;
+    }
+
+    /* Ajusta tamanhos de títulos */
+    .card-title {
+        font-size: 16pt !important;
+        margin-bottom: 15px !important;
+    }
+</style>
 @endsection 

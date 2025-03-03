@@ -148,18 +148,18 @@
 <!-- Adicione isso logo após o início do form -->
 <template id="item-template">
     <div class="item-row">
-        <div class="row">
+                        <div class="row">
             <div class="input-field col s12 m3">
                 <select name="rooms[{ROOM_INDEX}][items][{ITEM_INDEX}][material_id]" class="material-select" required>
-                    <option value="" disabled selected>Selecione o material</option>
-                    @foreach($materiais as $material)
+                                    <option value="" disabled selected>Selecione o material</option>
+                                    @foreach($materiais as $material)
                         <option value="{{ $material->id }}" data-preco="{{ $material->preco_venda }}">
                             {{ $material->nome }}
                         </option>
-                    @endforeach
-                </select>
-                <label>Material*</label>
-            </div>
+                                    @endforeach
+                                </select>
+                                <label>Material*</label>
+                            </div>
 
             <div class="input-field col s6 m2">
                 <input type="number" name="rooms[{ROOM_INDEX}][items][{ITEM_INDEX}][quantidade]" step="0.001" min="0.001" required>
@@ -173,25 +173,25 @@
                     <option value="pç">pç</option>
                 </select>
                 <label>Unid.*</label>
-            </div>
+                        </div>
 
             <div class="input-field col s6 m2">
                 <input type="number" name="rooms[{ROOM_INDEX}][items][{ITEM_INDEX}][largura]" step="0.001" min="0" required>
-                <label>Largura (m)*</label>
-            </div>
+                                <label>Largura (m)*</label>
+                            </div>
 
             <div class="input-field col s6 m2">
                 <input type="number" name="rooms[{ROOM_INDEX}][items][{ITEM_INDEX}][altura]" step="0.001" min="0" required>
-                <label>Altura (m)*</label>
-            </div>
+                                <label>Altura (m)*</label>
+                            </div>
 
             <div class="col s12 m2">
                 <button type="button" class="btn-floating red remove-item">
-                    <i class="material-icons">remove</i>
-                </button>
+                            <i class="material-icons">remove</i>
+                        </button>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
 </template>
 @endsection
 
@@ -223,7 +223,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
             </div>
         `;
-        
+
         document.querySelector('.rooms-container').insertAdjacentHTML('beforeend', roomTemplate);
         M.updateTextFields();
         roomIndex++;
@@ -299,4 +299,4 @@ function debugForm() {
     form.submit();
 }
 </script>
-@endpush
+@endpush 

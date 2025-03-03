@@ -12,6 +12,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use PDF;
+use App\Models\ApprovalLog;
+use App\Models\CompanySetting;
 
 class BudgetController extends Controller
 {
@@ -141,8 +143,9 @@ class BudgetController extends Controller
 
     public function show(Budget $budget)
     {
+        $company = CompanySetting::first();
         $budget->load(['client', 'rooms.items.material']);
-        return view('financial.budgets.show', compact('budget'));
+        return view('financial.budgets.show', compact('budget', 'company'));
     }
 
     public function edit(Budget $budget)
@@ -288,5 +291,48 @@ class BudgetController extends Controller
     {
         $budget->load(['client', 'rooms.items.material']);
         return view('financial.budgets.print', compact('budget'));
+    }
+
+    public function approve(Request $request, Budget $budget)
+    {
+        if ($request->action === 'approve') {
+            $budget->update([
+                'status' => 'aprovado',
+                'approved_by' => auth()->id(),
+                'approved_at' => now()
+            ]);
+
+            // Registra o log de aprovação
+            ApprovalLog::create([
+                'budget_id' => $budget->id,
+                'user_id' => auth()->id(),
+                'action' => 'approve'
+            ]);
+
+            return redirect()
+                ->route('financial.budgets.show', $budget)
+                ->with('success', 'Orçamento aprovado com sucesso!');
+        }
+
+        $request->validate([
+            'motivo_reprovacao' => 'required|string'
+        ]);
+
+        $budget->update([
+            'status' => 'reprovado',
+            'motivo_reprovacao' => $request->motivo_reprovacao
+        ]);
+
+        // Registra o log de rejeição
+        ApprovalLog::create([
+            'budget_id' => $budget->id,
+            'user_id' => auth()->id(),
+            'action' => 'reject',
+            'motivo' => $request->motivo_reprovacao
+        ]);
+
+        return redirect()
+            ->route('financial.budgets.show', $budget)
+            ->with('success', 'Orçamento reprovado com sucesso!');
     }
 } 

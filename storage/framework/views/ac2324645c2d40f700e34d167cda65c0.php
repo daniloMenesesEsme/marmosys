@@ -73,40 +73,79 @@
                     </div>
                 </div>
 
-                <div class="card-action">
-                    <a href="<?php echo e(route('financial.budgets.edit', $budget)); ?>" 
-                       class="btn waves-effect waves-light">
+                <div class="card-action" style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <a href="<?php echo e(route('financial.budgets.edit', $budget)); ?>" class="btn waves-effect waves-light teal">
                         <i class="material-icons left">edit</i>
-                        Editar
+                        EDITAR
                     </a>
                     
-                    <a href="<?php echo e(route('financial.budgets.pdf', $budget)); ?>" 
-                       class="btn waves-effect waves-light purple">
+                    <a href="<?php echo e(route('financial.budgets.pdf', $budget)); ?>" class="btn purple waves-effect waves-light">
                         <i class="material-icons left">picture_as_pdf</i>
-                        Gerar PDF
+                        GERAR PDF
                     </a>
                     
-                    <a href="<?php echo e(route('financial.budgets.print', $budget)); ?>" 
-                       class="btn waves-effect waves-light blue-grey">
+                    <a href="#" class="btn blue waves-effect waves-light">
                         <i class="material-icons left">print</i>
-                        Imprimir
+                        IMPRIMIR
                     </a>
-                    
-                    <form action="<?php echo e(route('financial.budgets.destroy', $budget)); ?>" 
-                          method="POST" 
-                          style="display: inline;"
-                          onsubmit="return confirm('Tem certeza que deseja excluir este orçamento?')">
-                        <?php echo csrf_field(); ?>
-                        <?php echo method_field('DELETE'); ?>
-                        <button type="submit" class="btn waves-effect waves-light red">
-                            <i class="material-icons left">delete</i>
-                            Excluir
+
+                    <a href="#" class="btn red waves-effect waves-light" onclick="event.preventDefault(); if(confirm('Tem certeza?')) document.getElementById('form-delete').submit();">
+                        <i class="material-icons left">delete</i>
+                        EXCLUIR
+                    </a>
+
+                    <?php if($budget->status === 'aguardando_aprovacao'): ?>
+                        <button type="button" onclick="aprovarOrcamento()" class="btn green waves-effect waves-light">
+                            <i class="material-icons left">check</i>
+                            APROVAR
                         </button>
-                    </form>
+
+                        <button type="button" class="btn red waves-effect waves-light modal-trigger" data-target="modal-rejeitar">
+                            <i class="material-icons left">close</i>
+                            REJEITAR
+                        </button>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
     </div>
+</div>
+
+<form id="form-aprovar" action="<?php echo e(route('financial.budgets.approve', $budget)); ?>" method="POST" style="display: none;">
+    <?php echo csrf_field(); ?>
+    <input type="hidden" name="action" value="approve">
+</form>
+
+<form id="form-delete" action="<?php echo e(route('financial.budgets.destroy', $budget)); ?>" method="POST" style="display: none;">
+    <?php echo csrf_field(); ?>
+    <?php echo method_field('DELETE'); ?>
+</form>
+
+<script>
+function aprovarOrcamento() {
+    if(confirm('Tem certeza que deseja aprovar este orçamento?')) {
+        document.getElementById('form-aprovar').submit();
+    }
+}
+</script>
+
+<!-- Modal de Rejeição -->
+<div id="modal-rejeitar" class="modal">
+    <form method="POST" action="<?php echo e(route('financial.budgets.approve', $budget)); ?>">
+        <?php echo csrf_field(); ?>
+        <input type="hidden" name="action" value="reject">
+        <div class="modal-content">
+            <h4>Rejeitar Orçamento</h4>
+            <div class="input-field">
+                <textarea name="motivo_reprovacao" class="materialize-textarea" required></textarea>
+                <label>Motivo da Rejeição</label>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <a href="#!" class="modal-close waves-effect waves-red btn-flat">Cancelar</a>
+            <button type="submit" class="waves-effect waves-light btn red">Confirmar</button>
+        </div>
+    </form>
 </div>
 <?php $__env->stopSection(); ?> 
 <?php echo $__env->make('layouts.app', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\laragon\www\marmosys\resources\views/financial/budgets/show.blade.php ENDPATH**/ ?>

@@ -16,6 +16,11 @@ use App\Http\Controllers\CostCenterController;
 use App\Http\Controllers\CashFlowProjectionController;
 use App\Http\Controllers\FinancialGoalController;
 use App\Http\Controllers\MaterialController;
+use App\Http\Controllers\Admin\ApprovalLogController;
+use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\SuppliersController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -72,8 +77,8 @@ Route::middleware('auth')->group(function () {
         Route::resource('cost-centers', CostCenterController::class);
 
         // Fluxo de Caixa Projetado
-        Route::get('projections', [CashFlowProjectionController::class, 'index'])
-            ->name('projections.index');
+        Route::get('projection', [CashFlowProjectionController::class, 'index'])
+            ->name('projection.index');
 
         // Metas Financeiras
         Route::get('goals', [FinancialGoalController::class, 'index'])->name('goals.index');
@@ -91,6 +96,7 @@ Route::middleware('auth')->group(function () {
             ->name('budgets.pdf');
         Route::get('budgets/{budget}/print', [\App\Http\Controllers\Financial\BudgetController::class, 'printView'])
             ->name('budgets.print');
+        Route::post('budgets/{budget}/approve', [BudgetController::class, 'approve'])->name('budgets.approve');
     });
 
     Route::get('/materials/search', [MaterialController::class, 'search'])->name('materials.search');
@@ -99,4 +105,24 @@ Route::middleware('auth')->group(function () {
     Route::prefix('stock')->name('stock.')->group(function () {
         Route::resource('materials', MaterialController::class);
     });
+
+    Route::prefix('admin')->name('admin.')->group(function () {
+        Route::get('approval-logs', [ApprovalLogController::class, 'index'])->name('approval-logs.index');
+        Route::resource('company', CompanyController::class);
+    });
+
+    // Fornecedores
+    Route::resource('suppliers', SupplierController::class);
+
+    // Funcionários
+    Route::resource('employees', EmployeeController::class);
+
+    // Empresas
+    Route::resource('companies', CompanyController::class);
+
+    // Rota para busca de CNPJ
+    Route::get('/api/companies/find-cnpj/{cnpj}', [CompanyController::class, 'findByCNPJ'])->name('companies.find-cnpj');
+
+    // Rota para busca de CNPJ
+    Route::get('/suppliers/find-cnpj/{cnpj}', [SuppliersController::class, 'findByCNPJ'])->name('suppliers.find-cnpj');
 }); 
