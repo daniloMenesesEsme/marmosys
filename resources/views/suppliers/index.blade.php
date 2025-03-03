@@ -32,7 +32,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($suppliers as $supplier)
+                        @forelse($suppliers as $supplier)
                         <tr>
                             <td>{{ $supplier->razao_social }}</td>
                             <td>{{ $supplier->nome_fantasia }}</td>
@@ -61,11 +61,20 @@
                                 </form>
                             </td>
                         </tr>
-                        @endforeach
+                        @empty
+                        <tr>
+                            <td colspan="5" class="center-align">Nenhum fornecedor cadastrado</td>
+                        </tr>
+                        @endforelse
                     </tbody>
                 </table>
 
-                {{ $suppliers->links() }}
+                <!-- Paginação -->
+                <div class="row">
+                    <div class="col s12">
+                        {{ $suppliers->links('vendor.pagination.materialize') }}
+                    </div>
+                </div>
             </div>
         </div>
     </div>
