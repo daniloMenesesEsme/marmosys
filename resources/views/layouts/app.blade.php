@@ -85,7 +85,16 @@
             <div class="divider"></div>
         </li>
         
-        <li><a href="{{ route('logout') }}" class="waves-effect" 
+        <li><a class="subheader">Configurações</a></li>
+        <li><a href="{{ route('settings.backup.index') }}" class="waves-effect">
+            <i class="material-icons">backup</i>Backup do Sistema
+        </a></li>
+
+        <li>
+            <div class="divider"></div>
+        </li>
+        
+        <li><a href="{{ route('logout') }}" class="waves-effect"  
                onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
             <i class="material-icons">exit_to_app</i>Sair
         </a></li>

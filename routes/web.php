@@ -21,6 +21,7 @@ use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\SuppliersController;
+use App\Http\Controllers\Settings\BackupController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -123,4 +124,19 @@ Route::middleware('auth')->group(function () {
 
     // Rota para busca de CNPJ
     Route::get('/suppliers/find-cnpj/{cnpj}', [SuppliersController::class, 'findByCNPJ'])->name('suppliers.find-cnpj');
+
+    // Rotas de configurações
+    Route::prefix('settings')->name('settings.')->group(function () {
+        // Rotas de backup
+        Route::get('/backup', [BackupController::class, 'index'])
+            ->name('backup.index');
+        Route::post('/backup', [BackupController::class, 'store'])
+            ->name('backup.store');
+        Route::post('/backup/create', [BackupController::class, 'createBackup'])
+            ->name('backup.create');
+        Route::get('/backup/download/{filename}', [BackupController::class, 'download'])
+            ->name('backup.download');
+        Route::get('/backup/delete/{filename}', [BackupController::class, 'delete'])
+            ->name('backup.delete');
+    });
 }); 
