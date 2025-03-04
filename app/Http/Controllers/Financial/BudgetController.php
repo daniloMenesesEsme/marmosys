@@ -267,24 +267,35 @@ class BudgetController extends Controller
 
     public function generatePdf(Budget $budget)
     {
-        $budget->load(['client', 'rooms.items.material']);
-        
-        $pdf = PDF::loadView('financial.budgets.pdf', compact('budget'));
-        
-        $pdf->setPaper('A4');
-        $pdf->setOptions([
-            'isHtml5ParserEnabled' => true,
-            'isPhpEnabled' => true,
-            'isRemoteEnabled' => true,
-            'defaultFont' => 'Arial',
-            'dpi' => 150,
-            'margin_top' => 10,
-            'margin_right' => 10,
-            'margin_bottom' => 10,
-            'margin_left' => 10
-        ]);
+        try {
+            // Busca as configurações da empresa
+            $company = CompanySetting::first();
+            
+            if (!$company) {
+                // Se não existir configuração, cria uma padrão
+                $company = CompanySetting::create([
+                    'nome_empresa' => 'MarmoSys',
+                    'cnpj' => '00.000.000/0001-00',
+                    'endereco' => 'Endereço da Empresa',
+                    'telefone' => '(00) 0000-0000',
+                    'email' => 'contato@empresa.com',
+                    'observacoes_orcamento' => 'Orçamento válido por 15 dias.'
+                ]);
+            }
 
-        return $pdf->stream("orcamento-{$budget->numero}.pdf");
+            // Carrega a view do PDF com os dados
+            $pdf = PDF::loadView('financial.budgets.pdf', compact('budget', 'company'));
+
+            // Retorna o PDF para download
+            return $pdf->stream('orcamento-' . $budget->id . '.pdf');
+
+        } catch (\Exception $e) {
+            // Log do erro
+            \Log::error('Erro ao gerar PDF: ' . $e->getMessage());
+            
+            // Retorna para a página anterior com mensagem de erro
+            return back()->with('error', 'Erro ao gerar PDF do orçamento. Por favor, tente novamente.');
+        }
     }
 
     public function printView(Budget $budget)

@@ -80,10 +80,11 @@
                         EDITAR
                     </a>
                     
-                    <a href="{{ route('financial.budgets.pdf', $budget) }}" class="btn purple waves-effect waves-light">
-                        <i class="material-icons left">picture_as_pdf</i>
-                        GERAR PDF
-                    </a>
+                    <button type="button" 
+                            class="btn btn-secondary" 
+                            onclick="window.open('{{ route('financial.budgets.pdf', $budget->id) }}', '_blank')">
+                        <i class="fas fa-file-pdf"></i> Visualizar PDF
+                    </button>
                     
                     <button onclick="window.print()" class="btn blue waves-effect waves-light">
                         <i class="material-icons left">print</i>

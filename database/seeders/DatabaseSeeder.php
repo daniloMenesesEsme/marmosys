@@ -19,6 +19,9 @@ class DatabaseSeeder extends Seeder
         $this->call([
             UserSeeder::class,
             ClientSeeder::class,
+            BudgetMaterialSeeder::class,
+            MaterialSeeder::class,
+            CompanySettingSeeder::class,
         ]);
 
         try {
@@ -129,11 +132,5 @@ class DatabaseSeeder extends Seeder
             DB::rollBack();
             throw $e;
         }
-
-        $this->call([
-            BudgetMaterialSeeder::class,
-            MaterialSeeder::class,
-            // ... outros seeders
-        ]);
     }
 } 

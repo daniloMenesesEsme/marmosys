@@ -72,9 +72,11 @@
         <li><a href="<?php echo e(route('financial.cost-centers.index')); ?>" class="waves-effect">
             <i class="material-icons">business</i>Centros de Custo
         </a></li>
+        <!--
         <li><a href="<?php echo e(route('financial.projections.index')); ?>" class="waves-effect">
             <i class="material-icons">timeline</i>Projeção
         </a></li>
+        -->
         <li><a href="<?php echo e(route('financial.goals.index')); ?>" class="waves-effect">
             <i class="material-icons">flag</i>Metas
         </a></li>

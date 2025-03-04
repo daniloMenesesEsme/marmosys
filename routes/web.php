@@ -77,26 +77,24 @@ Route::middleware('auth')->group(function () {
         Route::resource('cost-centers', CostCenterController::class);
 
         // Fluxo de Caixa Projetado
-        Route::get('projection', [CashFlowProjectionController::class, 'index'])
-            ->name('projection.index');
+        Route::get('projections', [CashFlowProjectionController::class, 'index'])
+            ->name('projections.index');
 
         // Metas Financeiras
-        Route::get('goals', [FinancialGoalController::class, 'index'])->name('goals.index');
-        Route::post('goals', [FinancialGoalController::class, 'store'])->name('goals.store');
-        Route::get('goals/create', [FinancialGoalController::class, 'create'])->name('goals.create');
-        Route::get('goals/{goal}/edit', [FinancialGoalController::class, 'edit'])->name('goals.edit');
-        Route::put('goals/{goal}', [FinancialGoalController::class, 'update'])->name('goals.update');
-        Route::delete('goals/{goal}', [FinancialGoalController::class, 'destroy'])->name('goals.destroy');
+        Route::resource('goals', FinancialGoalController::class);
         Route::post('goals/update-status', [FinancialGoalController::class, 'updateStatus'])
             ->name('goals.update-status');
 
-        // Orçamentos
-        Route::resource('budgets', \App\Http\Controllers\Financial\BudgetController::class);
-        Route::get('budgets/{budget}/pdf', [\App\Http\Controllers\Financial\BudgetController::class, 'generatePdf'])
+        // Rotas de orçamentos
+        Route::resource('budgets', BudgetController::class);
+        Route::get('budgets/{budget}/pdf', [BudgetController::class, 'generatePdf'])
             ->name('budgets.pdf');
-        Route::get('budgets/{budget}/print', [\App\Http\Controllers\Financial\BudgetController::class, 'printView'])
-            ->name('budgets.print');
-        Route::post('budgets/{budget}/approve', [BudgetController::class, 'approve'])->name('budgets.approve');
+        Route::post('budgets/{budget}/approve', [BudgetController::class, 'approve'])
+            ->name('budgets.approve');
+        Route::post('budgets/{budget}/reject', [BudgetController::class, 'reject'])
+            ->name('budgets.reject');
+        Route::post('budgets/copy', [BudgetController::class, 'copy'])
+            ->name('budgets.copy');
     });
 
     Route::get('/materials/search', [MaterialController::class, 'search'])->name('materials.search');

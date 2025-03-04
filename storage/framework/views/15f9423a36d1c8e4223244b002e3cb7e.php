@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Orçamento <?php echo e($budget->numero); ?></title>
+    <title>Orçamento #<?php echo e($budget->id); ?></title>
     <style>
         @page {
             margin: 2cm;
@@ -80,15 +80,15 @@
 <body>
     <div class="header">
         <img src="<?php echo e(public_path('images/logo.png')); ?>" alt="Logo" class="logo">
-        <h2>Angular Granitos - Fábrica</h2>
-        <p>CNPJ: 29.123.952/0001-84</p>
-        <p>RUA QUINTINO CUNHA, 2950 - CAUCAIA - CE</p>
-        <p>Fone: 85 9 9915-2076</p>
-        <p>angulargranitos@outlook.com</p>
+        <h1>Orçamento #<?php echo e($budget->id); ?></h1>
     </div>
 
     <div class="company-info">
-        <h3>Orçamento Nº <?php echo e($budget->numero); ?> - <?php echo e($budget->data->format('d/m/Y')); ?></h3>
+        <h3><?php echo e($company->nome_empresa); ?></h3>
+        <p>CNPJ: <?php echo e($company->cnpj); ?></p>
+        <p><?php echo e($company->endereco); ?></p>
+        <p>Tel: <?php echo e($company->telefone); ?></p>
+        <p>Email: <?php echo e($company->email); ?></p>
     </div>
 
     <div class="client-info">
@@ -103,6 +103,11 @@
                 <td><strong>Telefone:</strong> <?php echo e($budget->client->telefone ?? 'Não informado'); ?></td>
             </tr>
         </table>
+    </div>
+
+    <div class="budget-info">
+        <h3>Informações do Cliente</h3>
+        <p>Data: <?php echo e($budget->created_at->format('d/m/Y')); ?></p>
     </div>
 
     <?php $__currentLoopData = $budget->rooms; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $room): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
@@ -146,6 +151,13 @@
         <p><strong>Desconto:</strong> R$ <?php echo e(number_format($budget->desconto, 2, ',', '.')); ?></p>
         <p><strong>Valor Final:</strong> R$ <?php echo e(number_format($budget->valor_final, 2, ',', '.')); ?></p>
     </div>
+
+    <?php if($company->observacoes_orcamento): ?>
+    <div class="observations">
+        <h3>Observações</h3>
+        <p><?php echo e($company->observacoes_orcamento); ?></p>
+    </div>
+    <?php endif; ?>
 
     <div class="footer">
         <p>Validade do Orçamento: <?php echo e($budget->data_validade->format('d/m/Y')); ?></p>

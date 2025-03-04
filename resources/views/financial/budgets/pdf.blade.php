@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Orçamento {{ $budget->numero }}</title>
+    <title>Orçamento #{{ $budget->id }}</title>
     <style>
         @page {
             margin: 2cm;
@@ -80,15 +80,15 @@
 <body>
     <div class="header">
         <img src="{{ public_path('images/logo.png') }}" alt="Logo" class="logo">
-        <h2>Angular Granitos - Fábrica</h2>
-        <p>CNPJ: 29.123.952/0001-84</p>
-        <p>RUA QUINTINO CUNHA, 2950 - CAUCAIA - CE</p>
-        <p>Fone: 85 9 9915-2076</p>
-        <p>angulargranitos@outlook.com</p>
+        <h1>Orçamento #{{ $budget->id }}</h1>
     </div>
 
     <div class="company-info">
-        <h3>Orçamento Nº {{ $budget->numero }} - {{ $budget->data->format('d/m/Y') }}</h3>
+        <h3>{{ $company->nome_empresa }}</h3>
+        <p>CNPJ: {{ $company->cnpj }}</p>
+        <p>{{ $company->endereco }}</p>
+        <p>Tel: {{ $company->telefone }}</p>
+        <p>Email: {{ $company->email }}</p>
     </div>
 
     <div class="client-info">
@@ -103,6 +103,11 @@
                 <td><strong>Telefone:</strong> {{ $budget->client->telefone ?? 'Não informado' }}</td>
             </tr>
         </table>
+    </div>
+
+    <div class="budget-info">
+        <h3>Informações do Cliente</h3>
+        <p>Data: {{ $budget->created_at->format('d/m/Y') }}</p>
     </div>
 
     @foreach($budget->rooms as $room)
@@ -146,6 +151,13 @@
         <p><strong>Desconto:</strong> R$ {{ number_format($budget->desconto, 2, ',', '.') }}</p>
         <p><strong>Valor Final:</strong> R$ {{ number_format($budget->valor_final, 2, ',', '.') }}</p>
     </div>
+
+    @if($company->observacoes_orcamento)
+    <div class="observations">
+        <h3>Observações</h3>
+        <p>{{ $company->observacoes_orcamento }}</p>
+    </div>
+    @endif
 
     <div class="footer">
         <p>Validade do Orçamento: {{ $budget->data_validade->format('d/m/Y') }}</p>

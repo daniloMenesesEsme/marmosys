@@ -1,3 +1,5 @@
+
+
 <?php $__env->startSection('title', 'Detalhes do Orçamento'); ?>
 
 <?php $__env->startSection('content'); ?>
@@ -79,15 +81,16 @@
                         EDITAR
                     </a>
                     
-                    <a href="<?php echo e(route('financial.budgets.pdf', $budget)); ?>" class="btn purple waves-effect waves-light">
-                        <i class="material-icons left">picture_as_pdf</i>
-                        GERAR PDF
-                    </a>
+                    <button type="button" 
+                            class="btn btn-secondary" 
+                            onclick="window.open('<?php echo e(route('financial.budgets.pdf', $budget->id)); ?>', '_blank')">
+                        <i class="fas fa-file-pdf"></i> Visualizar PDF
+                    </button>
                     
-                    <a href="#" class="btn blue waves-effect waves-light">
+                    <button onclick="window.print()" class="btn blue waves-effect waves-light">
                         <i class="material-icons left">print</i>
                         IMPRIMIR
-                    </a>
+                    </button>
 
                     <a href="#" class="btn red waves-effect waves-light" onclick="event.preventDefault(); if(confirm('Tem certeza?')) document.getElementById('form-delete').submit();">
                         <i class="material-icons left">delete</i>
@@ -147,5 +150,49 @@ function aprovarOrcamento() {
         </div>
     </form>
 </div>
+
+<!-- Adicione este estilo para controlar o que será impresso -->
+<style type="text/css" media="print">
+    /* Oculta elementos desnecessários */
+    .card-action, .sidenav, .navbar-fixed, nav, footer {
+        display: none !important;
+    }
+
+    /* Configura página para retrato */
+    @page {
+        size: portrait;
+        margin: 20mm 15mm;
+    }
+
+    /* Ajusta o conteúdo do orçamento */
+    .container {
+        width: 100% !important;
+        max-width: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    .card {
+        box-shadow: none !important;
+        border: none !important;
+    }
+
+    /* Garante que todo conteúdo seja impresso */
+    .row {
+        page-break-inside: avoid;
+    }
+
+    /* Melhora legibilidade do texto */
+    body {
+        font-size: 12pt;
+        line-height: 1.3;
+    }
+
+    /* Ajusta tamanhos de títulos */
+    .card-title {
+        font-size: 16pt !important;
+        margin-bottom: 15px !important;
+    }
+</style>
 <?php $__env->stopSection(); ?> 
 <?php echo $__env->make('layouts.app', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\laragon\www\marmosys\resources\views/financial/budgets/show.blade.php ENDPATH**/ ?>
