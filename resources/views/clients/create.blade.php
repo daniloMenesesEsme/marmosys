@@ -48,8 +48,8 @@
                             </div>
                             <div class="input-field col s12 m4">
                                 <i class="material-icons prefix">badge</i>
-                                <input type="text" id="rg" name="rg" value="{{ old('rg') }}">
-                                <label for="rg">RG</label>
+                                <input type="text" id="rg_ie" name="rg_ie" value="{{ old('rg_ie') }}">
+                                <label for="rg_ie">RG/IE</label>
                             </div>
                         </div>
 

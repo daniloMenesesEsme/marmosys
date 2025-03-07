@@ -25,7 +25,7 @@ class ClientController extends Controller
             'email' => 'nullable|email|max:255',
             'telefone' => 'nullable|max:20',
             'cpf_cnpj' => 'nullable|max:20',
-            'rg' => 'nullable|max:20',
+            'rg_ie' => 'nullable|max:20',
             'endereco' => 'nullable|max:255',
             'numero' => 'nullable|max:20',
             'complemento' => 'nullable|max:255',
@@ -33,7 +33,7 @@ class ClientController extends Controller
             'cidade' => 'nullable|max:255',
             'estado' => 'nullable|max:2',
             'cep' => 'nullable|max:9',
-            'observacoes' => 'nullable|max:65535',
+            'observacoes' => 'nullable',
             'ativo' => 'boolean'
         ]);
 
@@ -70,7 +70,7 @@ class ClientController extends Controller
             'email' => 'nullable|email|max:255',
             'telefone' => 'nullable|max:20',
             'cpf_cnpj' => 'nullable|max:20',
-            'rg' => 'nullable|max:20',
+            'rg_ie' => 'nullable|max:20',
             'endereco' => 'nullable|max:255',
             'numero' => 'nullable|max:20',
             'complemento' => 'nullable|max:255',
@@ -78,7 +78,7 @@ class ClientController extends Controller
             'cidade' => 'nullable|max:255',
             'estado' => 'nullable|max:2',
             'cep' => 'nullable|max:9',
-            'observacoes' => 'nullable|max:65535',
+            'observacoes' => 'nullable',
             'ativo' => 'boolean'
         ]);
 
