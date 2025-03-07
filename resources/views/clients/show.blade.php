@@ -3,151 +3,132 @@
 @section('title', 'Detalhes do Cliente')
 
 @section('content')
-<div class="row">
-    <div class="col s12">
-        <div class="card">
-            <div class="card-content">
-                <div class="row">
-                    <div class="col s6">
-                        <span class="card-title">{{ $client->nome }}</span>
-                    </div>
-                    <div class="col s6 right-align">
-                        <a href="{{ route('clients.edit', $client) }}" class="btn waves-effect waves-light orange">
-                            <i class="material-icons left">edit</i>Editar
-                        </a>
-                    </div>
-                </div>
+    <div class="row">
+        <div class="col s12">
+            <div class="card">
+                <div class="card-content">
+                    <span class="card-title">Detalhes do Cliente</span>
 
-                <div class="row">
-                    <div class="col s12 m6">
-                        <h6>Informações Pessoais</h6>
-                        <table class="striped">
-                            <tbody>
-                                <tr>
-                                    <th>Nome/Razão Social:</th>
-                                    <td>{{ $client->nome }}</td>
-                                </tr>
-                                <tr>
-                                    <th>Tipo:</th>
-                                    <td>{{ $client->tipo_pessoa == 'F' ? 'Pessoa Física' : 'Pessoa Jurídica' }}</td>
-                                </tr>
-                                <tr>
-                                    <th>CPF/CNPJ:</th>
-                                    <td>{{ $client->documento }}</td>
-                                </tr>
-                                <tr>
-                                    <th>Telefone:</th>
-                                    <td>{{ $client->telefone }}</td>
-                                </tr>
-                                <tr>
-                                    <th>Email:</th>
-                                    <td>{{ $client->email ?: '-' }}</td>
-                                </tr>
-                                <tr>
-                                    <th>Status:</th>
-                                    <td>
-                                        <span class="chip {{ $client->ativo ? 'green white-text' : 'red white-text' }}">
-                                            {{ $client->ativo ? 'Ativo' : 'Inativo' }}
-                                        </span>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                    <div class="row">
+                        <div class="col s12">
+                            <h5 class="blue-text">{{ $client->nome }}</h5>
+                            <span class="chip {{ $client->ativo ? 'green' : 'grey' }} white-text">
+                                {{ $client->status }}
+                            </span>
 
-                    <div class="col s12 m6">
-                        <h6>Endereço</h6>
-                        <table class="striped">
-                            <tbody>
-                                <tr>
-                                    <th>CEP:</th>
-                                    <td>{{ $client->cep }}</td>
-                                </tr>
-                                <tr>
-                                    <th>Endereço:</th>
-                                    <td>{{ $client->endereco }}, {{ $client->numero }}</td>
-                                </tr>
-                                <tr>
-                                    <th>Complemento:</th>
-                                    <td>{{ $client->complemento ?: '-' }}</td>
-                                </tr>
-                                <tr>
-                                    <th>Bairro:</th>
-                                    <td>{{ $client->bairro }}</td>
-                                </tr>
-                                <tr>
-                                    <th>Cidade/UF:</th>
-                                    <td>{{ $client->cidade }}/{{ $client->estado }}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+                            <div class="section">
+                                <h6 class="blue-text">Informações Pessoais</h6>
+                                <div class="row">
+                                    <div class="col s12 m4">
+                                        <p>
+                                            <i class="material-icons tiny">pin</i>
+                                            <strong>CPF/CNPJ:</strong><br>
+                                            {{ $client->formatted_cpf_cnpj ?: 'Não informado' }}
+                                        </p>
+                                    </div>
+                                    <div class="col s12 m4">
+                                        <p>
+                                            <i class="material-icons tiny">badge</i>
+                                            <strong>RG:</strong><br>
+                                            {{ $client->rg ?: 'Não informado' }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
 
-                @if($client->observacoes)
-                <div class="row">
-                    <div class="col s12">
-                        <h6>Observações</h6>
-                        <p class="grey-text">{{ $client->observacoes }}</p>
-                    </div>
-                </div>
-                @endif
+                            <div class="section">
+                                <h6 class="blue-text">Contato</h6>
+                                <div class="row">
+                                    <div class="col s12 m6">
+                                        <p>
+                                            <i class="material-icons tiny">phone</i>
+                                            <strong>Telefone:</strong><br>
+                                            {{ $client->formatted_telefone ?: 'Não informado' }}
+                                        </p>
+                                    </div>
+                                    <div class="col s12 m6">
+                                        <p>
+                                            <i class="material-icons tiny">email</i>
+                                            <strong>E-mail:</strong><br>
+                                            {{ $client->email ? '<a href="mailto:' . $client->email . '" class="blue-text">' . $client->email . '</a>' : 'Não informado' }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
 
-                <div class="row">
-                    <div class="col s12">
-                        <h6>Últimos Orçamentos</h6>
-                        <table class="striped">
-                            <thead>
-                                <tr>
-                                    <th>Data</th>
-                                    <th>Número</th>
-                                    <th>Valor Total</th>
-                                    <th>Status</th>
-                                    <th>Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse($client->budgets()->latest()->take(5)->get() as $budget)
-                                <tr>
-                                    <td>{{ $budget->created_at->format('d/m/Y') }}</td>
-                                    <td>#{{ str_pad($budget->id, 6, '0', STR_PAD_LEFT) }}</td>
-                                    <td>R$ {{ number_format($budget->valor_total, 2, ',', '.') }}</td>
-                                    <td>
-                                        <span class="chip {{ $budget->status_class }}">
-                                            {{ $budget->status_text }}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <a href="{{ route('budgets.show', $budget) }}" class="btn-small waves-effect waves-light">
-                                            <i class="material-icons">visibility</i>
-                                        </a>
-                                    </td>
-                                </tr>
-                                @empty
-                                <tr>
-                                    <td colspan="5" class="center-align">Nenhum orçamento encontrado</td>
-                                </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                        <div class="right-align" style="margin-top: 10px;">
-                            <a href="{{ route('financial.budgets.create', ['client_id' => $client->id]) }}" class="btn waves-effect waves-light blue">
-                                <i class="material-icons left">add</i>Novo Orçamento
-                            </a>
+                            <div class="section">
+                                <h6 class="blue-text">Endereço</h6>
+                                <p>
+                                    <i class="material-icons tiny">location_on</i>
+                                    {{ $client->endereco }}
+                                    @if($client->numero), {{ $client->numero }}@endif
+                                    @if($client->complemento) - {{ $client->complemento }}@endif
+                                    @if($client->bairro), {{ $client->bairro }}@endif<br>
+                                    @if($client->cidade){{ $client->cidade }}@endif
+                                    @if($client->estado) - {{ $client->estado }}@endif
+                                    @if($client->cep)<br>CEP: {{ $client->cep }}@endif
+                                </p>
+                            </div>
+
+                            @if($client->observacoes)
+                                <div class="section">
+                                    <h6 class="blue-text">Observações</h6>
+                                    <p class="grey-text text-darken-2">{{ $client->observacoes }}</p>
+                                </div>
+                            @endif
+
+                            <div class="section">
+                                <h6 class="blue-text">Informações do Sistema</h6>
+                                <div class="row">
+                                    <div class="col s12 m4">
+                                        <p>
+                                            <strong>Cadastrado em:</strong><br>
+                                            {{ $client->created_at->format('d/m/Y H:i:s') }}
+                                        </p>
+                                    </div>
+                                    <div class="col s12 m4">
+                                        <p>
+                                            <strong>Última atualização:</strong><br>
+                                            {{ $client->updated_at->format('d/m/Y H:i:s') }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="row">
-                    <div class="col s12">
-                        <a href="{{ route('clients.index') }}" class="btn waves-effect waves-light grey">
-                            <i class="material-icons left">arrow_back</i>
-                            Voltar
-                        </a>
+                    <div class="row">
+                        <div class="col s12">
+                            <a href="{{ route('clients.edit', $client) }}" class="btn waves-effect waves-light orange">
+                                <i class="material-icons left">edit</i>
+                                Editar
+                            </a>
+                            <form action="{{ route('clients.destroy', $client) }}" method="POST" style="display: inline;" 
+                                  onsubmit="return confirm('Tem certeza que deseja excluir este cliente?');">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn waves-effect waves-light red">
+                                    <i class="material-icons left">delete</i>
+                                    Excluir
+                                </button>
+                            </form>
+                            <a href="{{ route('clients.index') }}" class="btn waves-effect waves-light grey right">
+                                <i class="material-icons left">arrow_back</i>
+                                Voltar
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
-@endsection 
+@endsection
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Inicializa os componentes do Materialize
+        M.AutoInit();
+    });
+</script>
+@endpush 

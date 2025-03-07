@@ -6,6 +6,8 @@
     <title>{{ config('app.name') }} - @yield('title')</title>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
     @stack('styles')
 </head>
 <body>
@@ -35,6 +37,10 @@
         
         <li><a href="{{ route('dashboard') }}" class="waves-effect">
             <i class="material-icons">dashboard</i>Dashboard
+        </a></li>
+        
+        <li><a href="{{ route('companies.index') }}" class="waves-effect">
+            <i class="material-icons">business</i>Empresas
         </a></li>
         
         <li><a href="{{ route('clients.index') }}" class="waves-effect">

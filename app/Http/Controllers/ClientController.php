@@ -15,7 +15,7 @@ class ClientController extends Controller
 
     public function create()
     {
-        return view('clients.form');
+        return view('clients.create');
     }
 
     public function store(Request $request)
@@ -25,8 +25,27 @@ class ClientController extends Controller
             'email' => 'nullable|email|max:255',
             'telefone' => 'nullable|max:20',
             'cpf_cnpj' => 'nullable|max:20',
-            'endereco' => 'nullable'
+            'rg' => 'nullable|max:20',
+            'endereco' => 'nullable|max:255',
+            'numero' => 'nullable|max:20',
+            'complemento' => 'nullable|max:255',
+            'bairro' => 'nullable|max:255',
+            'cidade' => 'nullable|max:255',
+            'estado' => 'nullable|max:2',
+            'cep' => 'nullable|max:9',
+            'observacoes' => 'nullable|max:65535',
+            'ativo' => 'boolean'
         ]);
+
+        if (isset($validated['telefone'])) {
+            $validated['telefone'] = preg_replace('/[^0-9]/', '', $validated['telefone']);
+        }
+        if (isset($validated['cpf_cnpj'])) {
+            $validated['cpf_cnpj'] = preg_replace('/[^0-9]/', '', $validated['cpf_cnpj']);
+        }
+        if (isset($validated['cep'])) {
+            $validated['cep'] = preg_replace('/[^0-9]/', '', $validated['cep']);
+        }
 
         Client::create($validated);
 
@@ -34,9 +53,14 @@ class ClientController extends Controller
                         ->with('success', 'Cliente cadastrado com sucesso!');
     }
 
+    public function show(Client $client)
+    {
+        return view('clients.show', compact('client'));
+    }
+
     public function edit(Client $client)
     {
-        return view('clients.form', compact('client'));
+        return view('clients.edit', compact('client'));
     }
 
     public function update(Request $request, Client $client)
@@ -46,9 +70,27 @@ class ClientController extends Controller
             'email' => 'nullable|email|max:255',
             'telefone' => 'nullable|max:20',
             'cpf_cnpj' => 'nullable|max:20',
-            'endereco' => 'nullable',
+            'rg' => 'nullable|max:20',
+            'endereco' => 'nullable|max:255',
+            'numero' => 'nullable|max:20',
+            'complemento' => 'nullable|max:255',
+            'bairro' => 'nullable|max:255',
+            'cidade' => 'nullable|max:255',
+            'estado' => 'nullable|max:2',
+            'cep' => 'nullable|max:9',
+            'observacoes' => 'nullable|max:65535',
             'ativo' => 'boolean'
         ]);
+
+        if (isset($validated['telefone'])) {
+            $validated['telefone'] = preg_replace('/[^0-9]/', '', $validated['telefone']);
+        }
+        if (isset($validated['cpf_cnpj'])) {
+            $validated['cpf_cnpj'] = preg_replace('/[^0-9]/', '', $validated['cpf_cnpj']);
+        }
+        if (isset($validated['cep'])) {
+            $validated['cep'] = preg_replace('/[^0-9]/', '', $validated['cep']);
+        }
 
         $client->update($validated);
 
@@ -58,10 +100,9 @@ class ClientController extends Controller
 
     public function destroy(Client $client)
     {
-        $client->ativo = false;
-        $client->save();
+        $client->delete();
 
         return redirect()->route('clients.index')
-                        ->with('success', 'Cliente desativado com sucesso!');
+                        ->with('success', 'Cliente removido com sucesso!');
     }
 } 
