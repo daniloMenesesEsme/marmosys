@@ -36,3 +36,9 @@ storage/framework/views/*.php
 storage/framework/sessions/*
 storage/logs/*.log
 storage/app/public/companies/*
+
+# Laravel storage
+storage/framework/views/*.php
+storage/framework/sessions/*
+storage/framework/cache/*
+storage/logs/*
