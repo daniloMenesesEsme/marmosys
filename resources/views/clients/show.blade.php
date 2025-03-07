@@ -43,14 +43,14 @@
                                         <p>
                                             <i class="material-icons tiny">phone</i>
                                             <strong>Telefone:</strong><br>
-                                            {{ $client->formatted_telefone ?: 'Não informado' }}
+                                            {{ $client->formatted_telefone ?? 'Não informado' }}
                                         </p>
                                     </div>
                                     <div class="col s12 m6">
                                         <p>
                                             <i class="material-icons tiny">email</i>
                                             <strong>E-mail:</strong><br>
-                                            {{ $client->email ? '<a href="mailto:' . $client->email . '" class="blue-text">' . $client->email . '</a>' : 'Não informado' }}
+                                            {{ $client->email ?? 'Não informado' }}
                                         </p>
                                     </div>
                                 </div>
