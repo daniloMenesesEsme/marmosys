@@ -149,23 +149,54 @@
         
         $('#cpf_cnpj').mask(cpfCnpjMask, cpfCnpjOptions);
 
+        // Máscara e busca de CEP
+        $('#cep').mask('00000-000');
+        
+        function limpaFormularioCep() {
+            $('#endereco').val('');
+            $('#bairro').val('');
+            $('#cidade').val('');
+            $('#estado').val('');
+            M.updateTextFields();
+        }
+        
+        function preencheEndereco(data) {
+            $('#endereco').val(data.logradouro);
+            $('#bairro').val(data.bairro);
+            $('#cidade').val(data.localidade);
+            $('#estado').val(data.uf);
+            
+            // Atualiza as labels do Materialize
+            M.updateTextFields();
+            
+            // Foca no campo número
+            $('#numero').focus();
+        }
+        
         // Busca de CEP
-        $('#cep').blur(function() {
+        $('#cep').on('input blur', function() {  // Adicionado evento 'input'
             var cep = $(this).val().replace(/\D/g, '');
+            
             if (cep.length === 8) {
-                $.getJSON('https://viacep.com.br/ws/' + cep + '/json/', function(data) {
-                    if (!data.erro) {
-                        $('#endereco').val(data.logradouro);
-                        M.updateTextFields();
-                        $('#bairro').val(data.bairro);
-                        M.updateTextFields();
-                        $('#cidade').val(data.localidade);
-                        M.updateTextFields();
-                        $('#estado').val(data.uf);
-                        M.updateTextFields();
-                        $('#numero').focus();
-                    }
-                });
+                // Mostra loader
+                M.toast({html: 'Buscando CEP...', classes: 'blue'});
+                
+                $.get(`https://viacep.com.br/ws/${cep}/json/`)  // Usando $.get ao invés de fetch
+                    .done(function(data) {
+                        if (!data.erro) {
+                            preencheEndereco(data);
+                            M.toast({html: 'CEP encontrado!', classes: 'green'});
+                            console.log('CEP encontrado:', data); // Debug
+                        } else {
+                            limpaFormularioCep();
+                            M.toast({html: 'CEP não encontrado!', classes: 'red'});
+                        }
+                    })
+                    .fail(function(error) {
+                        console.error('Erro:', error); // Debug
+                        limpaFormularioCep();
+                        M.toast({html: 'Erro ao buscar CEP!', classes: 'red'});
+                    });
             }
         });
 

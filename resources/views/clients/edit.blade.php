@@ -135,34 +135,80 @@
         
         // Máscara dinâmica para CPF/CNPJ
         var cpfCnpjMask = function (val) {
-            return val.replace(/\D/g, '').length <= 11 ? '000.000.000-00' : '00.000.000/0000-00';
+            return val.replace(/\D/g, '').length <= 11 ? 
+                '000.000.000-00' : '00.000.000/0000-00';
         },
         cpfCnpjOptions = {
             onKeyPress: function(val, e, field, options) {
                 field.mask(cpfCnpjMask.apply({}, arguments), options);
+            },
+            onChange: function(val, e, field, options) {
+                // Remove formatação para validação
+                field.val(val.replace(/[^\d]/g, ''));
             }
         };
-        $('.cpf_cnpj').mask(cpfCnpjMask, cpfCnpjOptions);
+        
+        $('#cpf_cnpj').mask(cpfCnpjMask, cpfCnpjOptions);
 
         // Busca de CEP
-        $('#cep').blur(function() {
+        $('#cep').on('input blur', function() {
             var cep = $(this).val().replace(/\D/g, '');
+            
             if (cep.length === 8) {
-                $.getJSON('https://viacep.com.br/ws/' + cep + '/json/', function(data) {
-                    if (!data.erro) {
-                        $('#endereco').val(data.logradouro);
-                        M.updateTextFields();
-                        $('#bairro').val(data.bairro);
-                        M.updateTextFields();
-                        $('#cidade').val(data.localidade);
-                        M.updateTextFields();
-                        $('#estado').val(data.uf);
-                        M.updateTextFields();
-                        $('#numero').focus();
-                    }
-                });
+                // Mostra loader
+                M.toast({html: 'Buscando CEP...', classes: 'blue'});
+                
+                $.get(`https://viacep.com.br/ws/${cep}/json/`)
+                    .done(function(data) {
+                        if (!data.erro) {
+                            preencheEndereco(data);
+                            M.toast({html: 'CEP encontrado!', classes: 'green'});
+                            console.log('CEP encontrado:', data); // Debug
+                        } else {
+                            limpaFormularioCep();
+                            M.toast({html: 'CEP não encontrado!', classes: 'red'});
+                        }
+                    })
+                    .fail(function(error) {
+                        console.error('Erro:', error); // Debug
+                        limpaFormularioCep();
+                        M.toast({html: 'Erro ao buscar CEP!', classes: 'red'});
+                    });
             }
         });
+
+        function limpaFormularioCep() {
+            $('#endereco').val('');
+            $('#bairro').val('');
+            $('#cidade').val('');
+            $('#estado').val('');
+            M.updateTextFields();
+        }
+        
+        function preencheEndereco(data) {
+            $('#endereco').val(data.logradouro);
+            $('#bairro').val(data.bairro);
+            $('#cidade').val(data.localidade);
+            $('#estado').val(data.uf);
+            
+            // Atualiza as labels do Materialize
+            M.updateTextFields();
+            
+            // Foca no campo número
+            $('#numero').focus();
+        }
+
+        // Máscara dinâmica para telefone
+        var SPMaskBehavior = function (val) {
+            return val.replace(/\D/g, '').length === 11 ? '(00) 00000-0000' : '(00) 0000-00009';
+        },
+        spOptions = {
+            onKeyPress: function(val, e, field, options) {
+                field.mask(SPMaskBehavior.apply({}, arguments), options);
+            }
+        };
+        
+        $('#telefone').mask(SPMaskBehavior, spOptions);
 
         // Inicializa os componentes do Materialize
         M.updateTextFields();

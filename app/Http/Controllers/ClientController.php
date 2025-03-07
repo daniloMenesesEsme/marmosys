@@ -6,6 +6,7 @@ use App\Models\Client;
 use Illuminate\Http\Request;
 use App\Rules\ValidCpfCnpj;
 use App\Rules\ValidPhone;
+use App\Rules\ValidCep;
 
 class ClientController extends Controller
 {
@@ -34,7 +35,7 @@ class ClientController extends Controller
             'bairro' => 'nullable|max:255',
             'cidade' => 'nullable|max:255',
             'estado' => 'nullable|max:2',
-            'cep' => 'nullable|max:9',
+            'cep' => ['nullable', 'max:9', new ValidCep],
             'observacoes' => 'nullable',
             'ativo' => 'boolean'
         ]);
@@ -79,7 +80,7 @@ class ClientController extends Controller
             'bairro' => 'nullable|max:255',
             'cidade' => 'nullable|max:255',
             'estado' => 'nullable|max:2',
-            'cep' => 'nullable|max:9',
+            'cep' => ['nullable', 'max:9', new ValidCep],
             'observacoes' => 'nullable',
             'ativo' => 'boolean'
         ]);
