@@ -40,6 +40,8 @@ Route::middleware('auth')->group(function () {
     Route::resource('clients', ClientController::class);
     
     // Rotas de produtos
+    Route::get('/products/generate-code/{type}', [ProductController::class, 'generateCode'])
+        ->name('products.generate-code');
     Route::resource('products', ProductController::class);  // Adicionado
     
     // Rotas financeiras
@@ -139,4 +141,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/backup/delete/{filename}', [BackupController::class, 'delete'])
             ->name('backup.delete');
     });
+
+    Route::post('/products/{product}/ajustar-estoque', [ProductController::class, 'ajustarEstoque'])
+        ->name('products.ajustar-estoque');
 }); 

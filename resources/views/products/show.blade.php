@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Detalhes do Produto')
+@section('title', 'Detalhes do Item')
 
 @section('content')
 <div class="row">
@@ -12,14 +12,30 @@
                         <span class="card-title">{{ $product->nome }}</span>
                     </div>
                     <div class="col s6 right-align">
-                        <a href="#modal-ajuste-estoque" class="btn waves-effect waves-light blue modal-trigger">
-                            <i class="material-icons left">add_shopping_cart</i>Ajustar Estoque
-                        </a>
+                        @if($product->tipo !== \App\Enums\ProductType::SERVICE)
+                            <a href="#modal-ajuste-estoque" class="btn waves-effect waves-light blue modal-trigger">
+                                <i class="material-icons left">add_shopping_cart</i>Ajustar Estoque
+                            </a>
+                        @endif
                         <a href="{{ route('products.edit', $product) }}" class="btn waves-effect waves-light orange">
                             <i class="material-icons left">edit</i>Editar
                         </a>
                     </div>
                 </div>
+
+                @if(session('success'))
+                    <div class="card-panel green lighten-4 green-text text-darken-4">
+                        {{ session('success') }}
+                    </div>
+                @endif
+
+                @if($errors->any())
+                    <div class="card-panel red lighten-4 red-text text-darken-4">
+                        @foreach($errors->all() as $error)
+                            <div>{{ $error }}</div>
+                        @endforeach
+                    </div>
+                @endif
 
                 <div class="row">
                     <div class="col s12 m6">
@@ -29,6 +45,12 @@
                                 <tr>
                                     <th>Código:</th>
                                     <td>{{ $product->codigo ?: '-' }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Tipo:</th>
+                                    <td>
+                                        <span class="chip">{{ $product->tipo->label() }}</span>
+                                    </td>
                                 </tr>
                                 <tr>
                                     <th>Categoria:</th>
@@ -55,21 +77,24 @@
                     </div>
 
                     <div class="col s12 m6">
-                        <h6>Informações de Estoque e Preços</h6>
+                        <h6>Informações de {{ $product->tipo === \App\Enums\ProductType::SERVICE ? 'Serviço' : 'Estoque e Preços' }}</h6>
                         <table class="striped">
                             <tbody>
-                                <tr>
-                                    <th>Estoque Atual:</th>
-                                    <td>
-                                        <span class="chip {{ $product->status_estoque['class'] }}">
-                                            {{ $product->estoque_atual }} {{ $product->unidade_medida }}
-                                        </span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th>Estoque Mínimo:</th>
-                                    <td>{{ $product->estoque_minimo }} {{ $product->unidade_medida }}</td>
-                                </tr>
+                                @if($product->tipo !== \App\Enums\ProductType::SERVICE)
+                                    <tr>
+                                        <th>Estoque Atual:</th>
+                                        <td>
+                                            <span class="chip {{ $product->status_estoque['class'] }}">
+                                                {{ $product->estoque_atual }} {{ $product->unidade_medida }}
+                                                ({{ $product->status_estoque['text'] }})
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>Estoque Mínimo:</th>
+                                        <td>{{ $product->estoque_minimo }} {{ $product->unidade_medida }}</td>
+                                    </tr>
+                                @endif
                                 <tr>
                                     <th>Preço de Custo:</th>
                                     <td>R$ {{ number_format($product->preco_custo, 2, ',', '.') }}</td>
@@ -96,6 +121,7 @@
                 </div>
                 @endif
 
+                @if($product->tipo !== \App\Enums\ProductType::SERVICE)
                 <div class="row">
                     <div class="col s12">
                         <h6>Últimos Movimentos</h6>
@@ -131,6 +157,7 @@
                         </table>
                     </div>
                 </div>
+                @endif
 
                 <div class="row">
                     <div class="col s12">
@@ -145,6 +172,7 @@
     </div>
 </div>
 
+@if($product->tipo !== \App\Enums\ProductType::SERVICE)
 <!-- Modal de Ajuste de Estoque -->
 <div id="modal-ajuste-estoque" class="modal">
     <form action="{{ route('products.ajustar-estoque', $product) }}" method="POST">
@@ -177,14 +205,15 @@
         </div>
         
         <div class="modal-footer">
-            <a href="#!" class="modal-close btn waves-effect waves-light grey">Cancelar</a>
-            <button type="submit" class="btn waves-effect waves-light blue">
+            <a href="#!" class="modal-close waves-effect waves-light grey btn">Cancelar</a>
+            <button type="submit" class="waves-effect waves-light blue btn">
                 <i class="material-icons left">save</i>
                 Salvar
             </button>
         </div>
     </form>
 </div>
+@endif
 
 @push('scripts')
 <script>
