@@ -42,3 +42,7 @@ storage/framework/views/*.php
 storage/framework/sessions/*
 storage/framework/cache/*
 storage/logs/*
+
+# Backups
+*.zip
+*.sql
