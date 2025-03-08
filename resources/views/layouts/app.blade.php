@@ -4,8 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ config('app.name') }} - @yield('title')</title>
+    
+    <!-- CSS -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link href="{{ asset('css/styles.css') }}" rel="stylesheet">
     @stack('styles')
 </head>
 <body>
@@ -35,6 +38,10 @@
         
         <li><a href="{{ route('dashboard') }}" class="waves-effect">
             <i class="material-icons">dashboard</i>Dashboard
+        </a></li>
+        
+        <li><a href="{{ route('companies.index') }}" class="waves-effect">
+            <i class="material-icons">business</i>Empresas
         </a></li>
         
         <li><a href="{{ route('clients.index') }}" class="waves-effect">
@@ -72,9 +79,11 @@
         <li><a href="{{ route('financial.cost-centers.index') }}" class="waves-effect">
             <i class="material-icons">business</i>Centros de Custo
         </a></li>
+        <!--
         <li><a href="{{ route('financial.projections.index') }}" class="waves-effect">
             <i class="material-icons">timeline</i>Projeção
         </a></li>
+        -->
         <li><a href="{{ route('financial.goals.index') }}" class="waves-effect">
             <i class="material-icons">flag</i>Metas
         </a></li>
@@ -83,7 +92,16 @@
             <div class="divider"></div>
         </li>
         
-        <li><a href="{{ route('logout') }}" class="waves-effect" 
+        <li><a class="subheader">Configurações</a></li>
+        <li><a href="{{ route('settings.backup.index') }}" class="waves-effect">
+            <i class="material-icons">backup</i>Backup do Sistema
+        </a></li>
+
+        <li>
+            <div class="divider"></div>
+        </li>
+        
+        <li><a href="{{ route('logout') }}" class="waves-effect"  
                onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
             <i class="material-icons">exit_to_app</i>Sair
         </a></li>
@@ -99,8 +117,10 @@
         </div>
     </main>
 
+    <!-- Scripts (na ordem correta) -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             M.AutoInit();

@@ -12,43 +12,62 @@ class Budget extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'cliente_id',
+        'numero',
+        'data',
+        'previsao_entrega',
+        'client_id',
         'status',
         'valor_total',
-        'data_aprovacao',
-        'previsao_entrega',
-        'data_entrega',
-        'convertido_pedido'
+        'desconto',
+        'valor_final',
+        'data_validade',
+        'user_id',
+        'observacoes',
+        'tipo_cliente',
+        'fator_multiplicador',
+        'rt_percentual',
+        'rt_material',
+        'rt_colocacao',
+        'rt_produto',
+        'rt_frete',
+        'condicoes_pagamento',
+        'prazo_entrega',
+        'observacoes_padrao'
     ];
 
     protected $casts = [
+        'data' => 'date',
+        'previsao_entrega' => 'date',
         'data_validade' => 'date',
         'valor_total' => 'decimal:2',
         'desconto' => 'decimal:2',
-        'valor_final' => 'decimal:2'
+        'valor_final' => 'decimal:2',
+        'fator_multiplicador' => 'decimal:2',
+        'rt_percentual' => 'decimal:2',
+        'rt_material' => 'boolean',
+        'rt_colocacao' => 'boolean',
+        'rt_produto' => 'boolean',
+        'rt_frete' => 'boolean'
     ];
 
     protected $dates = [
         'data',
-        'deleted_at',
-        'data_aprovacao',
-        'previsao_entrega',
-        'data_entrega'
+        'data_validade'
     ];
+
+    public function client()
+    {
+        return $this->belongsTo(Client::class);
+    }
 
     public function rooms()
     {
-        return $this->hasMany(Room::class);
+        return $this->hasMany(BudgetRoom::class);
     }
 
-    public function cliente()
+    public function user()
     {
-        return $this->belongsTo(Cliente::class);
-    }
-
-    public function order()
-    {
-        return $this->hasOne(Order::class);
+        return $this->belongsTo(User::class);
     }
 
     public function getStatusTextAttribute()
@@ -76,7 +95,7 @@ class Budget extends Model
     public function recalcularTotal()
     {
         $this->valor_total = $this->rooms->sum('valor_total');
-        $this->valor_final = $this->valor_total - $this->desconto;
+        $this->valor_final = $this->valor_total - ($this->desconto ?? 0);
         $this->save();
     }
 
@@ -104,5 +123,34 @@ class Budget extends Model
         static::creating(function ($budget) {
             $budget->numero = 'ORC-' . date('Y') . str_pad(static::whereYear('created_at', date('Y'))->count() + 1, 5, '0', STR_PAD_LEFT);
         });
+    }
+
+    public function calcularRT()
+    {
+        $valorRT = 0;
+        
+        foreach ($this->rooms as $room) {
+            foreach ($room->items as $item) {
+                if (!$item->aplicar_rt) continue;
+
+                if ($this->rt_material && $item->tipo === 'produto_fabricado') {
+                    $valorRT += $item->valor_total * ($this->rt_percentual / 100);
+                }
+                
+                if ($this->rt_colocacao && $item->valor_mao_obra_colocacao > 0) {
+                    $valorRT += $item->valor_mao_obra_colocacao * ($this->rt_percentual / 100);
+                }
+                
+                if ($this->rt_produto && $item->tipo === 'produto_revendido') {
+                    $valorRT += $item->valor_total * ($this->rt_percentual / 100);
+                }
+            }
+        }
+
+        if ($this->rt_frete && $this->valor_frete > 0) {
+            $valorRT += $this->valor_frete * ($this->rt_percentual / 100);
+        }
+
+        return $valorRT;
     }
 } 

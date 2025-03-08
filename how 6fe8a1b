@@ -1,0 +1,67 @@
+[33mcommit 6fe8a1b939dd773fd4fbe3123fff604dacb9a8cb[m
+Author: danilome <danilo.dsi@gmail.com>
+Date:   Tue Feb 18 21:13:16 2025 -0300
+
+    em progresso
+
+[1mdiff --git a/resources/views/layouts/app.blade.php b/resources/views/layouts/app.blade.php[m
+[1mindex 4e587f2..e323f9e 100644[m
+[1m--- a/resources/views/layouts/app.blade.php[m
+[1m+++ b/resources/views/layouts/app.blade.php[m
+[36m@@ -13,7 +13,7 @@[m
+         <div class="nav-wrapper">[m
+             <div class="container">[m
+                 <a href="#" data-target="slide-out" class="sidenav-trigger"><i class="material-icons">menu</i></a>[m
+[31m-                <a href="{{ url('/dashboard') }}" class="brand-logo">{{ config('app.name') }}</a>[m
+[32m+[m[32m                <a href="{{ url('/dashboard') }}" class="brand-logo center">{{ config('app.name') }}</a>[m
+                 <ul class="right hide-on-med-and-down">[m
+                     <li><a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">[m
+                         <i class="material-icons left">exit_to_app</i>Sair[m
+[1mdiff --git a/resources/views/layouts/guest.blade.php b/resources/views/layouts/guest.blade.php[m
+[1mindex cd4d2fa..38f1d8b 100644[m
+[1m--- a/resources/views/layouts/guest.blade.php[m
+[1m+++ b/resources/views/layouts/guest.blade.php[m
+[36m@@ -10,7 +10,7 @@[m
+ <body class="grey lighten-4">[m
+     <nav class="blue darken-2">[m
+         <div class="nav-wrapper container">[m
+[31m-            <a href="{{ url('/') }}" class="brand-logo">{{ config('app.name') }}</a>[m
+[32m+[m[32m            <a href="{{ url('/') }}" class="brand-logo center">{{ config('app.name') }}</a>[m
+         </div>[m
+     </nav>[m
+ [m
+[1mdiff --git a/resources/views/welcome.blade.php b/resources/views/welcome.blade.php[m
+[1mindex d77f4d1..1115d4a 100644[m
+[1m--- a/resources/views/welcome.blade.php[m
+[1m+++ b/resources/views/welcome.blade.php[m
+[36m@@ -10,7 +10,7 @@[m
+ <body>[m
+     <nav class="blue darken-2">[m
+         <div class="nav-wrapper container">[m
+[31m-            <a href="#" class="brand-logo">MarmoSys</a>[m
+[32m+[m[32m            <a href="#" class="brand-logo center">MarmoSys</a>[m
+         </div>[m
+     </nav>[m
+ [m
+[1mdiff --git a/storage/framework/sessions/48AWG4uUtxSk3Qcaovo9FRaT7RuPldUevCGpz21M b/storage/framework/sessions/48AWG4uUtxSk3Qcaovo9FRaT7RuPldUevCGpz21M[m
+[1mindex 2bcc8c5..d2735e5 100644[m
+[1m--- a/storage/framework/sessions/48AWG4uUtxSk3Qcaovo9FRaT7RuPldUevCGpz21M[m
+[1m+++ b/storage/framework/sessions/48AWG4uUtxSk3Qcaovo9FRaT7RuPldUevCGpz21M[m
+[36m@@ -1 +1 @@[m
+[31m-a:4:{s:6:"_token";s:40:"HMjntpHx3LaPdsQ2PNTvGNc0afbrbPMXGewVAmGv";s:6:"_flash";a:2:{s:3:"old";a:0:{}s:3:"new";a:0:{}}s:9:"_previous";a:1:{s:3:"url";s:39:"http://127.0.0.1:8000/financial/budgets";}s:50:"login_web_59ba36addc2b2f9401580f014c7f58ea4e30989d";i:1;}[m
+\ No newline at end of file[m
+[32m+[m[32ma:4:{s:6:"_token";s:40:"HMjntpHx3LaPdsQ2PNTvGNc0afbrbPMXGewVAmGv";s:6:"_flash";a:2:{s:3:"old";a:0:{}s:3:"new";a:0:{}}s:9:"_previous";a:1:{s:3:"url";s:31:"http://127.0.0.1:8000/dashboard";}s:50:"login_web_59ba36addc2b2f9401580f014c7f58ea4e30989d";i:1;}[m
+\ No newline at end of file[m
+[1mdiff --git a/storage/framework/views/e1221ffff9a6ff48e314dc7e5ae57ff9.php b/storage/framework/views/e1221ffff9a6ff48e314dc7e5ae57ff9.php[m
+[1mindex 3f711ad..a438423 100644[m
+[1m--- a/storage/framework/views/e1221ffff9a6ff48e314dc7e5ae57ff9.php[m
+[1m+++ b/storage/framework/views/e1221ffff9a6ff48e314dc7e5ae57ff9.php[m
+[36m@@ -13,7 +13,7 @@[m
+         <div class="nav-wrapper">[m
+             <div class="container">[m
+                 <a href="#" data-target="slide-out" class="sidenav-trigger"><i class="material-icons">menu</i></a>[m
+[31m-                <a href="<?php echo e(url('/dashboard')); ?>" class="brand-logo"><?php echo e(config('app.name')); ?></a>[m
+[32m+[m[32m                <a href="<?php echo e(url('/dashboard')); ?>" class="brand-logo center"><?php echo e(config('app.name')); ?></a>[m
+                 <ul class="right hide-on-med-and-down">[m
+                     <li><a href="<?php echo e(route('logout')); ?>" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">[m
+                         <i class="material-icons left">exit_to_app</i>Sair[m

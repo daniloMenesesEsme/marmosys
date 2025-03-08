@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\BudgetMaterial;
+use Illuminate\Support\Facades\DB;
 
 class BudgetMaterialSeeder extends Seeder
 {
@@ -12,24 +12,32 @@ class BudgetMaterialSeeder extends Seeder
         $materials = [
             [
                 'nome' => 'Granito Preto São Gabriel',
-                'preco_padrao' => 350.00,
-                'unidade_medida' => 'm²'
+                'codigo' => 'GRAN-001',
+                'descricao' => 'Granito preto de alta qualidade',
+                'preco_venda' => 350.00,
+                'ativo' => true
             ],
             [
                 'nome' => 'Mármore Branco Carrara',
-                'preco_padrao' => 450.00,
-                'unidade_medida' => 'm²'
+                'codigo' => 'MARB-001',
+                'descricao' => 'Mármore italiano de primeira linha',
+                'preco_venda' => 450.00,
+                'ativo' => true
             ],
             [
-                'nome' => 'Granito Cinza Corumbá',
-                'preco_padrao' => 280.00,
-                'unidade_medida' => 'm²'
-            ],
-            // Adicione mais materiais conforme necessário
+                'nome' => 'Granito Verde Ubatuba',
+                'codigo' => 'GRAN-002',
+                'descricao' => 'Granito verde brasileiro',
+                'preco_venda' => 320.00,
+                'ativo' => true
+            ]
         ];
 
         foreach ($materials as $material) {
-            BudgetMaterial::create($material);
+            DB::table('budget_materials')->insert(array_merge($material, [
+                'created_at' => now(),
+                'updated_at' => now()
+            ]));
         }
     }
 } 

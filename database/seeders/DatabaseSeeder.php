@@ -16,16 +16,17 @@ class DatabaseSeeder extends Seeder
 {
     public function run()
     {
+        $this->call([
+            UserSeeder::class,
+            ClientSeeder::class,
+            BudgetMaterialSeeder::class,
+            MaterialSeeder::class,
+            CompanySettingSeeder::class,
+        ]);
+
         try {
             DB::beginTransaction();
             
-            // Criar usuário admin
-            User::create([
-                'name' => 'Administrador',
-                'email' => 'admin@admin.com',
-                'password' => bcrypt('123456')
-            ]);
-
             // Criar categorias financeiras
             $categoriaReceita = FinancialCategory::create([
                 'nome' => 'Vendas',
@@ -131,11 +132,5 @@ class DatabaseSeeder extends Seeder
             DB::rollBack();
             throw $e;
         }
-
-        $this->call([
-            BudgetMaterialSeeder::class,
-            MaterialSeeder::class,
-            // ... outros seeders
-        ]);
     }
 } 

@@ -1,12 +1,12 @@
 <?php
 
+use App\Http\Controllers\Financial\BudgetController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\ProductController;  // Adicionado
-use App\Http\Controllers\BudgetController;
 use App\Http\Controllers\FinancialCategoryController;
 use App\Http\Controllers\FinancialAccountController;
 use App\Http\Controllers\FinancialReportController;
@@ -16,6 +16,12 @@ use App\Http\Controllers\CostCenterController;
 use App\Http\Controllers\CashFlowProjectionController;
 use App\Http\Controllers\FinancialGoalController;
 use App\Http\Controllers\MaterialController;
+use App\Http\Controllers\Admin\ApprovalLogController;
+use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\SuppliersController;
+use App\Http\Controllers\Settings\BackupController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -34,6 +40,8 @@ Route::middleware('auth')->group(function () {
     Route::resource('clients', ClientController::class);
     
     // Rotas de produtos
+    Route::get('/products/generate-code/{type}', [ProductController::class, 'generateCode'])
+        ->name('products.generate-code');
     Route::resource('products', ProductController::class);  // Adicionado
     
     // Rotas financeiras
@@ -76,23 +84,20 @@ Route::middleware('auth')->group(function () {
             ->name('projections.index');
 
         // Metas Financeiras
-        Route::get('goals', [FinancialGoalController::class, 'index'])->name('goals.index');
-        Route::post('goals', [FinancialGoalController::class, 'store'])->name('goals.store');
-        Route::get('goals/create', [FinancialGoalController::class, 'create'])->name('goals.create');
-        Route::get('goals/{goal}/edit', [FinancialGoalController::class, 'edit'])->name('goals.edit');
-        Route::put('goals/{goal}', [FinancialGoalController::class, 'update'])->name('goals.update');
-        Route::delete('goals/{goal}', [FinancialGoalController::class, 'destroy'])->name('goals.destroy');
+        Route::resource('goals', FinancialGoalController::class);
         Route::post('goals/update-status', [FinancialGoalController::class, 'updateStatus'])
             ->name('goals.update-status');
 
-        // Rotas de Orçamentos
+        // Rotas de orçamentos
         Route::resource('budgets', BudgetController::class);
-        
-        // Se você precisar da rota de cópia, adicione:
-        Route::post('budgets/copy', [BudgetController::class, 'copy'])->name('budgets.copy');
-
-        Route::get('/budgets/{budget}/pdf', [BudgetController::class, 'generatePdf'])->name('budgets.pdf');
-        Route::get('/budgets/{budget}/print', [BudgetController::class, 'printView'])->name('budgets.print');
+        Route::get('budgets/{budget}/pdf', [BudgetController::class, 'generatePdf'])
+            ->name('budgets.pdf');
+        Route::post('budgets/{budget}/approve', [BudgetController::class, 'approve'])
+            ->name('budgets.approve');
+        Route::post('budgets/{budget}/reject', [BudgetController::class, 'reject'])
+            ->name('budgets.reject');
+        Route::post('budgets/copy', [BudgetController::class, 'copy'])
+            ->name('budgets.copy');
     });
 
     Route::get('/materials/search', [MaterialController::class, 'search'])->name('materials.search');
@@ -101,4 +106,42 @@ Route::middleware('auth')->group(function () {
     Route::prefix('stock')->name('stock.')->group(function () {
         Route::resource('materials', MaterialController::class);
     });
+
+    Route::prefix('admin')->name('admin.')->group(function () {
+        Route::get('approval-logs', [ApprovalLogController::class, 'index'])->name('approval-logs.index');
+        Route::resource('company', CompanyController::class);
+    });
+
+    // Fornecedores
+    Route::resource('suppliers', SupplierController::class);
+
+    // Funcionários
+    Route::resource('employees', EmployeeController::class);
+
+    // Empresas
+    Route::resource('companies', CompanyController::class);
+
+    // Rota para busca de CNPJ
+    Route::get('/api/companies/find-cnpj/{cnpj}', [CompanyController::class, 'findByCNPJ'])->name('companies.find-cnpj');
+
+    // Rota para busca de CNPJ
+    Route::get('/suppliers/find-cnpj/{cnpj}', [SuppliersController::class, 'findByCNPJ'])->name('suppliers.find-cnpj');
+
+    // Rotas de configurações
+    Route::prefix('settings')->name('settings.')->group(function () {
+        // Rotas de backup
+        Route::get('/backup', [BackupController::class, 'index'])
+            ->name('backup.index');
+        Route::post('/backup', [BackupController::class, 'store'])
+            ->name('backup.store');
+        Route::post('/backup/create', [BackupController::class, 'createBackup'])
+            ->name('backup.create');
+        Route::get('/backup/download/{filename}', [BackupController::class, 'download'])
+            ->name('backup.download');
+        Route::get('/backup/delete/{filename}', [BackupController::class, 'delete'])
+            ->name('backup.delete');
+    });
+
+    Route::post('/products/{product}/ajustar-estoque', [ProductController::class, 'ajustarEstoque'])
+        ->name('products.ajustar-estoque');
 }); 

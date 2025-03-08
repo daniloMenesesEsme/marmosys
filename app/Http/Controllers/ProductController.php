@@ -4,34 +4,74 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use Illuminate\Http\Request;
+use App\Enums\ProductType;
+use Illuminate\Validation\Rule;
 
 class ProductController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::orderBy('nome')->paginate(10);
+        $query = Product::query();
+
+        // Filtro por tipo
+        if ($request->filled('tipo')) {
+            $query->where('tipo', $request->tipo);
+        }
+
+        // Filtro por busca
+        if ($request->filled('busca')) {
+            $search = $request->busca;
+            $query->where(function($q) use ($search) {
+                $q->where('nome', 'like', "%{$search}%")
+                  ->orWhere('codigo', 'like', "%{$search}%")
+                  ->orWhere('descricao', 'like', "%{$search}%");
+            });
+        }
+
+        // Filtro por status
+        if ($request->filled('status')) {
+            $query->where('ativo', $request->status);
+        }
+
+        $products = $query->orderBy('nome')->paginate(10);
         return view('products.index', compact('products'));
     }
 
     public function create()
     {
-        return view('products.form');
+        // Gera código inicial para produto (pode ser alterado quando o tipo mudar)
+        $nextCode = Product::generateNextCode('product');
+        return view('products.form', compact('nextCode'));
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'codigo' => 'required|unique:products|max:50',
-            'nome' => 'required|max:255',
-            'descricao' => 'nullable',
+            'tipo' => ['required', 'string', Rule::in(array_column(ProductType::cases(), 'value'))],
+            'codigo' => 'required|string|unique:products,codigo',
+            'nome' => 'required|string|max:255',
+            'descricao' => 'nullable|string',
+            'preco_custo' => 'required|numeric|min:0',
             'preco_venda' => 'required|numeric|min:0',
-            'estoque' => 'required|integer|min:0'
+            'estoque' => 'required|numeric|min:0',
+            'estoque_minimo' => 'required|numeric|min:0',
+            'unidade_medida' => 'required|string',
+            'categoria' => 'nullable|string|max:255',
+            'fornecedor' => 'nullable|string|max:255',
         ]);
 
-        Product::create($validated);
-
-        return redirect()->route('products.index')
-                        ->with('success', 'Produto cadastrado com sucesso!');
+        try {
+            $product = Product::create($validated);
+            
+            return redirect()
+                ->route('products.show', $product)
+                ->with('success', 'Produto cadastrado com sucesso!');
+        } catch (\Exception $e) {
+            return redirect()
+                ->back()
+                ->withInput()
+                ->withErrors(['error' => 'Erro ao cadastrar produto: ' . $e->getMessage()]);
+        }
     }
 
     public function show(Product $product)
@@ -47,18 +87,33 @@ class ProductController extends Controller
     public function update(Request $request, Product $product)
     {
         $validated = $request->validate([
-            'codigo' => 'required|max:50|unique:products,codigo,' . $product->id,
-            'nome' => 'required|max:255',
-            'descricao' => 'nullable',
+            'tipo' => ['required', 'string', Rule::in(array_column(ProductType::cases(), 'value'))],
+            'nome' => 'required|string|max:255',
+            'descricao' => 'nullable|string',
+            'preco_custo' => 'required|numeric|min:0',
             'preco_venda' => 'required|numeric|min:0',
-            'estoque' => 'required|integer|min:0',
-            'ativo' => 'boolean'
+            'estoque' => 'required|numeric|min:0',
+            'estoque_minimo' => 'required|numeric|min:0',
+            'unidade_medida' => 'required|string',
+            'categoria' => 'nullable|string|max:255',
+            'fornecedor' => 'nullable|string|max:255',
         ]);
 
-        $product->update($validated);
-
-        return redirect()->route('products.index')
-                        ->with('success', 'Produto atualizado com sucesso!');
+        try {
+            // Atualiza o status ativo/inativo
+            $validated['ativo'] = $request->has('ativo');
+            
+            $product->update($validated);
+            
+            return redirect()
+                ->route('products.index')
+                ->with('success', 'Produto atualizado com sucesso!');
+        } catch (\Exception $e) {
+            return redirect()
+                ->back()
+                ->withInput()
+                ->withErrors(['error' => 'Erro ao atualizar produto: ' . $e->getMessage()]);
+        }
     }
 
     public function destroy(Product $product)
@@ -72,29 +127,48 @@ class ProductController extends Controller
 
     public function ajustarEstoque(Request $request, Product $product)
     {
-        $request->validate([
-            'quantidade' => 'required|numeric',
+        $validated = $request->validate([
             'tipo_movimento' => 'required|in:entrada,saida',
-            'observacao' => 'required'
+            'quantidade' => 'required|numeric|min:0.01',
+            'observacao' => 'required|string'
         ]);
 
-        $quantidade = $request->quantidade;
-        if ($request->tipo_movimento === 'saida') {
-            $quantidade = -$quantidade;
+        try {
+            // Verifica se tem estoque suficiente para saída
+            if ($validated['tipo_movimento'] === 'saida' && $product->estoque < $validated['quantidade']) {
+                return redirect()
+                    ->back()
+                    ->withErrors(['error' => 'Estoque insuficiente para esta saída.']);
+            }
+
+            $product->ajustarEstoque(
+                $validated['quantidade'],
+                $validated['tipo_movimento'],
+                $validated['observacao']
+            );
+
+            return redirect()
+                ->back()
+                ->with('success', 'Estoque ajustado com sucesso!');
+        } catch (\Exception $e) {
+            return redirect()
+                ->back()
+                ->withErrors(['error' => 'Erro ao ajustar estoque: ' . $e->getMessage()]);
         }
+    }
 
-        $product->estoque_atual += $quantidade;
-        $product->save();
+    public function generateCode(string $type)
+    {
+        try {
+            // Validação do tipo
+            if (!in_array($type, array_column(ProductType::cases(), 'value'))) {
+                throw new \InvalidArgumentException('Tipo de produto inválido');
+            }
 
-        // Registra o movimento no histórico
-        $product->movimentos()->create([
-            'tipo' => $request->tipo_movimento,
-            'quantidade' => abs($quantidade),
-            'observacao' => $request->observacao,
-            'user_id' => auth()->id()
-        ]);
-
-        return redirect()->route('products.show', $product)
-            ->with('success', 'Estoque ajustado com sucesso!');
+            $code = Product::generateNextCode($type);
+            return response($code, 200);
+        } catch (\Exception $e) {
+            return response('Erro ao gerar código: ' . $e->getMessage(), 500);
+        }
     }
 } 
