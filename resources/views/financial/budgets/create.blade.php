@@ -130,9 +130,9 @@
                     <div class="row">
                         <div class="input-field col s12">
                             <i class="material-icons prefix">notes</i>
-                            <textarea id="observacao" name="observacao" class="materialize-textarea">{{ old('observacao') }}</textarea>
-                            <label for="observacao">Observações</label>
-                            @error('observacao') <span class="red-text">{{ $message }}</span> @enderror
+                            <textarea id="observacoes" name="observacoes" class="materialize-textarea">{{ old('observacoes') }}</textarea>
+                            <label for="observacoes">Observações</label>
+                            @error('observacoes') <span class="red-text">{{ $message }}</span> @enderror
                         </div>
                     </div>
                     <div class="card-action">

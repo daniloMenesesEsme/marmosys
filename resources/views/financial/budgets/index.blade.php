@@ -60,6 +60,11 @@
                                     <i class="material-icons left">clear</i>
                                     Limpar
                                 </a>
+                                <div style="float: right;">
+                                    <a href="{{ route('financial.budgets.create') }}" class="btn btn-success">
+                                        <i class="fas fa-plus"></i> + NOVO ORÇAMENTO
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </form>
@@ -105,11 +110,11 @@
                                         <i class="material-icons">edit</i>
                                     </a>
                                     
-                                    <a href="{{ route('financial.budgets.pdf', $budget) }}"
-                                       class="btn-floating waves-effect waves-light purple tooltipped"
-                                       data-position="top" 
-                                       data-tooltip="Gerar PDF">
-                                        <i class="material-icons">picture_as_pdf</i>
+                                    <a href="{{ route('financial.budgets.pdf', $budget->id) }}" 
+                                       target="_blank" 
+                                       class="btn btn-info btn-sm" 
+                                       title="Gerar PDF">
+                                        <i class="fas fa-file-pdf"></i>
                                     </a>
                                     
                                     <form action="{{ route('financial.budgets.destroy', $budget) }}" 
@@ -164,13 +169,6 @@
                         </ul>
                     </div>
                 </div>
-            </div>
-            <div class="card-action">
-                <a href="{{ route('financial.budgets.create') }}" 
-                   class="btn waves-effect waves-light">
-                    <i class="material-icons left">add</i>
-                    Novo Orçamento
-                </a>
             </div>
         </div>
     </div>

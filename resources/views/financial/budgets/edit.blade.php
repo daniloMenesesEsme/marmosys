@@ -172,6 +172,15 @@
                         </div>
                     </div>
 
+                    <div class="row">
+                        <div class="input-field col s12">
+                            <i class="material-icons prefix">notes</i>
+                            <textarea id="observacoes" name="observacoes" class="materialize-textarea">{{ old('observacoes', $budget->observacoes) }}</textarea>
+                            <label for="observacoes">Observações</label>
+                            @error('observacoes') <span class="red-text">{{ $message }}</span> @enderror
+                        </div>
+                    </div>
+
                     <div class="card-action">
                         <button type="submit" class="btn waves-effect waves-light">
                             <i class="material-icons left">save</i>

@@ -17,6 +17,8 @@ use App\Models\CompanySetting;
 use App\Models\Product;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
+use Config;
+use App\Models\Company;
 
 class BudgetController extends Controller
 {
@@ -90,7 +92,7 @@ class BudgetController extends Controller
                 'rooms.*.items.*.unidade' => 'required|string',
                 'rooms.*.items.*.largura' => 'required|numeric|min:0',
                 'rooms.*.items.*.altura' => 'required|numeric|min:0',
-                'observacao' => 'nullable|string|max:1000'
+                'observacoes' => 'nullable|string|max:1000'
             ]);
 
             \Log::info('Dados validados:', $validated);
@@ -104,7 +106,7 @@ class BudgetController extends Controller
                 'previsao_entrega' => $request->previsao_entrega,
                 'client_id' => $request->client_id,
                 'status' => 'aguardando_aprovacao',
-                'observacao' => $request->observacao,
+                'observacoes' => $request->observacoes,
                 'valor_total' => 0,
                 'desconto' => 0,
                 'valor_final' => 0,
@@ -309,33 +311,38 @@ class BudgetController extends Controller
     public function generatePdf(Budget $budget)
     {
         try {
-            // Busca as configurações da empresa
-            $company = CompanySetting::first();
+            \Log::info('Iniciando geração do PDF do orçamento #' . $budget->numero);
+
+            // Carrega o orçamento com relacionamentos necessários
+            $budget->load(['client', 'rooms.items.material']);
             
-            if (!$company) {
-                // Se não existir configuração, cria uma padrão
-                $company = CompanySetting::create([
-                    'nome_empresa' => 'MarmoSys',
-                    'cnpj' => '00.000.000/0001-00',
-                    'endereco' => 'Endereço da Empresa',
-                    'telefone' => '(00) 0000-0000',
-                    'email' => 'contato@empresa.com',
-                    'observacoes_orcamento' => 'Orçamento válido por 15 dias.'
-                ]);
-            }
+            // Busca dados da empresa
+            $company = Company::first();
+            
+            // Log para debug
+            \Log::info('Dados da empresa:', ['company' => $company->toArray()]);
 
-            // Carrega a view do PDF com os dados
-            $pdf = PDF::loadView('financial.budgets.pdf', compact('budget', 'company'));
+            // Configura o PDF
+            $pdf = PDF::loadView('financial.budgets.pdf', [
+                'budget' => $budget,
+                'company' => $company
+            ]);
 
-            // Retorna o PDF para download
-            return $pdf->stream('orcamento-' . $budget->id . '.pdf');
+            $pdf->setPaper('A4');
+            
+            $filename = 'orcamento_' . $budget->numero . '.pdf';
+
+            \Log::info('PDF gerado com sucesso');
+
+            return $pdf->stream($filename);
 
         } catch (\Exception $e) {
-            // Log do erro
-            \Log::error('Erro ao gerar PDF: ' . $e->getMessage());
-            
-            // Retorna para a página anterior com mensagem de erro
-            return back()->with('error', 'Erro ao gerar PDF do orçamento. Por favor, tente novamente.');
+            \Log::error('Erro ao gerar PDF:', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return back()->with('error', 'Erro ao gerar PDF do orçamento.');
         }
     }
 

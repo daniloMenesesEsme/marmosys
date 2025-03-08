@@ -74,6 +74,19 @@
                     </div>
                 </div>
 
+                <div class="row">
+                    <div class="col s12">
+                        @if($budget->observacoes)
+                            <div class="card">
+                                <div class="card-content">
+                                    <span class="card-title">Observações</span>
+                                    <p>{{ $budget->observacoes }}</p>
+                                </div>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+
                 <div class="card-action" style="display: flex; gap: 10px; flex-wrap: wrap;">
                     <a href="{{ route('financial.budgets.edit', $budget) }}" class="btn waves-effect waves-light teal">
                         <i class="material-icons left">edit</i>
