@@ -64,8 +64,14 @@ class CompanyController extends Controller
 
         // Upload do logo
         if ($request->hasFile('logo')) {
-            $logoPath = $request->file('logo')->store('companies', 'public');
-            $validated['logo'] = $logoPath;
+            // Remove logo antiga se existir
+            if ($company->logo) {
+                Storage::delete($company->logo);
+            }
+            
+            // Salva nova logo
+            $path = $request->file('logo')->store('companies', 'public');
+            $validated['logo'] = $path;
         }
 
         Company::create($validated);
@@ -129,13 +135,14 @@ class CompanyController extends Controller
 
         // Upload do logo
         if ($request->hasFile('logo')) {
-            // Remover logo anterior se existir
+            // Remove logo antiga se existir
             if ($company->logo) {
-                Storage::disk('public')->delete($company->logo);
+                Storage::delete($company->logo);
             }
             
-            $logoPath = $request->file('logo')->store('companies', 'public');
-            $validated['logo'] = $logoPath;
+            // Salva nova logo
+            $path = $request->file('logo')->store('companies', 'public');
+            $validated['logo'] = $path;
         }
 
         $company->update($validated);
