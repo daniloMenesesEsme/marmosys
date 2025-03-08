@@ -11,9 +11,9 @@
                 {{ isset($product) ? 'Editar Produto' : 'Novo Produto' }}
             </span>
 
-            <form action="{{ isset($product) ? route('products.update', $product) : route('products.store') }}" method="POST">
+            <form action="{{ $product->id ? route('products.update', $product) : route('products.store') }}" method="POST">
                 @csrf
-                @if(isset($product))
+                @if($product->id)
                     @method('PUT')
                 @endif
 
@@ -138,12 +138,12 @@
                     <div class="col s12" style="text-align: right; margin-bottom: 20px;">
                         <label style="margin-right: 20px;">
                             <input type="checkbox" class="filled-in" name="ativo" value="1" 
-                                   {{ $product->ativo ? 'checked' : '' }}>
+                                   {{ old('ativo', $product->ativo ?? true) ? 'checked' : '' }}>
                             <span>Ativar</span>
                         </label>
                         <label>
                             <input type="checkbox" class="filled-in" name="inativo" value="0" 
-                                   {{ !$product->ativo ? 'checked' : '' }}>
+                                   {{ old('inativo', !($product->ativo ?? true)) ? 'checked' : '' }}>
                             <span>Desativar</span>
                         </label>
                     </div>

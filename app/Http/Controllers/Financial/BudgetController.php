@@ -16,15 +16,43 @@ use App\Models\ApprovalLog;
 use App\Models\CompanySetting;
 use App\Models\Product;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
 
 class BudgetController extends Controller
 {
     public function index(Request $request)
     {
-        $budgets = Budget::with(['client', 'rooms.items'])
-            ->orderBy('created_at', 'desc')
-            ->paginate(10);
+        $query = Budget::with(['client', 'rooms.items'])
+            ->orderBy('created_at', 'desc');
 
+        // Filtro de busca geral
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('numero', 'like', "%{$search}%")
+                  ->orWhereHas('client', function($q) use ($search) {
+                      $q->where('nome', 'like', "%{$search}%")
+                        ->orWhere('cpf_cnpj', 'like', "%{$search}%")
+                        ->orWhere('telefone', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        // Filtro de status
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        // Filtro de data
+        if ($request->filled('data_inicio')) {
+            $query->whereDate('data', '>=', $request->data_inicio);
+        }
+        if ($request->filled('data_fim')) {
+            $query->whereDate('data', '<=', $request->data_fim);
+        }
+
+        $budgets = $query->paginate(10);
+        
         return view('financial.budgets.index', compact('budgets'));
     }
 
@@ -34,12 +62,10 @@ class BudgetController extends Controller
             ->orderBy('nome')
             ->get();
             
-        // Debug dos produtos
+        // Alterando para buscar da tabela products
         $materiais = Product::where('ativo', true)
             ->orderBy('nome')
             ->get();
-        
-        \Log::info('Produtos carregados:', $materiais->toArray());
         
         $numero = 'ORC-' . date('Y') . str_pad(Budget::count() + 1, 4, '0', STR_PAD_LEFT);
         
@@ -48,36 +74,41 @@ class BudgetController extends Controller
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'numero' => 'required|unique:budgets,numero',
-            'data' => 'required|date',
-            'previsao_entrega' => 'required|date|after_or_equal:data',
-            'client_id' => 'required|exists:clients,id',
-            'rooms' => 'required|array|min:1',
-            'rooms.*.nome' => 'required|string',
-            'rooms.*.items' => 'required|array|min:1',
-            'rooms.*.items.*.material_id' => 'required|exists:products,id',
-            'rooms.*.items.*.quantidade' => 'required|numeric|min:0.01',
-            'rooms.*.items.*.unidade' => 'required|string',
-            'rooms.*.items.*.largura' => 'required|numeric|min:0',
-            'rooms.*.items.*.altura' => 'required|numeric|min:0'
-        ]);
-
-        DB::beginTransaction();
         try {
-            \Log::info('Iniciando criação do orçamento');
-            
-            // Cria o orçamento
+            \Log::info('Iniciando criação do orçamento com dados:', $request->all());
+
+            $validated = $request->validate([
+                'numero' => 'required|unique:budgets,numero',
+                'data' => 'required|date',
+                'previsao_entrega' => 'required|date',
+                'client_id' => 'required|exists:clients,id',
+                'rooms' => 'required|array|min:1',
+                'rooms.*.nome' => 'required|string',
+                'rooms.*.items' => 'required|array|min:1',
+                'rooms.*.items.*.material_id' => 'required|exists:products,id',
+                'rooms.*.items.*.quantidade' => 'required|numeric|min:0.01',
+                'rooms.*.items.*.unidade' => 'required|string',
+                'rooms.*.items.*.largura' => 'required|numeric|min:0',
+                'rooms.*.items.*.altura' => 'required|numeric|min:0',
+                'observacao' => 'nullable|string|max:1000'
+            ]);
+
+            \Log::info('Dados validados:', $validated);
+
+            DB::beginTransaction();
+
+            // Cria o orçamento base
             $budget = Budget::create([
                 'numero' => $request->numero,
                 'data' => $request->data,
                 'previsao_entrega' => $request->previsao_entrega,
                 'client_id' => $request->client_id,
                 'status' => 'aguardando_aprovacao',
+                'observacao' => $request->observacao,
                 'valor_total' => 0,
                 'desconto' => 0,
                 'valor_final' => 0,
-                'data_validade' => Carbon::parse($request->data)->addDays(30),
+                'data_validade' => now()->addDays(30),
                 'user_id' => auth()->id()
             ]);
 
@@ -85,58 +116,66 @@ class BudgetController extends Controller
 
             $valorTotalOrcamento = 0;
 
-            foreach ($request->rooms as $roomData) {
-                \Log::info('Processando ambiente:', $roomData);
-                $valorTotalAmbiente = 0;
+            // Processa cada ambiente e seus itens
+            foreach ($request->rooms as $index => $roomData) {
+                \Log::info("Processando ambiente {$index}:", $roomData);
                 
                 $room = $budget->rooms()->create([
-                    'nome' => $roomData['nome'],
-                    'valor_total' => 0
+                    'nome' => $roomData['nome']
                 ]);
 
-                foreach ($roomData['items'] as $itemData) {
-                    $material = Product::findOrFail($itemData['material_id']);
+                \Log::info("Ambiente criado:", $room->toArray());
+
+                foreach ($roomData['items'] as $itemIndex => $itemData) {
+                    \Log::info("Processando item {$itemIndex} do ambiente {$index}:", $itemData);
                     
-                    // Calcula valor do item considerando quantidade e dimensões
+                    $material = Product::findOrFail($itemData['material_id']);
+                    \Log::info("Material encontrado:", $material->toArray());
+                    
                     $area = $itemData['largura'] * $itemData['altura'];
                     $quantidade = $itemData['quantidade'];
                     $valorUnitario = $material->preco_venda;
-                    $valorItem = $quantidade * $area * $valorUnitario;
+                    $valorTotal = $quantidade * $area * $valorUnitario;
+                    
+                    $valorTotalOrcamento += $valorTotal;
 
-                    $room->items()->create([
-                        'material_id' => $itemData['material_id'],
+                    $item = $room->items()->create([
+                        'material_id' => $material->id,
                         'quantidade' => $quantidade,
                         'unidade' => $itemData['unidade'],
-                        'descricao' => $material->nome,
                         'largura' => $itemData['largura'],
                         'altura' => $itemData['altura'],
                         'valor_unitario' => $valorUnitario,
-                        'valor_total' => $valorItem
+                        'valor_total' => $valorTotal,
+                        'descricao' => $material->descricao ?? $material->nome
                     ]);
 
-                    $valorTotalAmbiente += $valorItem;
+                    \Log::info("Item criado:", $item->toArray());
                 }
-
-                $room->update(['valor_total' => $valorTotalAmbiente]);
-                $valorTotalOrcamento += $valorTotalAmbiente;
             }
 
             // Atualiza os valores totais do orçamento
             $budget->update([
                 'valor_total' => $valorTotalOrcamento,
-                'valor_final' => $valorTotalOrcamento - $budget->desconto
+                'valor_final' => $valorTotalOrcamento
+            ]);
+
+            \Log::info("Orçamento atualizado com valores totais:", [
+                'valor_total' => $valorTotalOrcamento,
+                'valor_final' => $valorTotalOrcamento
             ]);
 
             DB::commit();
             \Log::info('Orçamento salvo com sucesso');
-            
+
             return redirect()
                 ->route('financial.budgets.show', $budget)
                 ->with('success', 'Orçamento criado com sucesso!');
+
         } catch (\Exception $e) {
-            DB::rollBack();
+            DB::rollback();
             \Log::error('Erro ao criar orçamento:', [
-                'message' => $e->getMessage(),
+                'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
             return back()
@@ -158,7 +197,8 @@ class BudgetController extends Controller
             ->orderBy('nome')
             ->get();
             
-        $materiais = BudgetMaterial::where('ativo', true)
+        // Alterado de BudgetMaterial para Product
+        $materiais = Product::where('ativo', true)
             ->orderBy('nome')
             ->get();
             
@@ -175,13 +215,11 @@ class BudgetController extends Controller
             'rooms' => 'required|array',
             'rooms.*.nome' => 'required|string',
             'rooms.*.items' => 'required|array',
-            'rooms.*.items.*.material_id' => 'required|exists:budget_materials,id',
+            'rooms.*.items.*.material_id' => 'required|exists:products,id',
             'rooms.*.items.*.quantidade' => 'required|numeric|min:0.001',
             'rooms.*.items.*.unidade' => 'required|string',
-            'rooms.*.items.*.descricao' => 'required|string',
             'rooms.*.items.*.largura' => 'required|numeric|min:0',
-            'rooms.*.items.*.altura' => 'required|numeric|min:0',
-            'rooms.*.items.*.valor_unitario' => 'required|numeric|min:0'
+            'rooms.*.items.*.altura' => 'required|numeric|min:0'
         ]);
 
         DB::beginTransaction();
@@ -217,7 +255,6 @@ class BudgetController extends Controller
                         'material_id' => $itemData['material_id'],
                         'quantidade' => $itemData['quantidade'],
                         'unidade' => $itemData['unidade'],
-                        'descricao' => $itemData['descricao'],
                         'largura' => $itemData['largura'],
                         'altura' => $itemData['altura'],
                         'valor_unitario' => $itemData['valor_unitario'],

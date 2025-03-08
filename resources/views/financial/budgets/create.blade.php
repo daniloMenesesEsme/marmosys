@@ -115,6 +115,7 @@
                         </div>
                     </div>
 
+
                     <div class="rooms-container"></div>
 
                     <div class="row">
@@ -126,6 +127,14 @@
                         </div>
                     </div>
 
+                    <div class="row">
+                        <div class="input-field col s12">
+                            <i class="material-icons prefix">notes</i>
+                            <textarea id="observacao" name="observacao" class="materialize-textarea">{{ old('observacao') }}</textarea>
+                            <label for="observacao">Observações</label>
+                            @error('observacao') <span class="red-text">{{ $message }}</span> @enderror
+                        </div>
+                    </div>
                     <div class="card-action">
                         <button type="submit" class="btn waves-effect waves-light">
                             <i class="material-icons left">save</i>
@@ -139,7 +148,7 @@
                     </div>
                 </form>
 
-                <button type="button" onclick="debugForm()">Debug Form</button>
+                <!--<button type="button" onclick="debugForm()">Debug Form</button>-->
             </div>
         </div>
     </div>
@@ -148,13 +157,14 @@
 <!-- Adicione isso logo após o início do form -->
 <template id="item-template">
     <div class="item-row">
-                        <div class="row">
+        <div class="row">
             <div class="input-field col s12 m3">
-                <select name="rooms[{ROOM_INDEX}][items][{ITEM_INDEX}][material_id]" class="material-select" required>
-                    <option value="" disabled selected>Selecione o material</option>
+                <select name="rooms[{ROOM_INDEX}][items][{ITEM_INDEX}][material_id]" class="material-select">
+                    <option value="">Selecione o material</option>
                     @foreach($materiais as $material)
-                        <option value="{{ $material['id'] }}" data-preco="{{ $material['preco_venda'] }}">
-                            {{ $material['nome'] }}
+                        <option value="{{ $material->id }}" 
+                                data-preco="{{ $material->preco_venda }}">
+                            {{ $material->nome }}
                         </option>
                     @endforeach
                 </select>
@@ -173,25 +183,25 @@
                     <option value="pç">pç</option>
                 </select>
                 <label>Unid.*</label>
-                        </div>
+            </div>
 
             <div class="input-field col s6 m2">
                 <input type="number" name="rooms[{ROOM_INDEX}][items][{ITEM_INDEX}][largura]" step="0.001" min="0" required>
-                                <label>Largura (m)*</label>
-                            </div>
+                <label>Largura (m)*</label>
+            </div>
 
             <div class="input-field col s6 m2">
                 <input type="number" name="rooms[{ROOM_INDEX}][items][{ITEM_INDEX}][altura]" step="0.001" min="0" required>
-                                <label>Altura (m)*</label>
-                            </div>
+                <label>Altura (m)*</label>
+            </div>
 
             <div class="col s12 m2">
                 <button type="button" class="btn-floating red remove-item">
-                            <i class="material-icons">remove</i>
-                        </button>
-                    </div>
-                </div>
+                    <i class="material-icons">remove</i>
+                </button>
             </div>
+        </div>
+    </div>
 </template>
 @endsection
 

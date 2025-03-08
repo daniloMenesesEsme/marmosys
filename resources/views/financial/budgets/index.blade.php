@@ -25,6 +25,46 @@
             <div class="card-content">
                 <span class="card-title">Orçamentos</span>
                 
+                <!-- Filtro -->
+                <div class="row">
+                    <form action="{{ route('financial.budgets.index') }}" method="GET" class="col s12">
+                        <div class="row mb-0">
+                            <div class="input-field col s12 m6">
+                                <i class="material-icons prefix">search</i>
+                                <input type="text" id="search" name="search" value="{{ request('search') }}">
+                                <label for="search">Buscar por Número, Cliente, CPF/CNPJ ou Telefone</label>
+                            </div>
+                            <div class="input-field col s6 m2">
+                                <select name="status">
+                                    <option value="">Todos os Status</option>
+                                    <option value="aguardando_aprovacao" {{ request('status') == 'aguardando_aprovacao' ? 'selected' : '' }}>Aguardando Aprovação</option>
+                                    <option value="aprovado" {{ request('status') == 'aprovado' ? 'selected' : '' }}>Aprovado</option>
+                                    <option value="reprovado" {{ request('status') == 'reprovado' ? 'selected' : '' }}>Reprovado</option>
+                                </select>
+                                <label>Status</label>
+                            </div>
+                            <div class="input-field col s6 m2">
+                                <input type="date" name="data_inicio" value="{{ request('data_inicio') }}">
+                                <label>Data Início</label>
+                            </div>
+                            <div class="input-field col s6 m2">
+                                <input type="date" name="data_fim" value="{{ request('data_fim') }}">
+                                <label>Data Fim</label>
+                            </div>
+                            <div class="col s12" style="margin-top: 10px;">
+                                <button type="submit" class="btn waves-effect waves-light">
+                                    <i class="material-icons left">search</i>
+                                    Filtrar
+                                </button>
+                                <a href="{{ route('financial.budgets.index') }}" class="btn waves-effect waves-light red">
+                                    <i class="material-icons left">clear</i>
+                                    Limpar
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
                 <table class="striped responsive-table">
                     <thead>
                         <tr>
@@ -95,7 +135,35 @@
                     </tbody>
                 </table>
 
-                {{ $budgets->links() }}
+                <!-- Paginação -->
+                <div class="row">
+                    <div class="col s12">
+                        <ul class="pagination center-align">
+                            {{-- Link Previous --}}
+                            @if ($budgets->onFirstPage())
+                                <li class="disabled"><a href="#!"><i class="material-icons">chevron_left</i></a></li>
+                            @else
+                                <li class="waves-effect"><a href="{{ $budgets->previousPageUrl() }}"><i class="material-icons">chevron_left</i></a></li>
+                            @endif
+
+                            {{-- Números das Páginas --}}
+                            @foreach ($budgets->getUrlRange(1, $budgets->lastPage()) as $page => $url)
+                                @if ($page == $budgets->currentPage())
+                                    <li class="active blue"><a href="#!">{{ $page }}</a></li>
+                                @else
+                                    <li class="waves-effect"><a href="{{ $url }}">{{ $page }}</a></li>
+                                @endif
+                            @endforeach
+
+                            {{-- Link Next --}}
+                            @if ($budgets->hasMorePages())
+                                <li class="waves-effect"><a href="{{ $budgets->nextPageUrl() }}"><i class="material-icons">chevron_right</i></a></li>
+                            @else
+                                <li class="disabled"><a href="#!"><i class="material-icons">chevron_right</i></a></li>
+                            @endif
+                        </ul>
+                    </div>
+                </div>
             </div>
             <div class="card-action">
                 <a href="{{ route('financial.budgets.create') }}" 
@@ -123,6 +191,11 @@ function printBudget(id) {
 document.addEventListener('DOMContentLoaded', function() {
     var tooltips = document.querySelectorAll('.tooltipped');
     M.Tooltip.init(tooltips);
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    var selects = document.querySelectorAll('select');
+    M.FormSelect.init(selects);
 });
 </script>
 @endpush

@@ -39,9 +39,10 @@ class ProductController extends Controller
 
     public function create()
     {
-        // Gera código inicial para produto (pode ser alterado quando o tipo mudar)
-        $nextCode = Product::generateNextCode('product');
-        return view('products.form', compact('nextCode'));
+        // Cria um produto vazio para o formulário
+        $product = new Product();
+        
+        return view('products.form', compact('product'));
     }
 
     public function store(Request $request)

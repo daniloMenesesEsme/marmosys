@@ -36,6 +36,6 @@ class BudgetItem extends Model
 
     public function material()
     {
-        return $this->belongsTo(BudgetMaterial::class, 'material_id');
+        return $this->belongsTo(Product::class, 'material_id');
     }
 } 
