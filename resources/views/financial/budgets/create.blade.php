@@ -151,15 +151,15 @@
                         <div class="row">
             <div class="input-field col s12 m3">
                 <select name="rooms[{ROOM_INDEX}][items][{ITEM_INDEX}][material_id]" class="material-select" required>
-                                    <option value="" disabled selected>Selecione o material</option>
-                                    @foreach($materiais as $material)
-                        <option value="{{ $material->id }}" data-preco="{{ $material->preco_venda }}">
-                            {{ $material->nome }}
+                    <option value="" disabled selected>Selecione o material</option>
+                    @foreach($materiais as $material)
+                        <option value="{{ $material['id'] }}" data-preco="{{ $material['preco_venda'] }}">
+                            {{ $material['nome'] }}
                         </option>
-                                    @endforeach
-                                </select>
-                                <label>Material*</label>
-                            </div>
+                    @endforeach
+                </select>
+                <label>Material*</label>
+            </div>
 
             <div class="input-field col s6 m2">
                 <input type="number" name="rooms[{ROOM_INDEX}][items][{ITEM_INDEX}][quantidade]" step="0.001" min="0.001" required>
