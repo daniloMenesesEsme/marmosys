@@ -14,6 +14,8 @@ use Carbon\Carbon;
 use PDF;
 use App\Models\ApprovalLog;
 use App\Models\CompanySetting;
+use App\Models\Product;
+use Illuminate\Support\Facades\Log;
 
 class BudgetController extends Controller
 {
@@ -32,11 +34,13 @@ class BudgetController extends Controller
             ->orderBy('nome')
             ->get();
             
-        $materiais = BudgetMaterial::where('ativo', true)
+        // Debug dos produtos
+        $materiais = Product::where('ativo', true)
             ->orderBy('nome')
             ->get();
         
-        // Número sequencial do orçamento
+        \Log::info('Produtos carregados:', $materiais->toArray());
+        
         $numero = 'ORC-' . date('Y') . str_pad(Budget::count() + 1, 4, '0', STR_PAD_LEFT);
         
         return view('financial.budgets.create', compact('clients', 'materiais', 'numero'));
@@ -52,7 +56,7 @@ class BudgetController extends Controller
             'rooms' => 'required|array|min:1',
             'rooms.*.nome' => 'required|string',
             'rooms.*.items' => 'required|array|min:1',
-            'rooms.*.items.*.material_id' => 'required|exists:budget_materials,id',
+            'rooms.*.items.*.material_id' => 'required|exists:products,id',
             'rooms.*.items.*.quantidade' => 'required|numeric|min:0.01',
             'rooms.*.items.*.unidade' => 'required|string',
             'rooms.*.items.*.largura' => 'required|numeric|min:0',
@@ -91,7 +95,7 @@ class BudgetController extends Controller
                 ]);
 
                 foreach ($roomData['items'] as $itemData) {
-                    $material = BudgetMaterial::findOrFail($itemData['material_id']);
+                    $material = Product::findOrFail($itemData['material_id']);
                     
                     // Calcula valor do item considerando quantidade e dimensões
                     $area = $itemData['largura'] * $itemData['altura'];
