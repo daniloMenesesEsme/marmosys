@@ -45,7 +45,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('products', ProductController::class);  // Adicionado
     
     // Rotas financeiras
-    Route::prefix('financial')->name('financial.')->group(function () {
+    Route::prefix('financial')->name('financial.')->middleware(['auth'])->group(function () {
         // Contas Financeiras
         Route::resource('accounts', FinancialAccountController::class);
         Route::post('accounts/{account}/pay', [FinancialAccountController::class, 'pay'])
