@@ -4,6 +4,57 @@
 
 @push('styles')
 <style>
+    /* Espaçamento geral */
+    .row {
+        margin-bottom: 20px;
+    }
+
+    /* Ajuste dos campos superiores */
+    .header-fields {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px;
+        background-color: #f5f5f5;
+        border-radius: 4px;
+        margin-bottom: 30px;
+    }
+
+    .header-fields .input-field {
+        margin: 0 15px;
+        flex: 1;
+    }
+
+    .header-fields .input-field:first-child {
+        margin-left: 0;
+    }
+
+    .header-fields .input-field:last-child {
+        margin-right: 0;
+    }
+
+    /* Ajuste do campo de cliente */
+    .client-field {
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 4px;
+        box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14);
+    }
+
+    /* Ajuste dos inputs */
+    .input-field input, .input-field select {
+        height: 3rem;
+    }
+
+    .input-field label {
+        transform: translateY(-14px) scale(0.8);
+    }
+
+    /* Ícones */
+    .material-icons.prefix {
+        line-height: 3rem;
+    }
+
     .input-field {
         margin-top: 1rem;
         margin-bottom: 1rem;
@@ -22,7 +73,8 @@
         border-radius: 4px;
     }
     .item-row {
-        margin-bottom: 1rem;
+        padding: 10px 0;
+        margin-bottom: 10px;
     }
     label {
         font-size: 0.9rem;
@@ -32,13 +84,13 @@
     }
     /* Estilos do datepicker */
     .datepicker-date-display {
-        background-color: #2196f3;
+        background-color: #031e34;
     }
     .datepicker-table td.is-selected {
-        background-color: #2196f3;
+        background-color: #033c6b;
     }
     .datepicker-table td.is-today {
-        color: #2196f3;
+        color: #051f33;
     }
     .datepicker-cancel, 
     .datepicker-clear, 
@@ -57,6 +109,41 @@
     .material-select {
         width: 100% !important;
     }
+
+    /* Ajuste do espaçamento do select de cliente sem ícone */
+    .select-wrapper input.select-dropdown {
+        margin-left: 0 !important;
+        width: 100% !important;
+    }
+
+    /* Ajuste do dropdown */
+    .dropdown-content {
+        margin-left: 0;
+        width: 100% !important;
+    }
+
+    /* Estilo para os botões */
+    .btn {
+        margin: 5px;
+        text-transform: none;
+        height: 36px;
+        line-height: 36px;
+        padding: 0 16px;
+    }
+    
+    .btn i.material-icons {
+        line-height: 36px;
+    }
+
+    /* Ajuste do espaçamento entre colunas */
+    .row .col {
+        padding: 0 0.75rem;
+    }
+
+    /* Alinhamento vertical do botão remover */
+    .btn-floating {
+        margin-top: 5px;
+    }
 </style>
 @endpush
 
@@ -65,7 +152,10 @@
     <div class="col s12">
         <div class="card">
             <div class="card-content">
-                <span class="card-title">Novo Orçamento</span>
+                <span class="card-title">
+                    <i class="material-icons left">add_circle</i>
+                    Novo Orçamento
+                </span>
 
                 @php
                     \Log::info('Dados do formulário:', request()->all());
@@ -74,25 +164,30 @@
                 <form id="budget-form" action="{{ route('financial.budgets.store') }}" method="POST">
                     @csrf
                     
-                    <div class="row">
-                        <div class="input-field col s12 m3">
+                    <div class="header-fields">
+                        <div class="input-field">
+                            <i class="material-icons prefix">tag</i>
                             <input type="text" id="numero" name="numero" value="{{ $numero }}" readonly>
                             <label for="numero">Número do Orçamento</label>
                         </div>
 
-                        <div class="input-field col s12 m3">
+                        <div class="input-field">
+                            <i class="material-icons prefix">event</i>
                             <input type="date" id="data" name="data" value="{{ date('Y-m-d') }}" required>
                             <label for="data">Data do Orçamento</label>
                         </div>
 
-                        <div class="input-field col s12 m3">
+                        <div class="input-field">
+                            <i class="material-icons prefix">event_available</i>
                             <input type="date" id="previsao_entrega" name="previsao_entrega" required>
                             <label for="previsao_entrega">Previsão de Entrega</label>
                         </div>
+                    </div>
 
-                        <div class="input-field col s12 m3">
-                            <select name="client_id" id="client_id" required>
-                                <option value="" disabled selected>Selecione o cliente</option>
+                    <div class="client-field">
+                        <div class="input-field">
+                            <select name="client_id" id="client_id" class="browser-default" required>
+                                <option value="" disabled selected>Digite para buscar o cliente</option>
                                 @foreach($clients as $client)
                                     <option value="{{ $client->id }}" 
                                             data-endereco="{{ $client->endereco }}"
@@ -108,13 +203,13 @@
 
                     <div class="row">
                         <div class="col s12">
-                            <div id="client-info" style="display: none;">
+                            <div id="client-info" class="card-panel" style="display: none;">
+                                <i class="material-icons left">info</i>
                                 <p><strong>Endereço:</strong> <span id="client-endereco"></span></p>
                                 <p><strong>Telefone:</strong> <span id="client-telefone"></span></p>
                             </div>
                         </div>
                     </div>
-
 
                     <div class="rooms-container"></div>
 
@@ -135,8 +230,9 @@
                             @error('observacoes') <span class="red-text">{{ $message }}</span> @enderror
                         </div>
                     </div>
+
                     <div class="card-action">
-                        <button type="submit" class="btn waves-effect waves-light">
+                        <button type="submit" class="btn waves-effect waves-light green">
                             <i class="material-icons left">save</i>
                             Salvar Orçamento
                         </button>
@@ -157,26 +253,29 @@
 <!-- Adicione isso logo após o início do form -->
 <template id="item-template">
     <div class="item-row">
-        <div class="row">
+        <div class="row" style="margin-bottom: 0;">
             <div class="input-field col s12 m3">
-                <select name="rooms[{ROOM_INDEX}][items][{ITEM_INDEX}][material_id]" class="material-select">
-                    <option value="">Selecione o material</option>
-                    @foreach($materiais as $material)
-                        <option value="{{ $material->id }}" 
-                                data-preco="{{ $material->preco_venda }}">
-                            {{ $material->nome }}
-                        </option>
-                    @endforeach
-                </select>
+                <input type="text" 
+                       class="autocomplete-material" 
+                       placeholder="Digite código ou nome"
+                       autocomplete="off">
+                <input type="hidden" 
+                       name="rooms[{ROOM_INDEX}][items][{ITEM_INDEX}][material_id]" 
+                       class="material-id-input" 
+                       required>
                 <label>Material*</label>
             </div>
 
             <div class="input-field col s6 m2">
-                <input type="number" name="rooms[{ROOM_INDEX}][items][{ITEM_INDEX}][quantidade]" step="0.001" min="0.001" required>
+                <input type="number" 
+                       name="rooms[{ROOM_INDEX}][items][{ITEM_INDEX}][quantidade]" 
+                       step="0.001" 
+                       min="0.001" 
+                       required>
                 <label>Quantidade*</label>
             </div>
 
-            <div class="input-field col s6 m1">
+            <div class="input-field col s6 m2">
                 <select name="rooms[{ROOM_INDEX}][items][{ITEM_INDEX}][unidade]" required>
                     <option value="m²">m²</option>
                     <option value="ml">ml</option>
@@ -186,17 +285,25 @@
             </div>
 
             <div class="input-field col s6 m2">
-                <input type="number" name="rooms[{ROOM_INDEX}][items][{ITEM_INDEX}][largura]" step="0.001" min="0" required>
+                <input type="number" 
+                       name="rooms[{ROOM_INDEX}][items][{ITEM_INDEX}][largura]" 
+                       step="0.001" 
+                       min="0" 
+                       required>
                 <label>Largura (m)*</label>
             </div>
 
             <div class="input-field col s6 m2">
-                <input type="number" name="rooms[{ROOM_INDEX}][items][{ITEM_INDEX}][altura]" step="0.001" min="0" required>
+                <input type="number" 
+                       name="rooms[{ROOM_INDEX}][items][{ITEM_INDEX}][altura]" 
+                       step="0.001" 
+                       min="0" 
+                       required>
                 <label>Altura (m)*</label>
             </div>
 
-            <div class="col s12 m2">
-                <button type="button" class="btn-floating red remove-item">
+            <div class="col s12 m1 center-align" style="padding-top: 10px;">
+                <button type="button" class="btn-floating red remove-item tooltipped" data-position="top" data-tooltip="Remover Item">
                     <i class="material-icons">remove</i>
                 </button>
             </div>
@@ -210,6 +317,9 @@
 document.addEventListener('DOMContentLoaded', function() {
     let roomIndex = 0;
     
+    // Inicializa componentes do Materialize
+    M.AutoInit();
+    
     // Adiciona ambiente
     document.querySelector('.add-room').addEventListener('click', function() {
         const roomTemplate = `
@@ -217,18 +327,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="card-content">
                     <div class="row">
                         <div class="input-field col s12">
+                            <i class="material-icons prefix">room</i>
                             <input type="text" name="rooms[${roomIndex}][nome]" class="room-name" required>
                             <label>Nome do Ambiente*</label>
                         </div>
                     </div>
                     <div class="items-container"></div>
-                    <button type="button" class="btn-floating green add-item">
-                        <i class="material-icons">add</i>
+                    <button type="button" class="btn waves-effect waves-light green add-item tooltipped" data-position="top" data-tooltip="Adicionar Item">
+                        <i class="material-icons left">add_shopping_cart</i>
+                        Adicionar Item
                     </button>
                 </div>
                 <div class="card-action">
-                    <button type="button" class="btn-floating red remove-room">
-                        <i class="material-icons">delete</i>
+                    <button type="button" class="btn waves-effect waves-light red remove-room tooltipped" data-position="top" data-tooltip="Remover Ambiente">
+                        <i class="material-icons left">delete</i>
+                        Remover Ambiente
                     </button>
                 </div>
             </div>
@@ -236,6 +349,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         document.querySelector('.rooms-container').insertAdjacentHTML('beforeend', roomTemplate);
         M.updateTextFields();
+        M.Tooltip.init(document.querySelectorAll('.tooltipped'));
         roomIndex++;
     });
 
@@ -298,6 +412,58 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Adiciona primeiro ambiente automaticamente
     document.querySelector('.add-room').click();
+
+    // Inicializa o select com funcionalidade de busca
+    M.FormSelect.init(document.querySelector('#client_id'), {
+        dropdownOptions: {
+            search: true, // Habilita a busca
+            searchText: 'Digite o nome do cliente',
+        }
+    });
+
+    // Preparar dados dos materiais para autocomplete
+    const materiais = {
+        @foreach($materiais as $material)
+            "{{ $material->codigo }} - {{ $material->nome }}": {
+                id: {{ $material->id }},
+                preco: {{ $material->preco_venda }}
+            },
+        @endforeach
+    };
+
+    // Inicializar autocomplete em campos existentes e novos
+    function initAutocomplete(element) {
+        M.Autocomplete.init(element, {
+            data: materiais,
+            minLength: 1,
+            onAutocomplete: function(text) {
+                // Quando um item é selecionado, atualiza o input hidden
+                const materialId = materiais[text].id;
+                element.nextElementSibling.value = materialId;
+            }
+        });
+    }
+
+    // Inicializar autocomplete para campos existentes
+    document.querySelectorAll('.autocomplete-material').forEach(initAutocomplete);
+
+    // Observer para inicializar autocomplete em novos campos
+    const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            mutation.addedNodes.forEach(function(node) {
+                if (node.nodeType === 1) { // Elemento
+                    const newInputs = node.querySelectorAll('.autocomplete-material');
+                    newInputs.forEach(initAutocomplete);
+                }
+            });
+        });
+    });
+
+    // Observar adições de novos campos
+    observer.observe(document.querySelector('.rooms-container'), {
+        childList: true,
+        subtree: true
+    });
 });
 
 function debugForm() {

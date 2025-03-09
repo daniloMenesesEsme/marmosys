@@ -110,11 +110,12 @@
                                         <i class="material-icons">edit</i>
                                     </a>
                                     
-                                    <a href="{{ route('financial.budgets.pdf', $budget->id) }}" 
-                                       target="_blank" 
-                                       class="btn btn-info btn-sm" 
-                                       title="Gerar PDF">
-                                        <i class="fas fa-file-pdf"></i>
+                                    <a href="{{ route('financial.budgets.pdf', $budget) }}"
+                                       class="btn-floating waves-effect waves-light purple tooltipped"
+                                       data-position="top" 
+                                       data-tooltip="Gerar PDF"
+                                       target="_blank">
+                                        <i class="material-icons">picture_as_pdf</i>
                                     </a>
                                     
                                     <form action="{{ route('financial.budgets.destroy', $budget) }}" 

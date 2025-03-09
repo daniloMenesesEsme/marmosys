@@ -37,38 +37,38 @@
                     <div class="col s12">
                         <h5>Itens do Orçamento</h5>
                         @foreach($budget->rooms as $room)
-                            <div class="card">
-                                <div class="card-content">
-                                    <span class="card-title">{{ $room->nome }}</span>
-                                    <table class="striped responsive-table">
-                                        <thead>
+                            <div class="ambiente">
+                                <h5>{{ $room->nome }}</h5>
+                                <table class="striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Material</th>
+                                            <th>Quantidade</th>
+                                            <th>Unid.</th>
+                                            <th>Dimensões</th>
+                                            <th>Valor Unit.</th>
+                                            <th>Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($room->items as $item)
                                             <tr>
-                                                <th>Material</th>
-                                                <th>Quantidade</th>
-                                                <th>Unid.</th>
-                                                <th>Dimensões</th>
-                                                <th>Valor Unit.</th>
-                                                <th>Total</th>
+                                                <td>{{ $item->material->nome }}</td>
+                                                <td>{{ number_format($item->quantidade, 3, ',', '.') }}</td>
+                                                <td>{{ $item->unidade }}</td>
+                                                <td>{{ number_format($item->largura, 3, ',', '.') }}m x {{ number_format($item->altura, 3, ',', '.') }}m</td>
+                                                <td>R$ {{ number_format($item->valor_unitario, 2, ',', '.') }}</td>
+                                                <td>R$ {{ number_format($item->valor_total, 2, ',', '.') }}</td>
                                             </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach($room->items as $item)
-                                                <tr>
-                                                    <td>{{ $item->material->nome }}</td>
-                                                    <td>{{ number_format($item->quantidade, 3, ',', '.') }}</td>
-                                                    <td>{{ $item->unidade }}</td>
-                                                    <td>{{ number_format($item->largura, 2, ',', '.') }}m x {{ number_format($item->altura, 2, ',', '.') }}m</td>
-                                                    <td>R$ {{ number_format($item->valor_unitario, 2, ',', '.') }}</td>
-                                                    <td>R$ {{ number_format($item->valor_total, 2, ',', '.') }}</td>
-                                                </tr>
-                                            @endforeach
-                                            <tr>
-                                                <td colspan="5" class="right-align"><strong>Subtotal do Ambiente:</strong></td>
-                                                <td><strong>R$ {{ number_format($room->valor_total, 2, ',', '.') }}</strong></td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
+                                        @endforeach
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <td colspan="5" class="right-align"><strong>Subtotal do Ambiente:</strong></td>
+                                            <td><strong>R$ {{ number_format($room->items->sum('valor_total'), 2, ',', '.') }}</strong></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
                             </div>
                         @endforeach
                     </div>
