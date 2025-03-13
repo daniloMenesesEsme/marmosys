@@ -22,6 +22,7 @@ use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\SuppliersController;
 use App\Http\Controllers\Settings\BackupController;
+use App\Http\Controllers\Financial\ReportController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -52,12 +53,17 @@ Route::middleware('auth')->group(function () {
             ->name('accounts.pay');
 
         // Relatórios Financeiros
-        Route::get('reports', [FinancialReportController::class, 'index'])
-            ->name('reports.index');
-        Route::get('reports/pdf', [FinancialReportController::class, 'pdf'])
-            ->name('reports.pdf');
-        Route::get('reports/excel', [FinancialReportController::class, 'excel'])
-            ->name('reports.excel');
+        Route::prefix('reports')->name('reports.')->group(function () {
+            Route::get('/', [ReportController::class, 'index'])->name('index');
+            Route::get('/export/pdf', [ReportController::class, 'exportPDF'])->name('export.pdf');
+            Route::get('/export/excel', [ReportController::class, 'exportExcel'])->name('export.excel');
+        });
+
+        Route::prefix('financial/reports')->name('financial.reports.')->middleware(['auth'])->group(function () {
+            Route::get('/', [ReportController::class, 'index'])->name('index');
+            Route::get('/export/pdf', [ReportController::class, 'exportPDF'])->name('export.pdf');
+            Route::get('/export/excel', [ReportController::class, 'exportExcel'])->name('export.excel');
+        });
 
         // Categorias Financeiras
         Route::resource('categories', FinancialCategoryController::class);

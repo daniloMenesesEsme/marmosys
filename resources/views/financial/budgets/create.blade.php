@@ -263,7 +263,7 @@
                        name="rooms[{ROOM_INDEX}][items][{ITEM_INDEX}][material_id]" 
                        class="material-id-input" 
                        required>
-                <label>Material*</label>
+                <label>Produto e Material*</label>
             </div>
 
             <div class="input-field col s6 m2">
@@ -280,11 +280,12 @@
                     <option value="m²">m²</option>
                     <option value="ml">ml</option>
                     <option value="pç">pç</option>
+                    <option value="un">un</option>
                 </select>
                 <label>Unid.*</label>
             </div>
 
-            <div class="input-field col s6 m2">
+            <div class="input-field col s6 m2" style="margin-left: 20px;">
                 <input type="number" 
                        name="rooms[{ROOM_INDEX}][items][{ITEM_INDEX}][largura]" 
                        step="0.001" 
