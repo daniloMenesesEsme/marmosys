@@ -20,9 +20,11 @@ use App\Http\Controllers\Admin\ApprovalLogController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\EmployeeController;
-use App\Http\Controllers\SuppliersController;
 use App\Http\Controllers\Settings\BackupController;
 use App\Http\Controllers\Financial\ReportController;
+use App\Http\Controllers\Financial\PaymentMethodController;
+use App\Http\Controllers\Financial\FinancialRegistrationController;
+use App\Http\Controllers\Financial\PaymentPlanController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -47,6 +49,22 @@ Route::middleware('auth')->group(function () {
     
     // Rotas financeiras
     Route::prefix('financial')->name('financial.')->middleware(['auth'])->group(function () {
+        // Cadastros Financeiros
+        Route::prefix('registration')->name('registration.')->group(function () {
+            // Formas de Pagamento
+            Route::get('payment-methods', [PaymentMethodController::class, 'index'])->name('payment-methods.index');
+            Route::get('payment-methods/create', [PaymentMethodController::class, 'create'])->name('payment-methods.create');
+            Route::post('payment-methods', [PaymentMethodController::class, 'store'])->name('payment-methods.store');
+            Route::get('payment-methods/{paymentMethod}/edit', [PaymentMethodController::class, 'edit'])->name('payment-methods.edit');
+            Route::put('payment-methods/{paymentMethod}', [PaymentMethodController::class, 'update'])->name('payment-methods.update');
+            Route::delete('payment-methods/{paymentMethod}', [PaymentMethodController::class, 'destroy'])->name('payment-methods.destroy');
+            
+            // Planos de Pagamento
+            Route::resource('payment-plans', PaymentPlanController::class);
+            Route::post('payment-plans/{paymentPlan}/simulate', [PaymentPlanController::class, 'simulate'])
+                ->name('payment-plans.simulate');
+        });
+
         // Contas Financeiras
         Route::resource('accounts', FinancialAccountController::class);
         Route::post('accounts/{account}/pay', [FinancialAccountController::class, 'pay'])
@@ -54,12 +72,6 @@ Route::middleware('auth')->group(function () {
 
         // Relatórios Financeiros
         Route::prefix('reports')->name('reports.')->group(function () {
-            Route::get('/', [ReportController::class, 'index'])->name('index');
-            Route::get('/export/pdf', [ReportController::class, 'exportPDF'])->name('export.pdf');
-            Route::get('/export/excel', [ReportController::class, 'exportExcel'])->name('export.excel');
-        });
-
-        Route::prefix('financial/reports')->name('financial.reports.')->middleware(['auth'])->group(function () {
             Route::get('/', [ReportController::class, 'index'])->name('index');
             Route::get('/export/pdf', [ReportController::class, 'exportPDF'])->name('export.pdf');
             Route::get('/export/excel', [ReportController::class, 'exportExcel'])->name('export.excel');
@@ -96,8 +108,8 @@ Route::middleware('auth')->group(function () {
 
         // Rotas de orçamentos
         Route::resource('budgets', BudgetController::class);
-        Route::get('budgets/{budget}/pdf', [BudgetController::class, 'generatePdf'])
-            ->name('budgets.pdf');
+        Route::get('budgets/{budget}/generatePdf', [BudgetController::class, 'generatePdf'])
+            ->name('budgets.generatePdf');
         Route::post('budgets/{budget}/approve', [BudgetController::class, 'approve'])
             ->name('budgets.approve');
         Route::post('budgets/{budget}/reject', [BudgetController::class, 'reject'])
@@ -131,7 +143,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/api/companies/find-cnpj/{cnpj}', [CompanyController::class, 'findByCNPJ'])->name('companies.find-cnpj');
 
     // Rota para busca de CNPJ
-    Route::get('/suppliers/find-cnpj/{cnpj}', [SuppliersController::class, 'findByCNPJ'])->name('suppliers.find-cnpj');
+    Route::get('/suppliers/find-cnpj/{cnpj}', [SupplierController::class, 'findByCNPJ'])->name('suppliers.find-cnpj');
 
     // Rotas de configurações
     Route::prefix('settings')->name('settings.')->group(function () {

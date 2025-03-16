@@ -8,15 +8,15 @@ return new class extends Migration
 {
     public function up()
     {
-        Schema::table('budget_items', function (Blueprint $table) {
-            $table->string('descricao')->nullable()->change();
+        Schema::table('budgets', function (Blueprint $table) {
+            $table->softDeletes();
         });
     }
 
     public function down()
     {
-        Schema::table('budget_items', function (Blueprint $table) {
-            $table->string('descricao')->nullable(false)->change();
+        Schema::table('budgets', function (Blueprint $table) {
+            $table->dropSoftDeletes();
         });
     }
-}; 
+};

@@ -1,0 +1,573 @@
+---
+description: 
+globs: 
+---
+
+# Regras de Desenvolvimento MARMOSYS
+
+## 1. BPDC (Basic Project Development Concepts)
+- Framework: Laravel 10+
+- CSS: Materialize CSS
+- Ícones: Material Design
+- Database: MySQL 8+
+
+### 1.1 Padrões de Código
+- PSR-4 autoload
+- Namespace: App\*
+- Controllers: App\Http\Controllers
+- Models: App\Models
+- Views: resources/views
+
+### 1.2 Padrões de Database
+- Timestamps em todas tabelas
+- Soft Deletes em todas tabelas
+- Foreign Keys com onDelete('cascade')
+- Charset: utf8mb4
+- Collation: utf8mb4_unicode_ci
+
+### 1.3 Interface
+- Layout responsivo
+- Menu lateral fixo (300px)
+- Footer com versão
+- Cores padrão: blue darken-2
+
+## 2. MVPS (Minimum Viable Product System)
+### 2.1 Módulos Obrigatórios
+- Usuários (users)
+- Empresas (companies)
+- Dashboard
+
+### 2.2 Regras de Negócio MVPS
+- Sistema multiempresa
+- Autenticação obrigatória
+- ACL por perfil
+- Log de ações
+
+## 3. MRPS (Minimum Required Product System)
+### 3.1 Módulos de Negócio
+- Clientes (clients)
+- Produtos (products)
+- Orçamentos (budgets)
+
+### 3.2 Regras de Negócio MRPS
+- Clientes vinculados à empresa
+- Produtos com controle de estoque
+- Orçamentos com status de aprovação
+
+## 4. MFPS (Minimum Financial Product System)
+### 4.1 Módulos Financeiros
+- Cadastros (financial/*)
+  - Categorias (categories)
+  - Centro de Custo (cost-centers)
+  - Formas de Pagamento (payment-methods)
+  - Planos de Pagamento (payment-plans)
+- Contas (accounts)
+- Relatórios (reports)
+- Previsão (forecast)
+- Conciliação (reconciliation)
+- Metas (goals)
+
+### 4.2 Regras de Negócio MFPS
+- Categorias: receita/despesa
+- Centro de Custo: hierárquico
+- Formas de Pagamento:
+  - nome (string, 100)
+  - descricao (string, nullable)
+  - ativo (boolean, default true)
+  - parcelas_padrao (integer, default 1)
+  - taxa_padrao (decimal, 10,2, default 0)
+- Planos de Pagamento:
+  - nome (string, 100)
+  - descricao (string, nullable)
+  - ativo (boolean, default true)
+  - parcelas (integer)
+  - intervalo (integer)
+  - taxa (decimal, 10,2)
+
+### 4.3 Padrões de Rotas MFPS
+- Prefix: financial
+- Middleware: auth
+- Namespace: Financial
+- Names: financial.*
+
+## 2. Estrutura de Módulos
+
+### 2.1 Menu Principal (main-menu)
+- Dashboard: Indicadores principais
+- Autenticação: Login/Logout
+- Breadcrumbs: Navegação hierárquica
+
+### 2.2 Módulo de Produtos (products)
+#### 2.2.1 Cadastros
+- Produtos (products)
+  - nome (string, 100)
+  - codigo (string, 20, unique)
+  - categoria_id (foreign)
+  - familia_id (foreign)
+  - unidade_id (foreign)
+  - preco_venda (decimal, 10,2)
+  - custo (decimal, 10,2)
+  - estoque_minimo (decimal, 10,2)
+  - estoque_maximo (decimal, 10,2)
+  - ativo (boolean)
+
+- Categorias (categories)
+  - nome (string, 100)
+  - descricao (text, nullable)
+  - ativo (boolean)
+
+- Famílias (families)
+  - nome (string, 100)
+  - descricao (text, nullable)
+  - ativo (boolean)
+
+- Unidades (units)
+  - sigla (string, 5)
+  - descricao (string, 100)
+  - fator_conversao (decimal, 10,4)
+
+- Similares (similar_products)
+  - produto_id (foreign)
+  - similar_id (foreign)
+  - tipo_relacao (enum)
+
+#### 2.2.2 Manutenção
+- Alteração em Lote
+  - Filtros avançados
+  - Alteração múltipla
+  - Log de alterações
+
+- Inconsistências Tributárias
+  - Validação NCM
+  - Validação CFOP
+  - Correção em lote
+
+#### 2.2.3 Relatórios
+- Produtos: Listagem completa
+- Kit: Composição e custos
+- Insumos: Consumo e necessidade
+- Material: Estoque e movimentação
+
+### 2.3 Módulo de Compras (purchases)
+#### 2.3.1 Processo de Compra
+- Pedido de Compra (purchase_orders)
+  - numero (string, 20)
+  - fornecedor_id (foreign)
+  - data_pedido (datetime)
+  - previsao_entrega (date)
+  - status (enum)
+  - valor_total (decimal, 10,2)
+  - observacoes (text)
+
+#### 2.3.2 Recebimento
+- Nota Fiscal Entrada (incoming_invoices)
+  - numero (string, 20)
+  - serie (string, 5)
+  - fornecedor_id (foreign)
+  - data_emissao (date)
+  - data_entrada (date)
+  - valor_total (decimal, 10,2)
+  - status (enum)
+
+- Conhecimento de Transporte (transport_knowledge)
+  - numero (string, 20)
+  - transportadora_id (foreign)
+  - data_emissao (date)
+  - valor_frete (decimal, 10,2)
+
+ ### 2.4 Módulo de Vendas (sales)
+#### 2.4.1 Orçamentos (budgets)
+- Estrutura
+  - numero (string, 20)
+  - cliente_id (foreign)
+  - vendedor_id (foreign)
+  - data_orcamento (datetime)
+  - validade (date)
+  - status (enum: pendente, aprovado, rejeitado, cancelado)
+  - valor_total (decimal, 10,2)
+  - desconto (decimal, 10,2)
+  - observacoes (text)
+
+#### 2.4.2 Acompanhamento
+- Meta de Venda (sales_goals)
+  - vendedor_id (foreign)
+  - periodo (date)
+  - valor_meta (decimal, 10,2)
+  - valor_realizado (decimal, 10,2)
+  - status (enum)
+
+- Monitoramento (sales_monitoring)
+  - dashboard em tempo real
+  - indicadores de performance
+  - alertas de metas
+
+- Comissões (commissions)
+  - vendedor_id (foreign)
+  - tipo_comissao (enum)
+  - percentual (decimal, 5,2)
+  - valor_minimo (decimal, 10,2)
+  - valor_maximo (decimal, 10,2)
+
+#### 2.4.3 Documentos Fiscais
+- Nota Fiscal Saída (outgoing_invoices)
+  - numero (string, 20)
+  - serie (string, 5)
+  - cliente_id (foreign)
+  - data_emissao (date)
+  - valor_total (decimal, 10,2)
+  - status (enum)
+  - chave_nfe (string, 44)
+
+#### 2.4.4 Trocas e Devoluções
+- Motivos (return_reasons)
+  - descricao (string, 100)
+  - tipo (enum: troca, devolucao)
+  - ativo (boolean)
+
+- Registros (returns)
+  - nota_fiscal_id (foreign)
+  - motivo_id (foreign)
+  - data_registro (datetime)
+  - valor_total (decimal, 10,2)
+  - status (enum)
+
+### 2.5 Módulo Financeiro (financial) [Expandido]
+#### 2.5.1 Cadastros
+- Categorias (categories)
+  - nome (string, 100)
+  - tipo (enum: receita, despesa)
+  - pai_id (self-reference, nullable)
+  - ativo (boolean)
+
+- Centro de Custo (cost_centers)
+  - nome (string, 100)
+  - codigo (string, 20)
+  - responsavel_id (foreign)
+  - orcamento_mensal (decimal, 10,2)
+  - ativo (boolean)
+
+- Forma de Pagamento (payment_methods)
+  - nome (string, 100)
+  - descricao (text, nullable)
+  - parcelas_padrao (integer)
+  - taxa_padrao (decimal, 5,2)
+  - ativo (boolean)
+
+- Plano de Pagamento (payment_plans)
+  - nome (string, 100)
+  - descricao (text, nullable)
+  - parcelas (integer)
+  - intervalo_dias (integer)
+  - carencia_dias (integer)
+  - taxa (decimal, 5,2)
+  - ativo (boolean)
+
+#### 2.5.2 Contas
+- Contas a Pagar (accounts_payable)
+  - numero (string, 20)
+  - fornecedor_id (foreign)
+  - categoria_id (foreign)
+  - centro_custo_id (foreign)
+  - data_vencimento (date)
+  - valor (decimal, 10,2)
+  - status (enum)
+
+- Contas a Receber (accounts_receivable)
+  - numero (string, 20)
+  - cliente_id (foreign)
+  - categoria_id (foreign)
+  - data_vencimento (date)
+  - valor (decimal, 10,2)
+  - status (enum)
+
+#### 2.5.3 Relatórios
+- DRE (income_statement)
+- Fluxo de Caixa (cash_flow)
+- Previsão Financeira (financial_forecast)
+- Conciliação Bancária (bank_reconciliation)
+- Metas Financeiras (financial_goals)
+
+### 2.6 Módulo Frente de Loja (pos)
+#### 2.6.1 Cadastros
+- Caixas PDV (pos_terminals)
+  - codigo (string, 10)
+  - descricao (string, 100)
+  - local_id (foreign)
+  - serie_fiscal (string, 10)
+  - impressora_fiscal (string, 100)
+  - status (enum: ativo, inativo, manutenção)
+  - ip_address (string, 15)
+
+#### 2.6.2 PDV Vendas
+- Vendas PDV (pos_sales)
+  - numero (string, 20)
+  - caixa_id (foreign)
+  - operador_id (foreign)
+  - cliente_id (foreign, nullable)
+  - data_venda (datetime)
+  - valor_total (decimal, 10,2)
+  - desconto (decimal, 10,2)
+  - forma_pagamento_id (foreign)
+  - status (enum)
+
+#### 2.6.3 Configurações
+- Impressoras (pos_printers)
+  - nome (string, 100)
+  - modelo (string, 50)
+  - porta (string, 20)
+  - tipo (enum: fiscal, não-fiscal)
+  - ativo (boolean)
+
+- Leitores (pos_readers)
+  - nome (string, 100)
+  - tipo (enum: código barras, QR code)
+  - porta (string, 20)
+  - configuracao (json)
+  - ativo (boolean)
+
+- Atalhos (pos_shortcuts)
+  - tecla (string, 20)
+  - funcao (string, 100)
+  - ativo (boolean)
+
+- Balanças (pos_scales)
+  - nome (string, 100)
+  - modelo (string, 50)
+  - porta (string, 20)
+  - protocolo (string, 50)
+  - ativo (boolean)
+
+### 2.7 Módulo Estoque (inventory)
+#### 2.7.1 Cadastros
+- Local de Estoque (stock_locations)
+  - nome (string, 100)
+  - codigo (string, 20)
+  - tipo (enum: principal, secundário)
+  - responsavel_id (foreign)
+  - ativo (boolean)
+
+- Setor de Produção (production_sectors)
+  - nome (string, 100)
+  - responsavel_id (foreign)
+  - capacidade_diaria (decimal, 10,2)
+  - ativo (boolean)
+
+- Tipos de Ajustes (adjustment_types)
+  - nome (string, 100)
+  - natureza (enum: entrada, saída)
+  - requer_aprovacao (boolean)
+  - ativo (boolean)
+
+#### 2.7.2 Movimentações
+- Saldo Estoque (stock_balance)
+  - produto_id (foreign)
+  - local_id (foreign)
+  - quantidade (decimal, 10,3)
+  - custo_medio (decimal, 10,4)
+  - ultima_movimentacao (datetime)
+
+- Produção (production)
+  - numero (string, 20)
+  - setor_id (foreign)
+  - produto_id (foreign)
+  - quantidade (decimal, 10,3)
+  - data_inicio (datetime)
+  - data_fim (datetime)
+  - status (enum)
+
+- Requisições (requisitions)
+  - numero (string, 20)
+  - solicitante_id (foreign)
+  - local_origem_id (foreign)
+  - local_destino_id (foreign)
+  - data_requisicao (datetime)
+  - status (enum)
+
+#### 2.7.3 Relatórios
+- Controle de Validade
+- Giro de Estoque
+- Movimentação Analítica
+- Posição de Estoque
+- Requisições
+- Produção
+
+### 2.8 Módulo Fiscal (fiscal)
+#### 2.8.1 Cadastros
+- Regime Tributário (tax_regimes)
+  - nome (string, 100)
+  - codigo (string, 10)
+  - descricao (text)
+  - ativo (boolean)
+
+- CFOP (fiscal_operations)
+  - codigo (string, 10)
+  - descricao (string, 255)
+  - tipo (enum: entrada, saída)
+  - ativo (boolean)
+
+- NCM (ncm_codes)
+  - codigo (string, 10)
+  - descricao (string, 255)
+  - aliquota_ipi (decimal, 5,2)
+  - ativo (boolean)
+
+#### 2.8.2 Configuração Tributária
+- Impostos Federais (federal_taxes)
+  - tipo (enum: PIS, COFINS, IPI)
+  - aliquota (decimal, 5,2)
+  - base_calculo (decimal, 5,2)
+  - cst (string, 10)
+
+- Tabela Tributária (tax_rules)
+  - uf_origem (string, 2)
+  - uf_destino (string, 2)
+  - cfop_id (foreign)
+  - icms_aliquota (decimal, 5,2)
+  - icms_reducao (decimal, 5,2)
+  - ipi_aliquota (decimal, 5,2)
+  - pis_aliquota (decimal, 5,2)
+  - cofins_aliquota (decimal, 5,2)
+
+#### 2.8.3 Integrações
+- Sped Fiscal
+- Sped Contribuições
+- SEF II
+- Sintegra
+
+### 2.9 Módulo Pessoa (people)
+#### 2.9.1 Clientes (clients)
+- Estrutura
+  - tipo (enum: PF, PJ)
+  - nome/razao_social (string, 100)
+  - cpf/cnpj (string, 14)
+  - rg/ie (string, 20)
+  - data_nascimento/data_fundacao (date)
+  - telefone (string, 20)
+  - celular (string, 20)
+  - email (string, 100)
+  - status (enum: ativo, inativo, bloqueado)
+  
+- Endereços (addresses)
+  - pessoa_id (foreign)
+  - tipo (enum: principal, cobrança, entrega)
+  - cep (string, 8)
+  - logradouro (string, 100)
+  - numero (string, 10)
+  - complemento (string, 50)
+  - bairro (string, 50)
+  - cidade (string, 50)
+  - uf (string, 2)
+
+- Contatos (contacts)
+  - pessoa_id (foreign)
+  - nome (string, 100)
+  - cargo (string, 50)
+  - telefone (string, 20)
+  - email (string, 100)
+  - principal (boolean)
+
+#### 2.9.2 Fornecedores (suppliers)
+- Estrutura Principal
+  - [mesma estrutura de Clientes]
+  - ramo_atividade (string, 100)
+  - prazo_entrega_padrao (integer)
+  - condicao_pagamento_padrao (foreign)
+
+- Produtos Fornecedor (supplier_products)
+  - fornecedor_id (foreign)
+  - produto_id (foreign)
+  - codigo_fornecedor (string, 50)
+  - preco_compra (decimal, 10,2)
+  - prazo_entrega (integer)
+  - pedido_minimo (decimal, 10,2)
+
+#### 2.9.3 Empresas (companies)
+- Dados Principais
+  - razao_social (string, 100)
+  - nome_fantasia (string, 100)
+  - cnpj (string, 14)
+  - ie (string, 20)
+  - regime_tributario_id (foreign)
+  - data_fundacao (date)
+  - logo (string, path)
+  - status (enum: ativa, inativa)
+
+- Configurações (company_settings)
+  - empresa_id (foreign)
+  - chave (string, 50)
+  - valor (text)
+  - tipo (enum: string, number, boolean, json)
+
+#### 2.9.4 Contador (accountants)
+- Dados Principais
+  - nome (string, 100)
+  - crc (string, 20)
+  - cpf (string, 11)
+  - telefone (string, 20)
+  - email (string, 100)
+  - empresa_contabil (string, 100)
+
+#### 2.9.5 Usuários (users)
+- Dados Principais
+  - nome (string, 100)
+  - email (string, 100)
+  - senha (string, hash)
+  - tipo (enum: admin, gerente, vendedor, operador)
+  - status (enum: ativo, inativo, bloqueado)
+  - ultimo_acesso (datetime)
+
+- Permissões (permissions)
+  - usuario_id (foreign)
+  - modulo (string, 50)
+  - acao (enum: visualizar, criar, editar, excluir)
+
+### 2.10 Módulo Administrativo (admin)
+#### 2.10.1 Backup do Sistema
+- Configurações (backup_settings)
+  - tipo (enum: local, ftp, s3)
+  - frequencia (enum: diário, semanal, mensal)
+  - hora_execucao (time)
+  - manter_por_dias (integer)
+  - notificar_email (string, 100)
+
+- Logs (backup_logs)
+  - data_execucao (datetime)
+  - tipo (string, 50)
+  - status (enum: sucesso, erro)
+  - tamanho (bigint)
+  - mensagem (text)
+
+#### 2.10.2 Licenciamento
+- Licenças (licenses)
+  - chave (string, 100)
+  - tipo (enum: básico, profissional, enterprise)
+  - data_inicio (date)
+  - data_fim (date)
+  - limite_usuarios (integer)
+  - recursos (json)
+  - status (enum: ativa, expirada, cancelada)
+
+#### 2.10.3 Níveis de Acesso
+- Perfis (profiles)
+  - nome (string, 50)
+  - descricao (text)
+  - nivel (integer)
+  - permissoes (json)
+  - status (enum: ativo, inativo)
+
+- Logs de Acesso (access_logs)
+  - usuario_id (foreign)
+  - data_hora (datetime)
+  - ip (string, 15)
+  - acao (string, 100)
+  - detalhes (json)
+
+#### 2.10.4 Auditoria
+- Logs de Sistema (system_logs)
+  - data_hora (datetime)
+  - usuario_id (foreign)
+  - modulo (string, 50)
+  - acao (string, 100)
+  - registro_id (bigint)
+  - dados_anteriores (json)
+  - dados_novos (json)

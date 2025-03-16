@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ config('app.name') }} - @yield('title')</title>
     
     <!-- CSS -->
@@ -107,35 +108,67 @@
                     </a>
                     <div class="collapsible-body">
                         <ul>
+                            <!-- Submenu Cadastro -->
                             <li>
-                                <a class="collapsible-header waves-effect">
-                                    <i class="material-icons">list</i>
-                                    <span style="margin-left: 8px;">Cadastro</span>
-                                    <i class="fas fa-chevron-down right"></i>
-                                </a>
-                                <div class="collapsible-body">
-                                    <ul>
-                                        <li><a href="{{ route('financial.categories.index') }}" class="waves-effect">
-                                            <i class="material-icons">category</i>Categorias
-                                        </a></li>
-                                        <li><a href="{{ route('financial.cost-centers.index') }}" class="waves-effect">
-                                            <i class="material-icons">business</i>Centros de Custo
-                                        </a></li>
-                                    </ul>
-                                </div>
+                                <ul class="collapsible">
+                                    <li>
+                                        <a class="collapsible-header waves-effect">
+                                            <i class="material-icons">list</i>
+                                            <span style="margin-left: 8px;">Cadastro</span>
+                                            <i class="fas fa-chevron-down right"></i>
+                                        </a>
+                                        <div class="collapsible-body">
+                                            <ul>
+                                                <li>
+                                                    <a href="{{ route('financial.categories.index') }}" class="waves-effect">
+                                                        <i class="material-icons">category</i>
+                                                        <span>Categorias</span>
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a href="{{ route('financial.cost-centers.index') }}" class="waves-effect">
+                                                        <i class="material-icons">business</i>
+                                                        <span>Centros de Custo</span>
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a href="{{ route('financial.registration.payment-methods.index') }}" class="waves-effect">
+                                                        <i class="material-icons">payment</i>
+                                                        <span>Forma de Pagamento</span>
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a href="{{ route('financial.registration.payment-plans.index') }}" class="waves-effect">
+                                                        <i class="material-icons">account_balance_wallet</i>
+                                                        <span>Plano de Pagamento</span>
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </li>
+                                </ul>
                             </li>
-                            <li><a href="{{ route('financial.accounts.index') }}" class="waves-effect">
-                                <i class="material-icons">account_balance</i>Contas
-                            </a></li>
-                            <li><a href="{{ route('financial.reports.index') }}" class="waves-effect">
-                                <i class="material-icons">assessment</i>Relatórios
-                            </a></li>
-                            <li><a href="{{ route('financial.forecast.index') }}" class="waves-effect">
-                                <i class="material-icons">trending_up</i>Previsão
-                            </a></li>
-                            <li><a href="{{ route('financial.reconciliation.index') }}" class="waves-effect">
-                                <i class="material-icons">check_circle</i>Conciliação
-                            </a></li>
+                            <!-- Outros itens do menu Financeiro -->
+                            <li>
+                                <a href="{{ route('financial.accounts.index') }}" class="waves-effect">
+                                    <i class="material-icons">account_balance</i>Contas
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ route('financial.reports.index') }}" class="waves-effect">
+                                    <i class="material-icons">assessment</i>Relatórios
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ route('financial.forecast.index') }}" class="waves-effect">
+                                    <i class="material-icons">trending_up</i>Previsão
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ route('financial.reconciliation.index') }}" class="waves-effect">
+                                    <i class="material-icons">check_circle</i>Conciliação
+                                </a>
+                            </li>
                         </ul>
                     </div>
                 </li>
@@ -181,34 +214,29 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Inicializa todos os componentes do Materialize
             M.AutoInit();
+
+            // Inicializa a navegação lateral
+            var sidenav = document.querySelectorAll('.sidenav');
+            M.Sidenav.init(sidenav);
+
+            // Inicializa todos os menus colapsáveis
             var elems = document.querySelectorAll('.collapsible');
-            var instances = M.Collapsible.init(elems, {
-                accordion: true,
-                onOpenStart: function(el) {
-                    // Quando abrir um menu principal, fecha os outros
-                    instances.forEach(function(instance) {
-                        if (instance.el !== el) {
-                            instance.close();
-                        }
-                    });
-                }
+            M.Collapsible.init(elems, {
+                accordion: false // Permite múltiplos itens abertos
             });
 
             // Previne que o menu feche ao clicar em itens dentro dele
-            document.querySelectorAll('.collapsible-body a').forEach(function(link) {
+            document.querySelectorAll('.collapsible-body a:not(.collapsible-header)').forEach(function(link) {
                 link.addEventListener('click', function(e) {
-                    e.stopPropagation(); // Impede que o clique se propague e feche o menu
+                    e.stopPropagation();
                 });
             });
 
-            // Fecha o menu apenas quando clicar em outro menu principal
-            document.querySelectorAll('.sidenav > li > a:not(.collapsible-header)').forEach(function(link) {
-                link.addEventListener('click', function() {
-                    instances.forEach(function(instance) {
-                        instance.close();
-                    });
-                });
+            // Adiciona margem aos itens do submenu
+            document.querySelectorAll('.collapsible .collapsible-body').forEach(function(submenu) {
+                submenu.style.marginLeft = '10px';
             });
         });
     </script>
