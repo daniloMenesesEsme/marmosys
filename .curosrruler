@@ -1,183 +1,190 @@
-- Utilize o padrão MVC corretamente no Laravel.
-- Sempre crie Models, Controllers e Requests separados para cada funcionalidade.
-- Utilize Eloquent para interagir com o banco de dados.
-- Prefira Migrations para gerenciar a estrutura do banco.
-- Utilize Repository Pattern para desacoplar lógica complexa do Controller.
-- Sempre documente o código com comentários simples e diretos.
-- Evite queries diretas no Controller, prefira usar Services ou Repositories.
-- Para cada novo recurso, siga as práticas do Laravel Documentation.
-- Utilize Tailwind CSS para o design da aplicação.
-
 {
   "rules": [
+    // Regras de Nomenclatura
     {
-      "name": "Controller Naming",
-      "pattern": ".*Controller$",
-      "description": "Os controllers devem ter o sufixo 'Controller'.",
-      "severity": "error"
+      "group": "naming",
+      "rules": [
+        {
+          "name": "Controller Naming",
+          "pattern": ".*Controller$",
+          "description": "Controllers devem ter o sufixo 'Controller'",
+          "severity": "error"
+        },
+        {
+          "name": "Model Naming",
+          "pattern": "^[A-Z][a-zA-Z0-9]*$",
+          "description": "Models devem usar PascalCase",
+          "severity": "error"
+        },
+        {
+          "name": "View Naming",
+          "pattern": ".*\\.blade\\.php$",
+          "description": "Views devem usar extensão .blade.php",
+          "severity": "error"
+        },
+        {
+          "name": "Method Naming",
+          "pattern": "^[a-z][a-zA-Z0-9]*$",
+          "description": "Métodos devem usar camelCase",
+          "severity": "error"
+        },
+        {
+          "name": "Database Naming",
+          "pattern": "^[a-z_]+$",
+          "description": "Banco de dados deve usar snake_case",
+          "severity": "error"
+        }
+      ]
     },
-    {
-      "name": "Model Naming",
-      "pattern": "^[A-Z][a-zA-Z0-9]*$",
-      "description": "Os models devem estar no formato PascalCase.",
-      "severity": "error"
-    },
-    {
-      "name": "View Naming",
-      "pattern": ".*\\.(blade\\.php)$",
-      "description": "As views devem utilizar a extensão '.blade.php'.",
-      "severity": "error"
-    },
-    {
-      "name": "Route Naming Convention",
-      "pattern": ".*",
-      "description": "As rotas devem utilizar kebab-case.",
-      "severity": "error"
-    },
-    {
-      "name": "Migration File Naming",
-      "pattern": "^[0-9]+_.*\\.php$",
-      "description": "Os arquivos de migração devem seguir o padrão 'timestamp_nome_da_migracao.php'.",
-      "severity": "error"
-    },
-    {
-      "name": "Request Validation Classes",
-      "pattern": ".*Request$",
-      "description": "Classes de validação devem terminar com 'Request'.",
-      "severity": "error"
-    },
-    {
-      "name": "Service Class Naming",
-      "pattern": ".*Service$",
-      "description": "Classes de serviço devem terminar com 'Service'.",
-      "severity": "error"
-    },
-    {
-      "name": "Repository Class Naming",
-      "pattern": ".*Repository$",
-      "description": "Classes de repositório devem terminar com 'Repository'.",
-      "severity": "error"
-    },
-    {
-      "name": "Middleware Naming",
-      "pattern": ".*Middleware$",
-      "description": "Middleware deve terminar com 'Middleware'.",
-      "severity": "error"
-    },
-    {
-      "name": "Method Naming Convention",
-      "pattern": "^[a-z][a-zA-Z0-9]*$",
-      "description": "Os métodos devem estar em camelCase.",
-      "severity": "error"
-    },
-    {
-      "name": "Variable Naming Convention",
-      "pattern": "^[a-z][a-zA-Z0-9]*$",
-      "description": "Variáveis devem estar em camelCase.",
-      "severity": "error"
-    },
-    {
-      "name": "Blade Template Syntax",
-      "pattern": ".*\\.blade\\.php$",
-      "description": "As views Blade devem seguir a sintaxe Blade corretamente.",
-      "severity": "error"
-    },
-    {
-      "name": "Database Naming Convention",
-      "pattern": "^[a-z_]+$",
-      "description": "Tabelas e colunas devem usar snake_case.",
-      "severity": "error"
-    },
-    {
-      "name": "API Endpoint Naming",
-      "pattern": ".*api/.*",
-      "description": "Endpoints API devem utilizar kebab-case.",
-      "severity": "error"
-    },
-    {
-      "name": "Error Handling",
-      "pattern": ".*Controller.*",
-      "description": "Utilizar tratamento adequado com 'try-catch' nos controllers.",
-      "severity": "warning"
-    },
-    {
-      "name": "Form Request Usage",
-      "pattern": ".*Controller.*",
-      "description": "Usar Form Requests para validação de dados.",
-      "severity": "error"
-    },
-    {
-      "name": "Use Eloquent ORM",
-      "pattern": ".*Repository.*",
-      "description": "Utilizar Eloquent ORM corretamente nos repositórios.",
-      "severity": "error"
-    },
-    {
-      "name": "Dependency Injection",
-      "pattern": ".*Controller.*",
-      "description": "Injetar dependências via construtor.",
-      "severity": "error"
-    },
-    {
-      "name": "Code Formatting",
-      "pattern": ".*\\.php$",
-      "description": "Usar PSR-12 para formatação de código.",
-      "severity": "error"
-    },
-    {
-      "name": "Inline Documentation",
-      "pattern": ".*\\.php$",
-      "description": "Documentar métodos com PHPDoc.",
-      "severity": "warning"
-    },
-    {
-      "name": "Testing Coverage",
-      "pattern": ".*Test\\.php$",
-      "description": "Testes devem cobrir as principais funcionalidades.",
-      "severity": "error"
-    },
-    {
-      "name": "Database Migrations",
-      "pattern": ".*Migration.*",
-      "description": "Usar migrations para alterações no banco de dados.",
-      "severity": "error"
-    },
-    {
-      "name": "Environment Configuration",
-      "pattern": ".*\\.env$",
-      "description": "Configurações específicas devem estar no arquivo '.env'.",
-      "severity": "error"
-    },
-    {
-      "name": "Error Logging",
-      "pattern": ".*\\.php$",
-      "description": "Usar logs para erros com 'Log' do Laravel.",
-      "severity": "error"
-    }
-    {
-     "name": "Tailwind CSS Usage",
-     "pattern": ".*\\.blade\\.php$",
-     "description": "Utilizar Tailwind CSS para o design da  aplicação.",
-     "severity": "error"
-    }
-    {
-     "name": "Follow Laravel Best Practices",
-     "pattern": ".*Controller.*",
-     "description": "Para novos recursos, siga as práticas recomendadas na documentação oficial do Laravel.",
-     "severity": "error"
-    }
-    {
-     "name": "Use Migrations",
-     "pattern": ".*Migration.*",
-     "description": "Gerencie todas as alterações na estrutura do banco com migrations.",
-     "severity": "error"
-    }
-    {
-     "name": "Minimum Test Coverage",
-     "pattern": ".*Test\\.php$",
-     "description": "As funcionalidades críticas devem ter cobertura mínima de 80%.",
-     "severity": "error"
-    }
 
+    // Regras de Layout e UI
+    {
+      "group": "layout",
+      "rules": [
+        {
+          "name": "Layout Structure",
+          "pattern": ".*\\.blade\\.php$",
+          "description": "Views devem seguir estrutura hierárquica: cabeçalho fixo, menu lateral e conteúdo principal",
+          "severity": "error"
+        },
+        {
+          "name": "Header Pattern",
+          "pattern": ".*\\.blade\\.php$",
+          "description": "Cabeçalho deve ter altura 64px, posição fixa e z-index adequado",
+          "severity": "error"
+        },
+        {
+          "name": "Content Padding",
+          "pattern": ".*\\.blade\\.php$",
+          "description": "Conteúdo principal deve ter padding-top 100px e padding-left 380px",
+          "severity": "error"
+        },
+        {
+          "name": "Materialize Usage",
+          "pattern": ".*\\.blade\\.php$",
+          "description": "Usar componentes do Materialize CSS com ícones adequados",
+          "severity": "error"
+        },
+        {
+          "name": "Responsive Design",
+          "pattern": ".*\\.blade\\.php$",
+          "description": "Implementar media queries para responsividade em telas menores",
+          "severity": "error"
+        }
+      ]
+    },
+
+    // Regras de Arquitetura
+    {
+      "group": "architecture",
+      "rules": [
+        {
+          "name": "MVPS Pattern",
+          "pattern": ".*",
+          "description": "Seguir o padrão MVPS (Materialize View Pattern System)",
+          "severity": "error"
+        },
+        {
+          "name": "Service Layer",
+          "pattern": ".*Service$",
+          "description": "Lógica de negócio deve estar em Services",
+          "severity": "error"
+        },
+        {
+          "name": "Repository Pattern",
+          "pattern": ".*Repository$",
+          "description": "Acesso a dados deve usar Repositories",
+          "severity": "error"
+        },
+        {
+          "name": "Form Requests",
+          "pattern": ".*Request$",
+          "description": "Validações devem usar Form Requests",
+          "severity": "error"
+        }
+      ]
+    },
+
+    // Regras de Código
+    {
+      "group": "code",
+      "rules": [
+        {
+          "name": "PSR-12",
+          "pattern": ".*\\.php$",
+          "description": "Seguir padrão PSR-12 para formatação",
+          "severity": "error"
+        },
+        {
+          "name": "Error Handling",
+          "pattern": ".*Controller.*",
+          "description": "Usar try-catch com logs apropriados",
+          "severity": "error"
+        },
+        {
+          "name": "Documentation",
+          "pattern": ".*\\.php$",
+          "description": "Documentar métodos com PHPDoc",
+          "severity": "warning"
+        }
+      ]
+    },
+
+    // Regras de Banco de Dados
+    {
+      "group": "database",
+      "rules": [
+        {
+          "name": "Migrations",
+          "pattern": "^[0-9]+_.*\\.php$",
+          "description": "Usar migrations para alterações no banco",
+          "severity": "error"
+        },
+        {
+          "name": "Eloquent Usage",
+          "pattern": ".*Model.*",
+          "description": "Usar Eloquent ORM para operações no banco",
+          "severity": "error"
+        }
+      ]
+    },
+
+    // Regras de Testes
+    {
+      "group": "testing",
+      "rules": [
+        {
+          "name": "Test Coverage",
+          "pattern": ".*Test\\.php$",
+          "description": "Mínimo de 80% de cobertura em funcionalidades críticas",
+          "severity": "error"
+        },
+        {
+          "name": "Feature Tests",
+          "pattern": ".*Test\\.php$",
+          "description": "Implementar testes de feature para fluxos principais",
+          "severity": "error"
+        }
+      ]
+    },
+
+    // Regras de Segurança
+    {
+      "group": "security",
+      "rules": [
+        {
+          "name": "Environment Config",
+          "pattern": ".*\\.env$",
+          "description": "Dados sensíveis devem estar no .env",
+          "severity": "error"
+        },
+        {
+          "name": "CSRF Protection",
+          "pattern": ".*\\.blade\\.php$",
+          "description": "Forms devem incluir token CSRF",
+          "severity": "error"
+        }
+      ]
+    }
   ]
 }

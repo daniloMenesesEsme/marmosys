@@ -12,14 +12,47 @@
     <link href="{{ asset('css/styles.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
-        /* Estilo personalizado para o menu */
+        body {
+            display: flex;
+            min-height: 100vh;
+            flex-direction: column;
+        }
+
+        main {
+            flex: 1 0 auto;
+            padding-left: 300px;
+            padding-top: 64px;
+        }
+
+        /* Navbar fixa */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 999;
+            height: 64px;
+            line-height: 64px;
+            padding-left: 300px;
+        }
+
+        nav .brand-logo {
+            position: relative;
+            left: 0;
+            transform: none;
+            padding-left: 20px;
+        }
+
+        /* Menu lateral */
         .sidenav {
-            width: 300px; /* Menu mais largo */
+            width: 300px;
+            top: 64px;
+            height: calc(100% - 64px);
         }
         
         .sidenav li > a {
-            font-size: 16px !important; /* Fonte maior */
-            height: 50px !important; /* Altura maior */
+            font-size: 16px !important;
+            height: 50px !important;
             line-height: 50px !important;
             padding: 0 16px !important;
         }
@@ -31,39 +64,51 @@
             padding: 0 16px !important;
         }
         
-        /* Ícone de seta personalizado */
         .sidenav .collapsible-header i.right {
             margin-right: 0;
             font-size: 24px;
         }
         
-        /* Espaçamento dos itens do submenu */
         .sidenav .collapsible-body li a {
             padding-left: 32px !important;
         }
         
-        /* Cor de fundo quando expandido */
         .sidenav .collapsible-body {
             background-color: rgba(0,0,0,0.05);
+        }
+
+        @media only screen and (max-width: 992px) {
+            nav {
+                padding-left: 0;
+            }
+
+            nav .brand-logo {
+                left: 50%;
+                transform: translateX(-50%);
+            }
+
+            main {
+                padding-left: 0;
+            }
         }
     </style>
     @stack('styles')
 </head>
 <body>
+    <!-- Navbar fixa -->
     <nav class="blue darken-2">
         <div class="nav-wrapper">
-            <div class="container">
-                <a href="#" data-target="slide-out" class="sidenav-trigger"><i class="material-icons">menu</i></a>
-                <a href="{{ url('/dashboard') }}" class="brand-logo center">{{ config('app.name') }}</a>
-                <ul class="right hide-on-med-and-down">
-                    <li><a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                        <i class="material-icons left">exit_to_app</i>Sair
-                    </a></li>
-                </ul>
-            </div>
+            <a href="#" data-target="slide-out" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+            <a href="{{ url('/dashboard') }}" class="brand-logo">{{ config('app.name') }}</a>
+            <ul class="right">
+                <li><a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                    <i class="material-icons left">exit_to_app</i>Sair
+                </a></li>
+            </ul>
         </div>
     </nav>
 
+    <!-- Menu lateral -->
     <ul id="slide-out" class="sidenav sidenav-fixed">
         <li>
             <div class="user-view">
@@ -203,62 +248,29 @@
     </form>
 
     <main>
-        <div class="container" style="margin-left: 300px; padding: 20px;">
-            @yield('content')
-        </div>
+        @yield('content')
     </main>
 
-    <!-- Scripts (na ordem correta) -->
+    <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Inicializa todos os componentes do Materialize
             M.AutoInit();
-
-            // Inicializa a navegação lateral
             var sidenav = document.querySelectorAll('.sidenav');
             M.Sidenav.init(sidenav);
-
-            // Inicializa todos os menus colapsáveis
             var elems = document.querySelectorAll('.collapsible');
             M.Collapsible.init(elems, {
-                accordion: false // Permite múltiplos itens abertos
+                accordion: false
             });
-
-            // Previne que o menu feche ao clicar em itens dentro dele
             document.querySelectorAll('.collapsible-body a:not(.collapsible-header)').forEach(function(link) {
                 link.addEventListener('click', function(e) {
                     e.stopPropagation();
                 });
             });
-
-            // Adiciona margem aos itens do submenu
-            document.querySelectorAll('.collapsible .collapsible-body').forEach(function(submenu) {
-                submenu.style.marginLeft = '10px';
-            });
         });
     </script>
     @stack('scripts')
-
-    <!-- Adicione antes do fechamento do body -->
-    <footer class="page-footer" style="position: fixed; bottom: 0; width: 100%; z-index: 1000; background-color: #1976d2; height: 40px; line-height: 30px; padding: 0;">
-        <div class="footer-copyright" style="background-color: rgba(0,0,0,0.1); height: 100%;">
-            <div class="container">
-                <div class="row mb-0" style="margin-bottom: 0 !important;">
-                    <div class="col s6" style="font-size: 15px;">
-                        © {{ date('Y') }} MarmosyS
-                    </div>
-                    <div class="col s6 right-align" style="font-size: 15px;">
-                        {{ \App\Helpers\VersionHelper::getVersion() }}
-                    </div>
-                </div>
-            </div>
-        </div>
-    </footer>
-
-    <!-- Adicione um espaço para evitar que o conteúdo fique sob o footer -->
-    <div style="height: 30px;"></div>
 </body>
 </html> 

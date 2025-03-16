@@ -22,16 +22,9 @@ class FinancialCategoryController extends Controller
     {
         $validated = $request->validate([
             'nome' => 'required|max:255',
-            'tipo' => 'required|in:analitica,sintetica',
-            'natureza' => 'required|in:receita,despesa',
-            'codigo_contabil_externo' => 'nullable|max:20',
-            'cor' => 'nullable|max:7',
-            'icone' => 'nullable|max:50',
-            'ativo' => 'boolean'
+            'tipo' => 'required|in:receita,despesa',
+            'descricao' => 'nullable'
         ]);
-
-        // Se não foi enviado, define como true
-        $validated['ativo'] = $request->has('ativo');
 
         FinancialCategory::create($validated);
 
@@ -48,16 +41,9 @@ class FinancialCategoryController extends Controller
     {
         $validated = $request->validate([
             'nome' => 'required|max:255',
-            'tipo' => 'required|in:analitica,sintetica',
-            'natureza' => 'required|in:receita,despesa',
-            'codigo_contabil_externo' => 'nullable|max:20',
-            'cor' => 'nullable|max:7',
-            'icone' => 'nullable|max:50',
-            'ativo' => 'boolean'
+            'tipo' => 'required|in:receita,despesa',
+            'descricao' => 'nullable'
         ]);
-
-        // Se não foi enviado, define como false
-        $validated['ativo'] = $request->has('ativo');
 
         $category->update($validated);
 

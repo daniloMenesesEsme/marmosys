@@ -50,6 +50,20 @@ class PaymentMethod extends Model
         'outros' => 'Outros'
     ];
 
+    // Adicionar a constante BANDEIRAS_TEF
+    const BANDEIRAS_TEF = [
+        'visa' => 'Visa',
+        'mastercard' => 'Mastercard',
+        'elo' => 'Elo',
+        'amex' => 'American Express',
+        'hipercard' => 'Hipercard',
+        'diners' => 'Diners Club',
+        'discover' => 'Discover',
+        'jcb' => 'JCB',
+        'aura' => 'Aura',
+        'outros' => 'Outros'
+    ];
+
     // Escopo para métodos à vista
     public function scopeAvista($query)
     {
