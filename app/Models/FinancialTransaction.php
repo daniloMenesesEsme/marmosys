@@ -19,7 +19,8 @@ class FinancialTransaction extends Model
         'categoria_id',
         'conta_id',
         'cliente_id',
-        'orcamento_id'
+        'orcamento_id',
+        'financial_agent_id'
     ];
 
     protected $casts = [
@@ -46,5 +47,17 @@ class FinancialTransaction extends Model
     public function budget()
     {
         return $this->belongsTo(Budget::class, 'orcamento_id');
+    }
+
+    public function financialAgent()
+    {
+        return $this->belongsTo(FinancialAgent::class);
+    }
+
+    public function validateFinancialAgent()
+    {
+        if ($this->paymentMethod?->requiresFinancialAgent() && !$this->financial_agent_id) {
+            throw new \Exception('O agente financeiro é obrigatório para este método de pagamento.');
+        }
     }
 } 

@@ -98,6 +98,17 @@ class PaymentMethod extends Model
         return $this->hasMany(PaymentMethodAccount::class);
     }
 
+    public function financialAgent()
+    {
+        return $this->belongsTo(FinancialAgent::class);
+    }
+
+    // Método auxiliar para verificar se o método requer agente financeiro
+    public function requiresFinancialAgent(): bool
+    {
+        return in_array($this->especie_documento, ['cartao_credito', 'cartao_debito', 'boleto']);
+    }
+
     // Boot do modelo para garantir regras de negócio
     protected static function boot()
     {

@@ -71,7 +71,94 @@
           "description": "Implementar media queries para responsividade em telas menores",
           "severity": "error"
         }
-      ]
+      ],
+      "materialize": {
+        "select_pattern": {
+          "description": "Padrão para implementação de selects do Materialize",
+          "css_required": {
+            "class": "select-field",
+            "styles": [
+              ".select-field { margin-bottom: 0 !important; }",
+              ".select-field .select-wrapper input.select-dropdown {",
+              "    height: 2rem !important;",
+              "    line-height: 2rem !important;",
+              "    font-size: 14px !important;",
+              "    border-bottom: 1px solid #9e9e9e !important;",
+              "}",
+              ".select-field .select-wrapper .dropdown-content { top: auto !important; }",
+              ".select-field .select-wrapper .dropdown-content li > span {",
+              "    font-size: 14px;",
+              "    padding: 8px 16px;",
+              "}",
+              ".select-field .helper-text { margin-top: 0; font-size: 12px; }"
+            ]
+          },
+          "html_structure": {
+            "template": [
+              "<div class=\"input-field col s12 m6 select-field\">",
+              "    <select name=\"field_name\" id=\"field_name\">",
+              "        <option value=\"\" disabled selected>Selecione...</option>",
+              "        @foreach($items as $item)",
+              "            <option value=\"{{ $item->id }}\" {{ (old('field_name', $model->field_name ?? '') == $item->id) ? 'selected' : '' }}>",
+              "                {{ $item->nome }}",
+              "            </option>",
+              "        @endforeach",
+              "    </select>",
+              "    <label for=\"field_name\">Label do Campo</label>",
+              "    @error('field_name') <span class=\"red-text\">{{ $message }}</span> @enderror",
+              "</div>"
+            ]
+          },
+          "javascript_required": {
+            "initialization": [
+              "document.addEventListener('DOMContentLoaded', function() {",
+              "    var selects = document.querySelectorAll('select');",
+              "    var selectInstances = M.FormSelect.init(selects, {",
+              "        dropdownOptions: {",
+              "            container: document.body,",
+              "            constrainWidth: false",
+              "        }",
+              "    });",
+              "",
+              "    selects.forEach(function(select) {",
+              "        select.addEventListener('change', function() {",
+              "            var selectedValue = this.value;",
+              "            var selectedText = this.options[this.selectedIndex].text;",
+              "            ",
+              "            setTimeout(function() {",
+              "                var instance = M.FormSelect.init(select);",
+              "                select.value = selectedValue;",
+              "                instance.input.value = selectedText;",
+              "            }, 100);",
+              "        });",
+              "    });",
+              "});"
+            ]
+          },
+          "examples": {
+            "basic_select": {
+              "description": "Exemplo de implementação básica de select",
+              "code": [
+                "<div class=\"input-field col s12 m6 select-field\">",
+                "    <select name=\"tipo\" id=\"tipo\" required>",
+                "        <option value=\"\" disabled selected>Selecione o tipo</option>",
+                "        @foreach($tipos as $key => $value)",
+                "            <option value=\"{{ $key }}\">{{ $value }}</option>",
+                "        @endforeach",
+                "    </select>",
+                "    <label for=\"tipo\">Tipo</label>",
+                "</div>"
+              ]
+            }
+          },
+          "observations": [
+            "1. Sempre usar a classe 'select-field' no container do select",
+            "2. Incluir os estilos CSS no início do arquivo blade ou em um arquivo CSS global",
+            "3. Inicializar os selects com o JavaScript fornecido no @push('scripts')",
+            "4. Manter a estrutura HTML conforme o template para garantir consistência"
+          ]
+        }
+      }
     },
 
     // Regras de Arquitetura

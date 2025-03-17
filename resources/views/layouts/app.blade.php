@@ -24,6 +24,23 @@
             padding-top: 64px;
         }
 
+        /* Ajustes para selects do Materialize */
+        .select-wrapper input.select-dropdown {
+            width: calc(100% - 20px) !important;
+            text-overflow: ellipsis !important;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            margin-right: 20px !important;
+            text-align: left !important;
+        }
+        
+        .select-wrapper .caret {
+            position: absolute !important;
+            right: 0 !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+        }
+
         /* Navbar fixa */
         nav {
             position: fixed;
@@ -186,6 +203,12 @@
                                                     <a href="{{ route('financial.registration.payment-plans.index') }}" class="waves-effect">
                                                         <i class="material-icons">account_balance_wallet</i>
                                                         <span>Plano de Pagamento</span>
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a href="{{ route('financial.agents.index') }}" class="waves-effect">
+                                                        <i class="material-icons">account_balance</i>
+                                                        <span>Agentes Financeiros</span>
                                                     </a>
                                                 </li>
                                             </ul>

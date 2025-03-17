@@ -68,3 +68,25 @@
     </div>
 </div>
 @endsection 
+
+<style>
+.select-field {
+    margin-bottom: 0 !important;
+}
+.select-field .select-wrapper input.select-dropdown {
+    height: 2rem;
+    line-height: 2rem;
+    font-size: 14px;
+}
+.select-field .helper-text {
+    margin-top: 0;
+    font-size: 12px;
+}
+</style> 
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var selects = document.querySelectorAll('select');
+    M.FormSelect.init(selects);
+});
+</script> 

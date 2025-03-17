@@ -133,6 +133,22 @@
                                         </label>
                                     </div>
                                 </div>
+
+                                <div class="row">
+                                    <div class="input-field col s12 m6 select-field">
+                                        <select name="financial_agent_id" id="financial_agent_id">
+                                            <option value="">Selecione o Agente Financeiro</option>
+                                            @foreach($financialAgents as $agent)
+                                                <option value="{{ $agent->id }}" 
+                                                    {{ old('financial_agent_id', $paymentMethod->financial_agent_id ?? '') == $agent->id ? 'selected' : '' }}>
+                                                    {{ $agent->nome }} ({{ \App\Models\FinancialAgent::TIPOS[$agent->tipo] }})
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        <label for="financial_agent_id">Agente Financeiro</label>
+                                        @error('financial_agent_id') <span class="red-text">{{ $message }}</span> @enderror
+                                    </div>
+                                </div>
                             </div>
 
                             <!-- Aba Fiscal -->

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Financial;
 use App\Http\Controllers\Controller;
 use App\Models\PaymentMethod;
 use App\Models\FinancialCategory;
+use App\Models\FinancialAgent;
 use Illuminate\Http\Request;
 
 class PaymentMethodController extends Controller
@@ -17,11 +18,11 @@ class PaymentMethodController extends Controller
 
     public function create()
     {
-        $categories = FinancialCategory::where('tipo', 'receita')
-            ->where('ativo', true)
+        $financialAgents = FinancialAgent::ativos()
             ->orderBy('nome')
             ->get();
-        return view('financial.registration.payment-methods.form', compact('categories'));
+
+        return view('financial.registration.payment-methods.form', compact('financialAgents'));
     }
 
     public function store(Request $request)
@@ -49,11 +50,11 @@ class PaymentMethodController extends Controller
 
     public function edit(PaymentMethod $paymentMethod)
     {
-        $categories = FinancialCategory::where('tipo', 'receita')
-            ->where('ativo', true)
+        $financialAgents = FinancialAgent::ativos()
             ->orderBy('nome')
             ->get();
-        return view('financial.registration.payment-methods.form', compact('paymentMethod', 'categories'));
+
+        return view('financial.registration.payment-methods.form', compact('paymentMethod', 'financialAgents'));
     }
 
     public function update(Request $request, PaymentMethod $paymentMethod)

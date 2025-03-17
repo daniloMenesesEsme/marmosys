@@ -25,6 +25,7 @@ use App\Http\Controllers\Financial\ReportController;
 use App\Http\Controllers\Financial\PaymentMethodController;
 use App\Http\Controllers\Financial\FinancialRegistrationController;
 use App\Http\Controllers\Financial\PaymentPlanController;
+use App\Http\Controllers\Financial\AgentController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -63,6 +64,16 @@ Route::middleware('auth')->group(function () {
             Route::resource('payment-plans', PaymentPlanController::class);
             Route::post('payment-plans/{paymentPlan}/simulate', [PaymentPlanController::class, 'simulate'])
                 ->name('payment-plans.simulate');
+
+            // Rotas para Agentes Financeiros
+            Route::resource('agents', AgentController::class)->except(['show'])->names([
+                'index' => 'agents.index',
+                'create' => 'agents.create',
+                'store' => 'agents.store',
+                'edit' => 'agents.edit',
+                'update' => 'agents.update',
+                'destroy' => 'agents.destroy'
+            ]);
         });
 
         // Contas Financeiras
@@ -116,6 +127,9 @@ Route::middleware('auth')->group(function () {
             ->name('budgets.reject');
         Route::post('budgets/copy', [BudgetController::class, 'copy'])
             ->name('budgets.copy');
+
+        // Rotas de agentes financeiros
+        Route::resource('agents', AgentController::class);
     });
 
     Route::get('/materials/search', [MaterialController::class, 'search'])->name('materials.search');
