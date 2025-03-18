@@ -26,6 +26,7 @@ use App\Http\Controllers\Financial\PaymentMethodController;
 use App\Http\Controllers\Financial\FinancialRegistrationController;
 use App\Http\Controllers\Financial\PaymentPlanController;
 use App\Http\Controllers\Financial\AgentController;
+use App\Http\Controllers\Financial\Reports\FinancialAgentReportController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -86,6 +87,10 @@ Route::middleware('auth')->group(function () {
             Route::get('/', [ReportController::class, 'index'])->name('index');
             Route::get('/export/pdf', [ReportController::class, 'exportPDF'])->name('export.pdf');
             Route::get('/export/excel', [ReportController::class, 'exportExcel'])->name('export.excel');
+            Route::get('agents', [FinancialAgentReportController::class, 'index'])->name('agents');
+            Route::get('agents/import', [FinancialAgentReportController::class, 'showImportForm'])->name('agents.import.form');
+            Route::post('agents/import', [FinancialAgentReportController::class, 'import'])->name('agents.import');
+            Route::get('agents/template', [FinancialAgentReportController::class, 'exportTemplate'])->name('agents.template');
         });
 
         // Categorias Financeiras
@@ -121,6 +126,8 @@ Route::middleware('auth')->group(function () {
         Route::resource('budgets', BudgetController::class);
         Route::get('budgets/{budget}/generatePdf', [BudgetController::class, 'generatePdf'])
             ->name('budgets.generatePdf');
+        Route::get('budgets/{budget}/pdf', [BudgetController::class, 'generatePdf'])
+            ->name('budgets.pdf');
         Route::post('budgets/{budget}/approve', [BudgetController::class, 'approve'])
             ->name('budgets.approve');
         Route::post('budgets/{budget}/reject', [BudgetController::class, 'reject'])
@@ -145,7 +152,7 @@ Route::middleware('auth')->group(function () {
     });
 
     // Fornecedores
-    Route::resource('suppliers', SupplierController::class);
+    // Route::resource('suppliers', SupplierController::class);
 
     // Funcionários
     Route::resource('employees', EmployeeController::class);
@@ -157,7 +164,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/api/companies/find-cnpj/{cnpj}', [CompanyController::class, 'findByCNPJ'])->name('companies.find-cnpj');
 
     // Rota para busca de CNPJ
-    Route::get('/suppliers/find-cnpj/{cnpj}', [SupplierController::class, 'findByCNPJ'])->name('suppliers.find-cnpj');
+    // Route::get('/suppliers/find-cnpj/{cnpj}', [SupplierController::class, 'findByCNPJ'])->name('suppliers.find-cnpj');
 
     // Rotas de configurações
     Route::prefix('settings')->name('settings.')->group(function () {

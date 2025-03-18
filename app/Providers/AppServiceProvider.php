@@ -21,6 +21,11 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind('excel.exporter', function ($app) {
             return new ExcelExporter();
         });
+
+        // Carregar nossos helpers
+        foreach (glob(app_path('Helpers') . '/*.php') as $file) {
+            require_once $file;
+        }
     }
 
     /**

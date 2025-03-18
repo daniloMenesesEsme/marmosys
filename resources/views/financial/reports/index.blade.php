@@ -28,6 +28,28 @@
                 <h4>Relatório Financeiro</h4>
             </div>
 
+            <!-- Menu de Relatórios -->
+            <div class="card">
+                <div class="card-content">
+                    <span class="card-title">Relatórios Disponíveis</span>
+                    <div class="row">
+                        <div class="col s12 m6 l4">
+                            <a href="{{ route('financial.reports.index') }}" class="btn waves-effect waves-light blue darken-1 btn-large btn-block">
+                                <i class="material-icons left">account_balance</i>
+                                Fluxo Financeiro
+                            </a>
+                        </div>
+                        <div class="col s12 m6 l4">
+                            <a href="{{ route('financial.reports.agents') }}" class="btn waves-effect waves-light teal darken-1 btn-large btn-block">
+                                <i class="material-icons left">business</i>
+                                Agentes Financeiros
+                            </a>
+                        </div>
+                        <!-- Adicione mais botões para outros relatórios aqui -->
+                    </div>
+                </div>
+            </div>
+
             <!-- Filtros -->
             <div class="card">
                 <div class="card-content">
@@ -206,6 +228,17 @@
 }
 .mb-0 {
     margin-bottom: 0 !important;
+}
+.btn-block {
+    display: block;
+    width: 100%;
+    margin-bottom: 15px;
+    text-align: left;
+    height: 54px;
+    line-height: 54px;
+}
+.btn-block i {
+    margin-right: 8px;
 }
 </style>
 @endsection

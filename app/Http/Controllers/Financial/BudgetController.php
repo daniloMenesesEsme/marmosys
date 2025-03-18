@@ -77,8 +77,16 @@ class BudgetController extends Controller
     public function store(Request $request)
     {
         try {
-            \Log::info('Iniciando criação do orçamento com dados:', $request->all());
+            Log::info('Iniciando criação do orçamento com dados:', $request->all());
 
+            // Verificação inicial dos dados
+            if (!$request->has('rooms') || !is_array($request->rooms) || count($request->rooms) === 0) {
+                Log::error('Erro ao criar orçamento: Nenhum ambiente informado');
+                return back()
+                    ->withInput()
+                    ->with('error', 'É necessário adicionar pelo menos um ambiente ao orçamento.');
+            }
+            
             $validated = $request->validate([
                 'numero' => 'required|unique:budgets,numero',
                 'data' => 'required|date',

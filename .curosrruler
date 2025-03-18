@@ -4,35 +4,35 @@
     {
       "group": "naming",
       "rules": [
-        {
-          "name": "Controller Naming",
-          "pattern": ".*Controller$",
+    {
+      "name": "Controller Naming",
+      "pattern": ".*Controller$",
           "description": "Controllers devem ter o sufixo 'Controller'",
-          "severity": "error"
-        },
-        {
-          "name": "Model Naming",
-          "pattern": "^[A-Z][a-zA-Z0-9]*$",
+      "severity": "error"
+    },
+    {
+      "name": "Model Naming",
+      "pattern": "^[A-Z][a-zA-Z0-9]*$",
           "description": "Models devem usar PascalCase",
-          "severity": "error"
-        },
-        {
-          "name": "View Naming",
-          "pattern": ".*\\.blade\\.php$",
+      "severity": "error"
+    },
+    {
+      "name": "View Naming",
+      "pattern": ".*\\.blade\\.php$",
           "description": "Views devem usar extensão .blade.php",
-          "severity": "error"
-        },
-        {
+      "severity": "error"
+    },
+    {
           "name": "Method Naming",
           "pattern": "^[a-z][a-zA-Z0-9]*$",
           "description": "Métodos devem usar camelCase",
-          "severity": "error"
-        },
-        {
+      "severity": "error"
+    },
+    {
           "name": "Database Naming",
           "pattern": "^[a-z_]+$",
           "description": "Banco de dados deve usar snake_case",
-          "severity": "error"
+      "severity": "error"
         }
       ]
     },
@@ -45,31 +45,37 @@
           "name": "Layout Structure",
           "pattern": ".*\\.blade\\.php$",
           "description": "Views devem seguir estrutura hierárquica: cabeçalho fixo, menu lateral e conteúdo principal",
-          "severity": "error"
-        },
-        {
+      "severity": "error"
+    },
+    {
           "name": "Header Pattern",
           "pattern": ".*\\.blade\\.php$",
           "description": "Cabeçalho deve ter altura 64px, posição fixa e z-index adequado",
-          "severity": "error"
-        },
-        {
+      "severity": "error"
+    },
+    {
           "name": "Content Padding",
           "pattern": ".*\\.blade\\.php$",
           "description": "Conteúdo principal deve ter padding-top 100px e padding-left 380px",
-          "severity": "error"
-        },
-        {
+      "severity": "error"
+    },
+    {
           "name": "Materialize Usage",
           "pattern": ".*\\.blade\\.php$",
           "description": "Usar componentes do Materialize CSS com ícones adequados",
-          "severity": "error"
-        },
-        {
+      "severity": "error"
+    },
+    {
           "name": "Responsive Design",
           "pattern": ".*\\.blade\\.php$",
           "description": "Implementar media queries para responsividade em telas menores",
-          "severity": "error"
+      "severity": "error"
+    },
+    {
+          "name": "Reporting PDF Standards",
+          "pattern": ".*\\.blade\\.php$",
+          "description": "Padrões para relatórios em PDF no sistema",
+      "severity": "error"
         }
       ],
       "materialize": {
@@ -158,6 +164,53 @@
             "4. Manter a estrutura HTML conforme o template para garantir consistência"
           ]
         }
+      },
+      "reporting": {
+        "pdf_standards": {
+          "description": "Padrões para relatórios em PDF no sistema",
+          "company_logo": {
+            "description": "O logo da empresa deve ser obtido usando o CompanyHelper",
+            "example": "CompanyHelper::getCompanyLogoBase64()",
+            "notes": "Isso garante que o logo seja exibido corretamente em todos os relatórios"
+          },
+          "style": {
+            "description": "Todos os relatórios PDF devem usar o estilo padrão do sistema",
+            "source": "resources/css/pdf-reports.css",
+            "application": "Usar o PdfHelper para gerar PDFs com estilo consistente"
+          },
+          "header": {
+            "description": "Estrutura do cabeçalho dos relatórios",
+            "elements": [
+              "Logo da empresa à esquerda",
+              "Título do relatório à direita em azul",
+              "Informações de geração (data, usuário, período) sob o título"
+            ]
+          },
+          "table": {
+            "description": "Padrão para tabelas nos relatórios",
+            "elements": [
+              "Cabeçalho em azul (#1976D2) com texto branco",
+              "Linhas alternadas para melhor legibilidade",
+              "Totalizadores no rodapé da tabela"
+            ]
+          },
+          "summary": {
+            "description": "Seção de resumo financeiro",
+            "style": "Fundo azul claro (#E3F2FD) com dados principais destacados",
+            "colors": {
+              "receita": "Verde (#4CAF50)",
+              "despesa": "Vermelho (#F44336)"
+            }
+          },
+          "implementation": {
+            "files": [
+              "app/Helpers/PdfHelper.php - Helper para gerar PDFs com estilo padrão",
+              "app/Helpers/CompanyHelper.php - Helper para obter informações da empresa",
+              "resources/css/pdf-reports.css - Estilos CSS para relatórios"
+            ],
+            "usage": "PdfHelper::generate('view.name', $data, 'nome_arquivo.pdf')"
+          }
+        }
       }
     },
 
@@ -169,25 +222,25 @@
           "name": "MVPS Pattern",
           "pattern": ".*",
           "description": "Seguir o padrão MVPS (Materialize View Pattern System)",
-          "severity": "error"
-        },
-        {
+      "severity": "error"
+    },
+    {
           "name": "Service Layer",
           "pattern": ".*Service$",
           "description": "Lógica de negócio deve estar em Services",
-          "severity": "error"
-        },
-        {
+      "severity": "error"
+    },
+    {
           "name": "Repository Pattern",
           "pattern": ".*Repository$",
           "description": "Acesso a dados deve usar Repositories",
-          "severity": "error"
-        },
-        {
+      "severity": "error"
+    },
+    {
           "name": "Form Requests",
           "pattern": ".*Request$",
           "description": "Validações devem usar Form Requests",
-          "severity": "error"
+      "severity": "error"
         }
       ]
     },
@@ -200,19 +253,19 @@
           "name": "PSR-12",
           "pattern": ".*\\.php$",
           "description": "Seguir padrão PSR-12 para formatação",
-          "severity": "error"
-        },
-        {
+      "severity": "error"
+    },
+    {
           "name": "Error Handling",
           "pattern": ".*Controller.*",
           "description": "Usar try-catch com logs apropriados",
-          "severity": "error"
-        },
-        {
+      "severity": "error"
+    },
+    {
           "name": "Documentation",
-          "pattern": ".*\\.php$",
+      "pattern": ".*\\.php$",
           "description": "Documentar métodos com PHPDoc",
-          "severity": "warning"
+      "severity": "warning"
         }
       ]
     },
@@ -225,13 +278,13 @@
           "name": "Migrations",
           "pattern": "^[0-9]+_.*\\.php$",
           "description": "Usar migrations para alterações no banco",
-          "severity": "error"
-        },
-        {
+      "severity": "error"
+    },
+    {
           "name": "Eloquent Usage",
           "pattern": ".*Model.*",
           "description": "Usar Eloquent ORM para operações no banco",
-          "severity": "error"
+      "severity": "error"
         }
       ]
     },
@@ -244,13 +297,13 @@
           "name": "Test Coverage",
           "pattern": ".*Test\\.php$",
           "description": "Mínimo de 80% de cobertura em funcionalidades críticas",
-          "severity": "error"
-        },
-        {
+      "severity": "error"
+    },
+    {
           "name": "Feature Tests",
           "pattern": ".*Test\\.php$",
           "description": "Implementar testes de feature para fluxos principais",
-          "severity": "error"
+      "severity": "error"
         }
       ]
     },
@@ -263,13 +316,13 @@
           "name": "Environment Config",
           "pattern": ".*\\.env$",
           "description": "Dados sensíveis devem estar no .env",
-          "severity": "error"
-        },
-        {
+      "severity": "error"
+    },
+    {
           "name": "CSRF Protection",
           "pattern": ".*\\.blade\\.php$",
           "description": "Forms devem incluir token CSRF",
-          "severity": "error"
+      "severity": "error"
         }
       ]
     }

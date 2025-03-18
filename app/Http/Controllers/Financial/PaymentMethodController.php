@@ -21,8 +21,10 @@ class PaymentMethodController extends Controller
         $financialAgents = FinancialAgent::ativos()
             ->orderBy('nome')
             ->get();
+            
+        $categories = FinancialCategory::orderBy('nome')->get();
 
-        return view('financial.registration.payment-methods.form', compact('financialAgents'));
+        return view('financial.registration.payment-methods.form', compact('financialAgents', 'categories'));
     }
 
     public function store(Request $request)
@@ -53,8 +55,10 @@ class PaymentMethodController extends Controller
         $financialAgents = FinancialAgent::ativos()
             ->orderBy('nome')
             ->get();
-
-        return view('financial.registration.payment-methods.form', compact('paymentMethod', 'financialAgents'));
+        
+        $categories = FinancialCategory::orderBy('nome')->get();
+        
+        return view('financial.registration.payment-methods.form', compact('paymentMethod', 'financialAgents', 'categories'));
     }
 
     public function update(Request $request, PaymentMethod $paymentMethod)

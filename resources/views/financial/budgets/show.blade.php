@@ -93,10 +93,10 @@
                         EDITAR
                     </a>
                     
-                    <button type="button" 
-                            class="btn btn-secondary" 
-                            onclick="window.open('{{ route('financial.budgets.pdf', $budget->id) }}', '_blank')">
-                        <i class="fas fa-file-pdf"></i> Visualizar PDF
+                    <button type="button" class="btn blue-grey darken-2 waves-effect waves-light"
+                        onclick="window.open('{{ route('financial.budgets.pdf', $budget->id) }}', '_blank')">
+                        <i class="material-icons left">picture_as_pdf</i>
+                        IMPRIMIR PDF
                     </button>
                     
                     <button onclick="window.print()" class="btn blue waves-effect waves-light">

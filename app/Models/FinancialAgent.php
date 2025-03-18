@@ -51,6 +51,11 @@ class FinancialAgent extends Model
         return $this->hasMany(PaymentMethod::class);
     }
 
+    public function transactions()
+    {
+        return $this->hasMany(FinancialTransaction::class);
+    }
+
     // Métodos de negócio
     public function isBanco(): bool
     {

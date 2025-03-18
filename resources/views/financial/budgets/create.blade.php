@@ -232,7 +232,7 @@
                     </div>
 
                     <div class="card-action">
-                        <button type="submit" class="btn waves-effect waves-light green">
+                        <button type="submit" id="submit-button" class="btn waves-effect waves-light green">
                             <i class="material-icons left">save</i>
                             Salvar Orçamento
                         </button>
@@ -243,6 +243,12 @@
                         </a>
                     </div>
                 </form>
+
+                <!-- Botão para teste (pode ser removido após resolver o problema) -->
+                <button type="button" id="bypass-validation" class="btn grey lighten-2" style="margin-left: 10px;">
+                    <i class="material-icons left">bug_report</i>
+                    Enviar Sem Validação
+                </button>
 
                 <!--<button type="button" onclick="debugForm()">Debug Form</button>-->
             </div>
@@ -387,27 +393,84 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('budget-form').addEventListener('submit', function(e) {
         e.preventDefault();
         
+        console.log('Iniciando validação do formulário');
+        
+        // Verifica se há ambientes
         const rooms = document.querySelectorAll('.room-card');
         if (rooms.length === 0) {
             M.toast({html: 'Adicione pelo menos um ambiente'});
-            return;
+            console.log('Validação falhou: nenhum ambiente');
+            return false;
         }
-
+        
+        // Verifica se cada ambiente tem pelo menos um item
         let valid = true;
-        rooms.forEach(room => {
+        
+        // Array para guardar mensagens específicas de erro
+        let errorMessages = [];
+        
+        rooms.forEach((room, roomIndex) => {
+            const roomName = room.querySelector('.room-name').value || `Ambiente ${roomIndex + 1}`;
             const items = room.querySelectorAll('.item-row');
+            
             if (items.length === 0) {
-                M.toast({html: `O ambiente ${room.querySelector('.room-name').value} precisa ter pelo menos um item`});
+                M.toast({html: `O ambiente ${roomName} precisa ter pelo menos um item`});
+                console.log(`Validação falhou: ambiente ${roomName} sem itens`);
                 valid = false;
             }
+            
+            // Verifica cada item do ambiente
+            items.forEach((item, itemIndex) => {
+                const materialAutocomplete = item.querySelector('.autocomplete-material');
+                const materialIdField = item.querySelector('input[name$="[material_id]"]');
+                
+                if (!materialIdField || !materialIdField.value) {
+                    materialAutocomplete.classList.add('invalid');
+                    const errorMsg = `Selecione um material para o item ${itemIndex + 1} do ambiente "${roomName}"`;
+                    errorMessages.push(errorMsg);
+                    console.log(errorMsg);
+                    valid = false;
+                }
+            });
         });
-
-        if (!valid) return;
-        if (!this.checkValidity()) {
-            M.toast({html: 'Preencha todos os campos obrigatórios'});
-            return;
+        
+        if (!valid) {
+            // Mostra mensagem específica com o que está faltando
+            if (errorMessages.length > 0) {
+                M.toast({html: errorMessages[0], displayLength: 4000});
+            } else {
+                M.toast({html: 'Verifique os campos obrigatórios'});
+            }
+            return false;
         }
-
+        
+        // Verificação adicional para todos os campos obrigatórios
+        const requiredFields = this.querySelectorAll('[required]');
+        let missingFields = [];
+        
+        requiredFields.forEach(field => {
+            if (!field.value.trim()) {
+                field.classList.add('invalid');
+                missingFields.push(field.name || field.id || 'campo não identificado');
+            }
+        });
+        
+        if (missingFields.length > 0) {
+            console.log('Campos obrigatórios faltando:', missingFields);
+            M.toast({html: 'Preencha todos os campos obrigatórios'});
+            return false;
+        }
+        
+        console.log('Formulário válido, enviando...');
+        
+        // Desativa o botão para evitar envios duplicados
+        const submitBtn = document.querySelector('button[type="submit"]');
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="material-icons left">hourglass_empty</i> Salvando...';
+        }
+        
+        // Envia o formulário
         this.submit();
     });
 
@@ -440,7 +503,16 @@ document.addEventListener('DOMContentLoaded', function() {
             onAutocomplete: function(text) {
                 // Quando um item é selecionado, atualiza o input hidden
                 const materialId = materiais[text].id;
-                element.nextElementSibling.value = materialId;
+                const hiddenInput = element.parentElement.querySelector('input[name$="[material_id]"]');
+                
+                if (hiddenInput) {
+                    hiddenInput.value = materialId;
+                    // Adiciona uma indicação visual de que o material foi selecionado
+                    element.classList.add('valid');
+                    console.log('Material selecionado com sucesso:', text, 'ID:', materialId);
+                } else {
+                    console.error('Campo hidden para material_id não encontrado!', element);
+                }
             }
         });
     }
@@ -464,6 +536,17 @@ document.addEventListener('DOMContentLoaded', function() {
     observer.observe(document.querySelector('.rooms-container'), {
         childList: true,
         subtree: true
+    });
+
+    // Botão para bypassa a validação em caso de emergência
+    document.querySelector('#bypass-validation').addEventListener('click', function() {
+        const form = document.getElementById('budget-form');
+        // Remover atributo required de todos os campos
+        form.querySelectorAll('[required]').forEach(field => {
+            field.removeAttribute('required');
+        });
+        // Enviar o formulário diretamente
+        form.submit();
     });
 });
 
