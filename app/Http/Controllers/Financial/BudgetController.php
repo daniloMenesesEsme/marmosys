@@ -62,11 +62,18 @@ class BudgetController extends Controller
     public function create()
     {
         // Gerar número sequencial para o orçamento
-        $ultimoNumero = Budget::whereYear('created_at', date('Y'))
-            ->max(DB::raw('CAST(SUBSTRING(numero, 5) AS UNSIGNED)'));
+        $ano = date('Y');
+        $ultimoNumero = Budget::whereYear('created_at', $ano)
+            ->orderBy('id', 'desc')
+            ->first();
         
-        $sequencial = $ultimoNumero ? $ultimoNumero + 1 : 1;
-        $numero = 'ORC-' . date('Y') . str_pad($sequencial, 4, '0', STR_PAD_LEFT);
+        $sequencial = 1;
+        if ($ultimoNumero) {
+            preg_match('/ORC-\d+(\d{4})$/', $ultimoNumero->numero, $matches);
+            $sequencial = isset($matches[1]) ? (int)$matches[1] + 1 : 1;
+        }
+        
+        $numero = 'ORC-' . $ano . str_pad($sequencial, 4, '0', STR_PAD_LEFT);
         
         // Recuperar clientes ativos para o select
         $clients = Client::where('ativo', true)->get();
@@ -471,7 +478,11 @@ class BudgetController extends Controller
     public function printView(Budget $budget)
     {
         $budget->load(['client', 'rooms.items.material']);
-        return view('financial.budgets.print', compact('budget'));
+        
+        // Busca dados da empresa para padronizar com o PDF
+        $company = Company::first();
+        
+        return view('financial.budgets.print', compact('budget', 'company'));
     }
 
     public function approve(Request $request, Budget $budget)
@@ -592,6 +603,60 @@ class BudgetController extends Controller
             return redirect()
                 ->route('financial.budgets.show', $budget)
                 ->with('error', 'Erro ao converter orçamento em contas a receber: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Desfaz a conversão de um orçamento em contas a receber
+     */
+    public function undoConvertToReceivable(Budget $budget)
+    {
+        try {
+            // Verifica se o orçamento foi convertido
+            if (!$budget->converted_to_receivable) {
+                return redirect()
+                    ->route('financial.budgets.show', $budget)
+                    ->with('error', 'Este orçamento não foi convertido em contas a receber.');
+            }
+            
+            // Obter todas as parcelas do orçamento
+            $installments = $budget->installments;
+            
+            // Para cada parcela, verificar se a conta a receber associada pode ser excluída
+            foreach ($installments as $installment) {
+                if ($installment->financialAccount) {
+                    // Verificar se a conta a receber já foi paga
+                    if ($installment->financialAccount->status === 'pago') {
+                        return redirect()
+                            ->route('financial.budgets.show', $budget)
+                            ->with('error', 'Não é possível desfazer a conversão, pois existem contas a receber já pagas.');
+                    }
+                    
+                    // Deletar a conta a receber
+                    $installment->financialAccount->delete();
+                    
+                    // Remover a associação com a conta a receber
+                    $installment->update(['financial_account_id' => null]);
+                }
+            }
+            
+            // Marcar o orçamento como não convertido
+            $budget->update(['converted_to_receivable' => false]);
+            
+            return redirect()
+                ->route('financial.budgets.show', $budget)
+                ->with('success', 'Conversão para contas a receber desfeita com sucesso!');
+                
+        } catch (\Exception $e) {
+            Log::error('Erro ao desfazer conversão do orçamento em contas a receber:', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'budget_id' => $budget->id
+            ]);
+            
+            return redirect()
+                ->route('financial.budgets.show', $budget)
+                ->with('error', 'Erro ao desfazer conversão: ' . $e->getMessage());
         }
     }
 } 

@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Orçamento {{ $budget->numero }}</title>
+    <title>Orçamento <?php echo e($budget->numero); ?></title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -96,27 +96,29 @@
         <table class="header-table">
             <tr>
                 <td style="width: 20%;">
-                    @if(isset($company->logo) && !empty($company->logo))
-                        <img src="{{ asset('storage/' . $company->logo) }}" alt="Logo" class="logo">
-                    @else
+                    <?php if(isset($company->logo) && !empty($company->logo)): ?>
+                        <img src="<?php echo e(asset('storage/' . $company->logo)); ?>" alt="Logo" class="logo">
+                    <?php else: ?>
                         <div class="logo-placeholder">Logo</div>
-                    @endif
+                    <?php endif; ?>
                 </td>
                 <td style="width: 60%; text-align: center;">
                     <div style="font-size: 16px; font-weight: bold; margin-bottom: 5px;">
-                        {{ $company->nome ?? 'ANGULAR GRANITOS FÁBRICA' }}
+                        <?php echo e($company->nome ?? 'ANGULAR GRANITOS FÁBRICA'); ?>
+
                     </div>
                     <div style="line-height: 1.5;">
-                        CNPJ: {{ $company->cnpj ?? '00.000.000/0000-00' }}<br>
-                        {{ $company->endereco ?? 'RUA QUINTINO CUNHA, 2950' }} - {{ $company->cidade ?? 'CAUCAIA' }} - {{ $company->estado ?? 'CE' }}<br>
-                        Fone: {{ $company->telefone ?? '(00) 00000-0000' }}<br>
-                        {{ $company->email ?? 'contato@angular.com' }}
+                        CNPJ: <?php echo e($company->cnpj ?? '00.000.000/0000-00'); ?><br>
+                        <?php echo e($company->endereco ?? 'RUA QUINTINO CUNHA, 2950'); ?> - <?php echo e($company->cidade ?? 'CAUCAIA'); ?> - <?php echo e($company->estado ?? 'CE'); ?><br>
+                        Fone: <?php echo e($company->telefone ?? '(00) 00000-0000'); ?><br>
+                        <?php echo e($company->email ?? 'contato@angular.com'); ?>
+
                     </div>
                 </td>
                 <td style="width: 20%; text-align: right; vertical-align: top;">
                     <div>Orçamento</div>
-                    <div>Nº {{ $budget->numero }}</div>
-                    <div>{{ $budget->data->format('d/m/Y') }}</div>
+                    <div>Nº <?php echo e($budget->numero); ?></div>
+                    <div><?php echo e($budget->data->format('d/m/Y')); ?></div>
                 </td>
             </tr>
         </table>
@@ -127,23 +129,28 @@
         <table class="client-table" style="border: none;">
             <tr>
                 <td style="border: none; width: 50%;">
-                    <strong>Nome:</strong> {{ $budget->client->nome }}
+                    <strong>Nome:</strong> <?php echo e($budget->client->nome); ?>
+
                 </td>
                 <td style="border: none; width: 50%;">
-                    <strong>CPF/CNPJ:</strong> {{ $budget->client->cpf_cnpj ?? 'Não informado' }}
+                    <strong>CPF/CNPJ:</strong> <?php echo e($budget->client->cpf_cnpj ?? 'Não informado'); ?>
+
                 </td>
             </tr>
             <tr>
                 <td style="border: none;">
-                    <strong>Endereço:</strong> {{ $budget->client->endereco ?? 'Não informado' }}
+                    <strong>Endereço:</strong> <?php echo e($budget->client->endereco ?? 'Não informado'); ?>
+
                 </td>
                 <td style="border: none;">
-                    <strong>Telefone:</strong> {{ $budget->client->telefone ?? 'Não informado' }}
+                    <strong>Telefone:</strong> <?php echo e($budget->client->telefone ?? 'Não informado'); ?>
+
                 </td>
             </tr>
             <tr>
                 <td style="border: none;" colspan="2">
-                    <strong>Email:</strong> {{ $budget->client->email ?? 'Não informado' }}
+                    <strong>Email:</strong> <?php echo e($budget->client->email ?? 'Não informado'); ?>
+
                 </td>
             </tr>
         </table>
@@ -151,15 +158,15 @@
 
     <div class="section">
         <div class="section-title">Dados do Orçamento</div>
-        <p><strong>Data:</strong> {{ $budget->data->format('d/m/Y') }}</p>
-        <p><strong>Validade:</strong> {{ $budget->data_validade->format('d/m/Y') }}</p>
-        <p><strong>Status:</strong> {{ $budget->status_text }}</p>
+        <p><strong>Data:</strong> <?php echo e($budget->data->format('d/m/Y')); ?></p>
+        <p><strong>Validade:</strong> <?php echo e($budget->data_validade->format('d/m/Y')); ?></p>
+        <p><strong>Status:</strong> <?php echo e($budget->status_text); ?></p>
     </div>
 
     <div class="section">
         <div class="section-title">Itens do Orçamento</div>
-        @foreach($budget->rooms as $room)
-            <h4>{{ $room->nome }}</h4>
+        <?php $__currentLoopData = $budget->rooms; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $room): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+            <h4><?php echo e($room->nome); ?></h4>
             <table>
                 <tr>
                     <th>Material</th>
@@ -169,46 +176,47 @@
                     <th>Valor Unit.</th>
                     <th>Total</th>
                 </tr>
-                @foreach($room->items as $item)
+                <?php $__currentLoopData = $room->items; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                     <tr>
-                        <td>{{ $item->material->nome }}</td>
-                        <td>{{ number_format($item->quantidade, 3, ',', '.') }}</td>
-                        <td>{{ $item->unidade }}</td>
-                        <td>{{ number_format($item->largura, 3, ',', '.') }}m x {{ number_format($item->altura, 3, ',', '.') }}m</td>
-                        <td>R$ {{ number_format($item->valor_unitario, 2, ',', '.') }}</td>
-                        <td>R$ {{ number_format($item->valor_total, 2, ',', '.') }}</td>
+                        <td><?php echo e($item->material->nome); ?></td>
+                        <td><?php echo e(number_format($item->quantidade, 3, ',', '.')); ?></td>
+                        <td><?php echo e($item->unidade); ?></td>
+                        <td><?php echo e(number_format($item->largura, 3, ',', '.')); ?>m x <?php echo e(number_format($item->altura, 3, ',', '.')); ?>m</td>
+                        <td>R$ <?php echo e(number_format($item->valor_unitario, 2, ',', '.')); ?></td>
+                        <td>R$ <?php echo e(number_format($item->valor_total, 2, ',', '.')); ?></td>
                     </tr>
-                @endforeach
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 <tr>
                     <td colspan="5" class="subtotal">Subtotal do Ambiente:</td>
-                    <td>R$ {{ number_format($room->items->sum('valor_total'), 2, ',', '.') }}</td>
+                    <td>R$ <?php echo e(number_format($room->items->sum('valor_total'), 2, ',', '.')); ?></td>
                 </tr>
             </table>
-        @endforeach
+        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
     </div>
 
     <div class="total">
-        <div>Valor Total: R$ {{ number_format($budget->valor_total, 2, ',', '.') }}</div>
-        <div>Desconto: R$ {{ number_format($budget->desconto, 2, ',', '.') }}</div>
-        <div>Valor Final: R$ {{ number_format($budget->valor_final, 2, ',', '.') }}</div>
+        <div>Valor Total: R$ <?php echo e(number_format($budget->valor_total, 2, ',', '.')); ?></div>
+        <div>Desconto: R$ <?php echo e(number_format($budget->desconto, 2, ',', '.')); ?></div>
+        <div>Valor Final: R$ <?php echo e(number_format($budget->valor_final, 2, ',', '.')); ?></div>
     </div>
 
-    @if(!empty($budget->observacoes))
+    <?php if(!empty($budget->observacoes)): ?>
         <div style="margin-top: 20px; border-top: 1px solid #ccc; padding-top: 10px;">
             <h4 style="margin-bottom: 10px;">Observações</h4>
             <p style="margin: 0; padding: 10px; background-color: #f9f9f9; border: 1px solid #ddd;">
-                {{ $budget->observacoes }}
+                <?php echo e($budget->observacoes); ?>
+
             </p>
         </div>
-    @endif
+    <?php endif; ?>
 
     <div style="margin-top: 20px;">
-        <p>Validade do Orçamento: {{ $budget->data_validade->format('d/m/Y') }}</p>
+        <p>Validade do Orçamento: <?php echo e($budget->data_validade->format('d/m/Y')); ?></p>
     </div>
 
     <div class="footer">
-        <p>Este orçamento foi gerado em {{ now()->format('d/m/Y H:i:s') }}</p>
+        <p>Este orçamento foi gerado em <?php echo e(now()->format('d/m/Y H:i:s')); ?></p>
         <p>Marmosys - Sistema de gestão para marmorarias</p>
     </div>
 </body>
-</html> 
+</html> <?php /**PATH C:\laragon\www\marmosys\resources\views/financial/budgets/print.blade.php ENDPATH**/ ?>

@@ -154,6 +154,11 @@ unset($__errorArgs, $__bag); ?>
                                 <label for="valor_minimo_parcela">Valor Mínimo da Parcela</label>
                             </div>
 
+                            <div class="input-field col s12 m4">
+                                <input type="number" id="limite_credito" name="limite_credito" step="0.01" min="0" value="<?php echo e(old('limite_credito', $paymentPlan->limite_credito ?? '0')); ?>">
+                                <label for="limite_credito">Limite de Crédito</label>
+                            </div>
+
                             <!-- Configurações de Entrada -->
                             <div class="col s12">
                                 <h5>Configurações de Entrada</h5>
@@ -268,6 +273,39 @@ unset($__errorArgs, $__bag); ?>
 
         var textareas = document.querySelectorAll('.materialize-textarea');
         M.textareaAutoResize(textareas);
+        
+        // Adicionar debug no envio do formulário
+        const form = document.getElementById('payment-plan-form');
+        
+        form.addEventListener('submit', function(e) {
+            console.log('Tentando enviar formulário');
+            
+            // Verifique se todos os campos obrigatórios estão preenchidos
+            const requiredFields = form.querySelectorAll('[required]');
+            let allValid = true;
+            
+            requiredFields.forEach(field => {
+                if (!field.value.trim()) {
+                    console.error('Campo obrigatório não preenchido:', field.name);
+                    allValid = false;
+                    field.classList.add('invalid');
+                }
+            });
+            
+            if (!allValid) {
+                e.preventDefault();
+                M.toast({html: 'Por favor, preencha todos os campos obrigatórios'});
+                return false;
+            }
+            
+            // Adicione um feedback visual
+            const submitBtn = form.querySelector('button[type="submit"]');
+            submitBtn.innerHTML = '<i class="material-icons left">hourglass_empty</i> Salvando...';
+            submitBtn.disabled = true;
+            
+            // Prossiga com o envio
+            return true;
+        });
     });
 </script>
 <?php $__env->stopPush(); ?> 

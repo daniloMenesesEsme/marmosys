@@ -5,6 +5,7 @@
         
         <div class="row">
             <form id="simulate-form" class="col s12">
+                <?php echo csrf_field(); ?>
                 <div class="row">
                     <div class="input-field col s12">
                         <i class="material-icons prefix">attach_money</i>
@@ -69,15 +70,31 @@ function simularParcelas() {
         return;
     }
 
+    // Busca o token CSRF do meta tag ou do input hidden
+    const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || 
+                 document.querySelector('input[name="_token"]')?.value;
+
+    // Adiciona o token e os headers necessários
+    const headers = {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': token,
+        'Accept': 'application/json'
+    };
+
+    // Mostra um indicador de carregamento
+    M.toast({html: 'Calculando parcelas...', classes: 'blue'});
+
     fetch(`/financial/registration/payment-plans/${window.currentPlanId}/simulate`, {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-        },
-        body: JSON.stringify({ valor: valor })
+        headers: headers,
+        body: JSON.stringify({ valor: parseFloat(valor) })
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Erro na resposta: ' + response.status);
+        }
+        return response.json();
+    })
     .then(data => {
         if (data.error) {
             M.toast({html: data.error, classes: 'red'});
@@ -105,10 +122,11 @@ function simularParcelas() {
 
         document.getElementById('total-final').textContent = `R$ ${totalFinal.toFixed(2)}`;
         document.getElementById('simulation-results').style.display = 'table';
+        M.toast({html: 'Simulação concluída!', classes: 'green'});
     })
     .catch(error => {
         console.error('Erro:', error);
-        M.toast({html: 'Erro ao simular parcelas!', classes: 'red'});
+        M.toast({html: 'Erro ao simular parcelas: ' + error.message, classes: 'red'});
     });
 }
 </script>

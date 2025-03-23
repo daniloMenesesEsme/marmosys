@@ -126,7 +126,7 @@ Route::middleware('auth')->group(function () {
         Route::post('goals/update-status', [FinancialGoalController::class, 'updateStatus'])
             ->name('goals.update-status');
 
-        // Rotas para orçamentos
+        // Rotas para Orçamentos
         Route::prefix('budgets')->name('budgets.')->group(function () {
             Route::get('/', [BudgetController::class, 'index'])->name('index');
             Route::get('/create', [BudgetController::class, 'create'])->name('create');
@@ -138,7 +138,9 @@ Route::middleware('auth')->group(function () {
             Route::get('/{budget}/pdf', [BudgetController::class, 'generatePdf'])->name('pdf');
             Route::get('/{budget}/print', [BudgetController::class, 'printView'])->name('print');
             Route::post('/{budget}/approve', [BudgetController::class, 'approve'])->name('approve');
+            Route::post('/{budget}/reject', [BudgetController::class, 'reject'])->name('reject');
             Route::get('/{budget}/convert-receivable', [BudgetController::class, 'convertToReceivable'])->name('convert-receivable');
+            Route::post('/{budget}/undo-convert-receivable', [BudgetController::class, 'undoConvertToReceivable'])->name('undo-convert-receivable');
         });
     });
 

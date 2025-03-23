@@ -48,6 +48,40 @@
                         </div>
                     </div>
 
+                    <!-- Campos de forma de pagamento -->
+                    <div class="row">
+                        <div class="input-field col s12 m4">
+                            <i class="material-icons prefix">payment</i>
+                            <select name="payment_method_id" id="payment_method_id">
+                                <option value="" disabled selected>Selecione a forma de pagamento</option>
+                                @foreach($paymentMethods as $method)
+                                    <option value="{{ $method->id }}">{{ $method->nome }}</option>
+                                @endforeach
+                            </select>
+                            <label for="payment_method_id">Forma de Pagamento</label>
+                        </div>
+
+                        <div class="input-field col s12 m4">
+                            <i class="material-icons prefix">view_list</i>
+                            <input type="number" id="payment_installments" name="payment_installments" value="1" min="1">
+                            <label for="payment_installments">Número de Parcelas</label>
+                        </div>
+
+                        <div class="input-field col s12 m4">
+                            <i class="material-icons prefix">event</i>
+                            <input type="date" id="first_installment_date" name="first_installment_date" value="{{ date('Y-m-d') }}">
+                            <label for="first_installment_date">Data da 1ª Parcela</label>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="input-field col s12">
+                            <i class="material-icons prefix">description</i>
+                            <input type="text" id="payment_condition" name="payment_condition">
+                            <label for="payment_condition">Condição de Pagamento</label>
+                        </div>
+                    </div>
+
                     <div id="rooms-container">
                         <!-- Os ambientes serão adicionados aqui via JavaScript -->
                     </div>

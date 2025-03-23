@@ -137,7 +137,18 @@ class Budget extends Model
 
         static::creating(function ($budget) {
             if (!$budget->numero) {
-                $budget->numero = 'ORC-' . date('Y') . str_pad(static::whereYear('created_at', date('Y'))->count() + 1, 5, '0', STR_PAD_LEFT);
+                $ano = date('Y');
+                $ultimoNumero = static::whereYear('created_at', $ano)
+                    ->orderBy('id', 'desc')
+                    ->first();
+                
+                $sequencial = 1;
+                if ($ultimoNumero) {
+                    preg_match('/ORC-\d+(\d{4})$/', $ultimoNumero->numero, $matches);
+                    $sequencial = isset($matches[1]) ? (int)$matches[1] + 1 : 1;
+                }
+                
+                $budget->numero = 'ORC-' . $ano . str_pad($sequencial, 4, '0', STR_PAD_LEFT);
             }
         });
     }

@@ -92,9 +92,9 @@
                                     </td>
                                     <td>
                                         <div class="buttons-actions">
-                                            <a href="#modal-simulate" 
+                                            <a href="#simulate-modal" 
                                                class="btn-floating waves-effect waves-light green modal-trigger"
-                                               onclick="setPlanForSimulation(<?php echo e($plan->id); ?>)"
+                                               onclick="openSimulateModal(<?php echo e($plan->id); ?>)"
                                                title="Simular">
                                                 <i class="material-icons">calculate</i>
                                             </a>
@@ -150,52 +150,6 @@
         var modals = document.querySelectorAll('.modal');
         M.Modal.init(modals);
     });
-
-    let currentPlanId = null;
-
-    function setPlanForSimulation(planId) {
-        currentPlanId = planId;
-    }
-
-    function simulate() {
-        const valor = document.getElementById('valor_simulacao').value;
-        
-        fetch(`/financial/registration/payment-plans/${currentPlanId}/simulate`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>'
-            },
-            body: JSON.stringify({ valor })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.error) {
-                M.toast({html: data.error, classes: 'red'});
-                return;
-            }
-            renderSimulationResults(data);
-        })
-        .catch(error => {
-            M.toast({html: 'Erro ao simular parcelas', classes: 'red'});
-        });
-    }
-
-    function renderSimulationResults(parcelas) {
-        const tbody = document.getElementById('simulation-results');
-        tbody.innerHTML = '';
-
-        parcelas.forEach(parcela => {
-            tbody.innerHTML += `
-                <tr>
-                    <td>${parcela.numero}x</td>
-                    <td>R$ ${parseFloat(parcela.valor).toFixed(2)}</td>
-                    <td>${new Date(parcela.vencimento).toLocaleDateString()}</td>
-                    <td>${parcela.taxa}%</td>
-                </tr>
-            `;
-        });
-    }
 
     <?php if(session('success')): ?>
         M.toast({html: '<?php echo e(session("success")); ?>', classes: 'green'});

@@ -73,19 +73,6 @@
                     </div>
                 </div>
 
-                <div class="row">
-                    <div class="col s12">
-                        <?php if($budget->observacoes): ?>
-                            <div class="card">
-                                <div class="card-content">
-                                    <span class="card-title">Observações</span>
-                                    <p><?php echo e($budget->observacoes); ?></p>
-                                </div>
-                            </div>
-                        <?php endif; ?>
-                    </div>
-                </div>
-
                 <!-- Observações -->
                 <?php if($budget->observacoes): ?>
                 <div class="row">
@@ -181,6 +168,13 @@
                                        Converter em Contas a Receber
                                     </a>
                                 </div>
+                            <?php elseif($budget->status == 'aprovado' && $budget->payment_method_id && $budget->converted_to_receivable): ?>
+                                <div class="card-action">
+                                    <button type="button" class="btn waves-effect waves-light amber darken-3 modal-trigger" data-target="modal-desfazer-conversao">
+                                        <i class="material-icons left">undo</i>
+                                        Desfazer Conversão para Contas a Receber
+                                    </button>
+                                </div>
                             <?php endif; ?>
                         </div>
                     </div>
@@ -198,7 +192,7 @@
                         IMPRIMIR PDF
                     </button>
                     
-                    <button onclick="window.print()" class="btn blue waves-effect waves-light">
+                    <button onclick="printBudget()" class="btn blue waves-effect waves-light">
                         <i class="material-icons left">print</i>
                         IMPRIMIR
                     </button>
@@ -225,6 +219,23 @@
     </div>
 </div>
 
+<!-- Modal de desfazer conversão para contas a receber -->
+<div id="modal-desfazer-conversao" class="modal">
+    <div class="modal-content">
+        <h4>Desfazer Conversão para Contas a Receber</h4>
+        <p>Tem certeza que deseja desfazer a conversão deste orçamento para contas a receber? Todas as contas a receber vinculadas a este orçamento serão excluídas.</p>
+        <p class="red-text">Atenção: Esta ação não poderá ser desfeita caso as contas já tenham sido processadas ou pagas.</p>
+    </div>
+    <div class="modal-footer">
+        <a href="#!" class="modal-close waves-effect waves-green btn-flat">Cancelar</a>
+        <a href="#" onclick="event.preventDefault(); document.getElementById('form-desfazer-conversao').submit();" class="waves-effect waves-light btn red">Desfazer Conversão</a>
+    </div>
+</div>
+
+<form id="form-desfazer-conversao" action="<?php echo e(route('financial.budgets.undo-convert-receivable', $budget)); ?>" method="POST" style="display: none;">
+    <?php echo csrf_field(); ?>
+</form>
+
 <form id="form-aprovar" action="<?php echo e(route('financial.budgets.approve', $budget)); ?>" method="POST" style="display: none;">
     <?php echo csrf_field(); ?>
     <input type="hidden" name="action" value="approve">
@@ -236,11 +247,31 @@
 </form>
 
 <script>
-function aprovarOrcamento() {
-    if(confirm('Tem certeza que deseja aprovar este orçamento?')) {
-        document.getElementById('form-aprovar').submit();
+    document.addEventListener('DOMContentLoaded', function() {
+        // Inicializa os modais
+        var modals = document.querySelectorAll('.modal');
+        M.Modal.init(modals);
+
+        // Inicializa tooltips
+        var tooltips = document.querySelectorAll('.tooltipped');
+        M.Tooltip.init(tooltips);
+    });
+
+    function aprovarOrcamento() {
+        if (confirm('Deseja realmente aprovar este orçamento?')) {
+            document.getElementById('form-aprovar').submit();
+        }
     }
-}
+    
+    function printBudget() {
+        // Abre uma nova janela com a view de impressão otimizada
+        var printWindow = window.open("<?php echo e(route('financial.budgets.print', $budget)); ?>", "_blank");
+        
+        // Aguarda o carregamento da página e então imprime
+        printWindow.onload = function() {
+            printWindow.print();
+        };
+    }
 </script>
 
 <!-- Modal de Rejeição -->
@@ -309,10 +340,30 @@ function aprovarOrcamento() {
 <?php $__env->startPush('scripts'); ?>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Inicializa o modal
-        var modalElems = document.querySelectorAll('.modal');
-        var modalInstances = M.Modal.init(modalElems);
+        // Inicializa os modais
+        var modals = document.querySelectorAll('.modal');
+        M.Modal.init(modals);
+
+        // Inicializa tooltips
+        var tooltips = document.querySelectorAll('.tooltipped');
+        M.Tooltip.init(tooltips);
     });
+
+    function aprovarOrcamento() {
+        if (confirm('Deseja realmente aprovar este orçamento?')) {
+            document.getElementById('form-aprovar').submit();
+        }
+    }
+    
+    function printBudget() {
+        // Abre uma nova janela com a view de impressão otimizada
+        var printWindow = window.open("<?php echo e(route('financial.budgets.print', $budget)); ?>", "_blank");
+        
+        // Aguarda o carregamento da página e então imprime
+        printWindow.onload = function() {
+            printWindow.print();
+        };
+    }
 </script>
 <?php $__env->stopPush(); ?>
 

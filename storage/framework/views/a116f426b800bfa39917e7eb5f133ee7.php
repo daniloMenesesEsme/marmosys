@@ -111,7 +111,11 @@
                                         <i class="material-icons">edit</i>
                                     </a>
                                     
-                                    <a href="<?php echo e(route('financial.budgets.pdf', $budget)); ?>" class="btn-floating waves-effect waves-light purple tooltipped" data-position="top" data-tooltip="Gerar PDF">
+                                    <a href="<?php echo e(route('financial.budgets.pdf', $budget)); ?>" 
+                                       class="btn-floating waves-effect waves-light purple tooltipped" 
+                                       data-position="top" 
+                                       data-tooltip="Gerar PDF"
+                                       target="_blank">
                                         <i class="material-icons">picture_as_pdf</i>
                                     </a>
                                     

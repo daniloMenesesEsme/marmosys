@@ -276,6 +276,23 @@
 
     <main>
         <?php echo $__env->yieldContent('content'); ?>
+        
+        <!-- Versão do sistema -->
+        <footer class="page-footer blue darken-2" style="padding-top: 0; margin-top: 30px;">
+            <div class="footer-copyright">
+                <div class="container">
+                    <div class="row" style="margin-bottom: 0;">
+                        <div class="col s6">
+                            &copy; <?php echo e(date('Y')); ?> <?php echo e(config('app.name')); ?>
+
+                        </div>
+                        <div class="col s6 right-align">
+                            <span class="white-text">Versão <?php echo e(config('version.number')); ?></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </footer>
     </main>
 
     <!-- Scripts -->
