@@ -1,0 +1,18 @@
+/* Estilos para os campos select do Materialize */
+.select-wrapper input.select-dropdown {
+    text-align: center !important;
+    text-indent: 0 !important;
+    padding: 0 15px !important;
+}
+
+.input-field .prefix ~ input,
+.input-field .prefix ~ .select-dropdown {
+    margin-left: 3rem !important;
+    width: calc(100% - 3rem) !important;
+}
+
+/* Mantém o texto visível e centralizado */
+.select-wrapper input.select-dropdown {
+    opacity: 1 !important;
+    color: rgba(0,0,0,0.87) !important;
+} 
