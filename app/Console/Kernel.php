@@ -28,5 +28,6 @@ class Kernel extends ConsoleKernel
     protected $commands = [
         \App\Console\Commands\FixMigrationDates::class,
         \App\Console\Commands\VerifyModels::class,
+        \App\Console\Commands\VersionCommand::class,
     ];
 }
