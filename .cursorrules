@@ -1,0 +1,96 @@
+# Regras de Paginação - Sistema Marmosys
+
+## Template de Paginação
+O sistema utiliza um template personalizado do Materialize CSS para paginação, localizado em:
+`resources/views/vendor/pagination/materialize.blade.php`
+
+## Implementação
+Para implementar paginação em qualquer módulo, seguir o padrão:
+
+### No Controller
+```php
+public function index()
+{
+    $items = Model::paginate(10); // 10 itens por página
+    return view('seu-modulo.index', compact('items'));
+}
+```
+
+### Na View
+```php
+{{ $items->links() }}
+```
+
+## Características do Template
+- Ícones do Materialize CSS para navegação
+- Página atual destacada em azul
+- Layout centralizado
+- Contador de resultados em português
+- Responsivo
+
+## Configuração
+A configuração está definida em `AppServiceProvider.php`:
+```php
+Paginator::defaultView('vendor.pagination.materialize');
+Paginator::defaultSimpleView('vendor.pagination.materialize');
+```
+
+## Traduções
+As traduções estão em `lang/pt_BR/pagination.php`:
+```php
+return [
+    'previous' => '&laquo; Anterior',
+    'next' => 'Próximo &raquo;',
+    'showing' => 'Mostrando',
+    'to' => 'até',
+    'of' => 'de',
+    'results' => 'resultados',
+];
+```
+
+## Boas Práticas
+1. Sempre usar `paginate()` ao invés de `get()` para listagens
+2. Ajustar o número de itens por página conforme necessidade
+3. Manter o padrão visual em todos os módulos
+4. Não modificar o template base sem aprovação
+5. Em caso de necessidade de personalização, criar um novo template específico para o módulo
+
+## Exemplo Completo
+```php
+// Controller
+public function index()
+{
+    $items = Model::query()
+        ->when($request->search, function($query, $search) {
+            return $query->where('name', 'like', "%{$search}%");
+        })
+        ->paginate(10)
+        ->withQueryString();
+
+    return view('seu-modulo.index', compact('items'));
+}
+
+// View
+<div class="table-responsive">
+    <table class="striped">
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($items as $item)
+                <tr>
+                    <td>{{ $item->name }}</td>
+                    <td>
+                        <!-- Ações -->
+                    </td>
+                </tr>
+            @endforeach
+        </tbody>
+    </table>
+</div>
+
+{{ $items->links() }}
+``` 

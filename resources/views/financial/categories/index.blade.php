@@ -24,6 +24,45 @@
                     </div>
                 </div>
 
+                <form action="{{ route('financial.categories.index') }}" method="GET" class="row">
+                    <div class="col s12 m4">
+                        <div class="input-field">
+                            <input type="text" name="nome" id="nome" value="{{ request('nome') }}">
+                            <label for="nome">Nome</label>
+                        </div>
+                    </div>
+                    <div class="col s12 m4">
+                        <div class="input-field">
+                            <select name="natureza" id="natureza">
+                                <option value="">Todas as Naturezas</option>
+                                <option value="receita" {{ request('natureza') === 'receita' ? 'selected' : '' }}>Receita</option>
+                                <option value="despesa" {{ request('natureza') === 'despesa' ? 'selected' : '' }}>Despesa</option>
+                            </select>
+                            <label>Natureza</label>
+                        </div>
+                    </div>
+                    <div class="col s12 m4">
+                        <div class="input-field">
+                            <select name="status" id="status">
+                                <option value="">Todos os Status</option>
+                                <option value="ativo" {{ request('status') === 'ativo' ? 'selected' : '' }}>Ativo</option>
+                                <option value="inativo" {{ request('status') === 'inativo' ? 'selected' : '' }}>Inativo</option>
+                            </select>
+                            <label>Status</label>
+                        </div>
+                    </div>
+                    <div class="col s12 right-align">
+                        <a href="{{ route('financial.categories.index') }}" class="btn waves-effect waves-light grey">
+                            <i class="material-icons left">clear</i>
+                            Limpar
+                        </a>
+                        <button type="submit" class="btn waves-effect waves-light blue">
+                            <i class="material-icons left">search</i>
+                            Filtrar
+                        </button>
+                    </div>
+                </form>
+
                 <table class="striped highlight responsive-table">
                     <thead>
                         <tr>
@@ -106,6 +145,10 @@
 document.addEventListener('DOMContentLoaded', function() {
     var tooltips = document.querySelectorAll('.tooltipped');
     M.Tooltip.init(tooltips);
+
+    // Inicializa os selects do Materialize
+    var selects = document.querySelectorAll('select');
+    M.FormSelect.init(selects);
 });
 </script>
 @endpush

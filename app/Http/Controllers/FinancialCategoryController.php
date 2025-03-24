@@ -8,9 +8,27 @@ use Illuminate\Support\Facades\Log;
 
 class FinancialCategoryController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $categories = FinancialCategory::orderBy('nome')->paginate(10);
+        $query = FinancialCategory::query();
+
+        // Filtro por nome
+        if ($request->filled('nome')) {
+            $query->where('nome', 'like', '%' . $request->nome . '%');
+        }
+
+        // Filtro por natureza
+        if ($request->filled('natureza')) {
+            $query->where('natureza', $request->natureza);
+        }
+
+        // Filtro por status
+        if ($request->filled('status')) {
+            $query->where('ativo', $request->status === 'ativo');
+        }
+
+        $categories = $query->orderBy('nome')->paginate(10)->withQueryString();
+
         return view('financial.categories.index', compact('categories'));
     }
 
