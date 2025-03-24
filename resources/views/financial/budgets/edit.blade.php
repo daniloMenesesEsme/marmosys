@@ -39,6 +39,25 @@
                             <label for="client_id">Cliente*</label>
                         </div>
                     </div>
+                    
+                    <div class="row">
+                        <div class="input-field col s12 m6">
+                            <select name="seller_id" id="seller_id">
+                                <option value="">Selecione o vendedor (opcional)</option>
+                                @foreach($sellers as $seller)
+                                    <option value="{{ $seller->id }}" {{ old('seller_id', $budget->seller_id) == $seller->id ? 'selected' : '' }}>
+                                        {{ $seller->nome }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            <label for="seller_id">Vendedor</label>
+                        </div>
+                        
+                        <div class="input-field col s12 m6">
+                            <input type="date" id="previsao_entrega" name="previsao_entrega" value="{{ $budget->previsao_entrega->format('Y-m-d') }}" required>
+                            <label for="previsao_entrega">Previsão de Entrega*</label>
+                        </div>
+                    </div>
 
                     <div class="row">
                         <div class="col s12">

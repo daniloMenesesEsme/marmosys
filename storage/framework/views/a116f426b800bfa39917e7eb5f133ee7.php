@@ -76,6 +76,7 @@
                             <th>Número</th>
                             <th>Data</th>
                             <th>Cliente</th>
+                            <th>Vendedor</th>
                             <th>Telefone</th>
                             <th>Valor Total</th>
                             <th>Status</th>
@@ -88,6 +89,7 @@
                                 <td><?php echo e($budget->numero); ?></td>
                                 <td><?php echo e($budget->data->format('d/m/Y')); ?></td>
                                 <td><?php echo e($budget->client->nome); ?></td>
+                                <td><?php echo e($budget->seller->nome ?? 'N/A'); ?></td>
                                 <td><?php echo e($budget->client->telefone); ?></td>
                                 <td>R$ <?php echo e(number_format($budget->valor_total, 2, ',', '.')); ?></td>
                                 <td>

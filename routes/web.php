@@ -27,6 +27,7 @@ use App\Http\Controllers\Financial\FinancialRegistrationController;
 use App\Http\Controllers\Financial\PaymentPlanController;
 use App\Http\Controllers\Financial\AgentController;
 use App\Http\Controllers\Financial\Reports\FinancialAgentReportController;
+use App\Http\Controllers\SellerController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -43,6 +44,11 @@ Route::middleware('auth')->group(function () {
     
     // Rotas de clientes
     Route::resource('clients', ClientController::class);
+    
+    // Rotas de vendedores
+    Route::resource('sellers', SellerController::class);
+    Route::get('sellers-report', [SellerController::class, 'report'])->name('sellers.report');
+    Route::get('sellers-regions', [SellerController::class, 'regions'])->name('sellers.regions');
     
     // Rotas de produtos
     Route::get('/products/generate-code/{type}', [ProductController::class, 'generateCode'])

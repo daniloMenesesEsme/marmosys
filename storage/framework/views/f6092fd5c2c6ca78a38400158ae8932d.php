@@ -160,6 +160,7 @@
         <div class="section-title">Dados do Orçamento</div>
         <p><strong>Data:</strong> <?php echo e($budget->data->format('d/m/Y')); ?></p>
         <p><strong>Validade:</strong> <?php echo e($budget->data_validade->format('d/m/Y')); ?></p>
+        <p><strong>Vendedor:</strong> <?php echo e($budget->seller->nome ?? 'Não atribuído'); ?></p>
         <p><strong>Status:</strong> <?php echo e($budget->status_text); ?></p>
     </div>
 

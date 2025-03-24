@@ -30,6 +30,21 @@
                         </div>
 
                         <div class="input-field col s12 m6">
+                            <select name="seller_id" id="seller_id">
+                                <option value="">Selecione o vendedor (opcional)</option>
+                                @foreach($sellers as $seller)
+                                    <option value="{{ $seller->id }}" {{ (old('seller_id', $budget->seller_id ?? '') == $seller->id) ? 'selected' : '' }}>
+                                        {{ $seller->nome }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            <label for="seller_id">Vendedor</label>
+                            @error('seller_id') <span class="red-text">{{ $message }}</span> @enderror
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="input-field col s12 m6">
                             <input type="text" id="previsao_entrega" name="previsao_entrega" class="datepicker" 
                                 value="{{ old('previsao_entrega', isset($budget) ? $budget->previsao_entrega->format('d/m/Y') : '') }}" required>
                             <label for="previsao_entrega">Previsão de Entrega*</label>

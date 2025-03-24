@@ -152,6 +152,10 @@
                 <td class="label">Email:</td>
                 <td>{{ $budget->client->email }}</td>
             </tr>
+            <tr>
+                <td class="label">Vendedor:</td>
+                <td colspan="3">{{ $budget->seller->nome ?? 'Não atribuído' }}</td>
+            </tr>
         </table>
     </div>
 

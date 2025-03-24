@@ -153,6 +153,10 @@
                 <td class="label">Email:</td>
                 <td><?php echo e($budget->client->email); ?></td>
             </tr>
+            <tr>
+                <td class="label">Vendedor:</td>
+                <td colspan="3"><?php echo e($budget->seller->nome ?? 'Não atribuído'); ?></td>
+            </tr>
         </table>
     </div>
 

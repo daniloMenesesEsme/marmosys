@@ -47,6 +47,20 @@
                             <label for="client_id">Cliente</label>
                         </div>
                     </div>
+                    
+                    <!-- Campo de seleção de vendedor -->
+                    <div class="row">
+                        <div class="input-field col s12">
+                            <i class="material-icons prefix">person_outline</i>
+                            <select name="seller_id" id="seller_id">
+                                <option value="">Selecione o vendedor (opcional)</option>
+                                @foreach($sellers as $seller)
+                                    <option value="{{ $seller->id }}">{{ $seller->nome }}</option>
+                                @endforeach
+                            </select>
+                            <label for="seller_id">Vendedor</label>
+                        </div>
+                    </div>
 
                     <!-- Campos de forma de pagamento -->
                     <div class="row">

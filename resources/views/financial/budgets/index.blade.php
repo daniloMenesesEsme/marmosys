@@ -76,6 +76,7 @@
                             <th>Número</th>
                             <th>Data</th>
                             <th>Cliente</th>
+                            <th>Vendedor</th>
                             <th>Telefone</th>
                             <th>Valor Total</th>
                             <th>Status</th>
@@ -88,6 +89,7 @@
                                 <td>{{ $budget->numero }}</td>
                                 <td>{{ $budget->data->format('d/m/Y') }}</td>
                                 <td>{{ $budget->client->nome }}</td>
+                                <td>{{ $budget->seller->nome ?? 'N/A' }}</td>
                                 <td>{{ $budget->client->telefone }}</td>
                                 <td>R$ {{ number_format($budget->valor_total, 2, ',', '.') }}</td>
                                 <td>

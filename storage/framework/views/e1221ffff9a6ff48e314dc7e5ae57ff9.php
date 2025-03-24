@@ -148,6 +148,10 @@
             <i class="material-icons">people</i>Clientes
         </a></li>
         
+        <li><a href="<?php echo e(route('sellers.index')); ?>" class="waves-effect">
+            <i class="material-icons">person</i>Vendedores
+        </a></li>
+        
         <li><a href="<?php echo e(route('financial.budgets.index')); ?>" class="waves-effect">
             <i class="material-icons">description</i>Orçamentos
         </a></li>

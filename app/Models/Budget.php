@@ -17,6 +17,7 @@ class Budget extends Model
         'data',
         'previsao_entrega',
         'client_id',
+        'seller_id',
         'status',
         'valor_total',
         'desconto',
@@ -58,6 +59,11 @@ class Budget extends Model
     public function client()
     {
         return $this->belongsTo(Client::class);
+    }
+
+    public function seller()
+    {
+        return $this->belongsTo(Seller::class);
     }
 
     public function rooms()

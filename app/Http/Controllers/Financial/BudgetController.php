@@ -13,6 +13,7 @@ use App\Models\ApprovalLog;
 use App\Models\CompanySetting;
 use App\Models\Product;
 use App\Models\Company;
+use App\Models\Seller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -78,6 +79,9 @@ class BudgetController extends Controller
         // Recuperar clientes ativos para o select
         $clients = Client::where('ativo', true)->get();
         
+        // Recuperar vendedores ativos para o select
+        $sellers = Seller::where('ativo', true)->get();
+        
         // Recuperar formas de pagamento ativas
         $paymentMethods = PaymentMethod::where('ativo', true)->get();
         
@@ -97,6 +101,7 @@ class BudgetController extends Controller
         return view('financial.budgets.create', compact(
             'numero', 
             'clients', 
+            'sellers',
             'paymentMethods', 
             'materiais',
             'materiaisFormatados'
@@ -135,6 +140,7 @@ class BudgetController extends Controller
                 'data' => 'required|date',
                 'previsao_entrega' => 'required|date',
                 'client_id' => 'required|exists:clients,id',
+                'seller_id' => 'nullable|exists:sellers,id',
                 'rooms' => 'required|array|min:1',
                 'rooms.*.nome' => 'required|string',
                 'rooms.*.items' => 'required|array|min:1',
@@ -160,6 +166,7 @@ class BudgetController extends Controller
                 'data' => $request->data,
                 'previsao_entrega' => $request->previsao_entrega,
                 'client_id' => $request->client_id,
+                'seller_id' => $request->seller_id,
                 'status' => 'aguardando_aprovacao',
                 'observacoes' => $request->observacoes,
                 'valor_total' => 0,
@@ -248,30 +255,44 @@ class BudgetController extends Controller
 
     public function show(Budget $budget)
     {
-        $company = CompanySetting::first();
-        $budget->load(['client', 'rooms.items.material']);
+        $company = Company::first();
+        $budget->load(['client', 'seller', 'rooms.items.material', 'paymentMethod']);
+        
         return view('financial.budgets.show', compact('budget', 'company'));
     }
 
     public function edit(Budget $budget)
     {
-        $clients = Client::where('ativo', true)
-            ->orderBy('nome')
-            ->get();
-            
-        // Alterado de BudgetMaterial para Product
-        $materiais = Product::where('ativo', true)
-            ->orderBy('nome')
-            ->get();
-            
-        $budget->load(['rooms.items.material']);
+        // Recuperar clientes ativos para o select
+        $clients = Client::where('ativo', true)->get();
         
-        // Busca formas de pagamento ativas
-        $paymentMethods = PaymentMethod::where('ativo', true)
-            ->orderBy('nome')
-            ->get();
+        // Recuperar vendedores ativos para o select
+        $sellers = Seller::where('ativo', true)->get();
         
-        return view('financial.budgets.edit', compact('budget', 'clients', 'materiais', 'paymentMethods'));
+        // Recuperar formas de pagamento ativas
+        $paymentMethods = PaymentMethod::where('ativo', true)->get();
+        
+        // Recuperar materiais para autocomplete
+        $materiais = Product::where('ativo', true)->get();
+        
+        // Preparar dados de materiais para JavaScript
+        $materiaisFormatados = [];
+        foreach ($materiais as $material) {
+            $key = "{$material->codigo} - {$material->nome}";
+            $materiaisFormatados[$key] = [
+                'id' => $material->id,
+                'preco' => $material->preco_venda
+            ];
+        }
+        
+        return view('financial.budgets.edit', compact(
+            'budget', 
+            'clients', 
+            'sellers',
+            'paymentMethods', 
+            'materiais',
+            'materiaisFormatados'
+        ));
     }
 
     public function update(Request $request, Budget $budget)
@@ -293,9 +314,12 @@ class BudgetController extends Controller
             $request->merge(['rooms' => $processedRooms]);
             
             $validated = $request->validate([
+                'numero' => 'required|unique:budgets,numero,' . $budget->id,
+                'data' => 'required|date',
+                'previsao_entrega' => 'required|date',
                 'client_id' => 'required|exists:clients,id',
-                'data' => 'required|date_format:Y-m-d',
-                'rooms' => 'required|array',
+                'seller_id' => 'nullable|exists:sellers,id',
+                'rooms' => 'required|array|min:1',
                 'rooms.*.nome' => 'required|string',
                 'rooms.*.items' => 'required|array',
                 'rooms.*.items.*.material_id' => 'required|exists:products,id',
@@ -443,7 +467,7 @@ class BudgetController extends Controller
             Log::info('Iniciando geração do PDF do orçamento #' . $budget->numero);
 
             // Carrega o orçamento com relacionamentos necessários
-            $budget->load(['client', 'rooms.items.material']);
+            $budget->load(['client', 'seller', 'rooms.items.material']);
             
             // Busca dados da empresa
             $company = Company::first();
@@ -477,7 +501,7 @@ class BudgetController extends Controller
 
     public function printView(Budget $budget)
     {
-        $budget->load(['client', 'rooms.items.material']);
+        $budget->load(['client', 'seller', 'rooms.items.material']);
         
         // Busca dados da empresa para padronizar com o PDF
         $company = Company::first();
