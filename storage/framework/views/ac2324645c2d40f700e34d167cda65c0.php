@@ -1,3 +1,5 @@
+
+
 <?php $__env->startSection('title', 'Detalhes do Orçamento'); ?>
 
 <?php $__env->startSection('content'); ?>

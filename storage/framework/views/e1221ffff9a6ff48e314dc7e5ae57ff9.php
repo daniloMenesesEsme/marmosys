@@ -148,9 +148,73 @@
             <i class="material-icons">people</i>Clientes
         </a></li>
         
-        <li><a href="<?php echo e(route('sellers.index')); ?>" class="waves-effect">
-            <i class="material-icons">person</i>Vendedores
-        </a></li>
+        <li>
+            <ul class="collapsible collapsible-accordion">
+                <li>
+                    <a class="collapsible-header waves-effect">
+                        <i class="material-icons">person</i>
+                        <span style="margin-left: 8px;">Vendedores</span>
+                        <i class="fas fa-chevron-down right"></i>
+                    </a>
+                    <div class="collapsible-body">
+                        <ul>
+                            <li>
+                                <a href="<?php echo e(route('sellers.index')); ?>" class="waves-effect">
+                                    <i class="material-icons">list</i>
+                                    <span>Cadastro</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="<?php echo e(route('sellers.report')); ?>" class="waves-effect">
+                                    <i class="material-icons">assessment</i>
+                                    <span>Relatório</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="<?php echo e(route('sellers.regions')); ?>" class="waves-effect">
+                                    <i class="material-icons">map</i>
+                                    <span>Regiões</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+        </li>
+        
+        <li>
+            <ul class="collapsible collapsible-accordion">
+                <li>
+                    <a class="collapsible-header waves-effect">
+                        <i class="material-icons">local_shipping</i>
+                        <span style="margin-left: 8px;">Fornecedores</span>
+                        <i class="fas fa-chevron-down right"></i>
+                    </a>
+                    <div class="collapsible-body">
+                        <ul>
+                            <li>
+                                <a href="<?php echo e(route('suppliers.index')); ?>" class="waves-effect">
+                                    <i class="material-icons">list</i>
+                                    <span>Cadastro</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="<?php echo e(route('suppliers.report')); ?>" class="waves-effect">
+                                    <i class="material-icons">assessment</i>
+                                    <span>Relatório</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="<?php echo e(route('suppliers.regions')); ?>" class="waves-effect">
+                                    <i class="material-icons">map</i>
+                                    <span>Regiões</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+        </li>
         
         <li><a href="<?php echo e(route('financial.budgets.index')); ?>" class="waves-effect">
             <i class="material-icons">description</i>Orçamentos

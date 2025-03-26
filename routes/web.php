@@ -162,8 +162,13 @@ Route::middleware('auth')->group(function () {
         Route::resource('company', CompanyController::class);
     });
 
-    // Fornecedores
-    // Route::resource('suppliers', SupplierController::class);
+    // Rotas de Fornecedores
+    Route::middleware(['auth'])->group(function () {
+        Route::get('/suppliers/find/{cnpj}', [SupplierController::class, 'findByCNPJ'])->name('suppliers.find');
+        Route::get('suppliers-report', [SupplierController::class, 'report'])->name('suppliers.report');
+        Route::get('suppliers-regions', [SupplierController::class, 'regions'])->name('suppliers.regions');
+        Route::resource('suppliers', SupplierController::class);
+    });
 
     // Funcionários
     Route::resource('employees', EmployeeController::class);
@@ -173,9 +178,6 @@ Route::middleware('auth')->group(function () {
 
     // Rota para busca de CNPJ
     Route::get('/api/companies/find-cnpj/{cnpj}', [CompanyController::class, 'findByCNPJ'])->name('companies.find-cnpj');
-
-    // Rota para busca de CNPJ
-    // Route::get('/suppliers/find-cnpj/{cnpj}', [SupplierController::class, 'findByCNPJ'])->name('suppliers.find-cnpj');
 
     // Rotas de configurações
     Route::prefix('settings')->name('settings.')->group(function () {
@@ -214,4 +216,9 @@ Route::get('/novo-orcamento-v2', function () {
     $clients = \App\Models\Client::where('ativo', true)->get();
     $materiais = \App\Models\Product::where('ativo', true)->get();
     return view('financial.budgets.create_new', compact('numero', 'clients', 'materiais'));
-})->name('novo.orcamento.v2'); 
+})->name('novo.orcamento.v2');
+
+// Rota de teste para verificar o logo
+Route::get('/test-logo', function () {
+    return view('test-logo');
+}); 

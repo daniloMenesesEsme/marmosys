@@ -6,6 +6,7 @@ use App\Models\Seller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Helpers\PdfHelper;
 
 class SellerController extends Controller
 {
@@ -225,7 +226,61 @@ class SellerController extends Controller
             'total_vendedores' => Seller::count()
         ];
 
+        // Verificar se requisição pede PDF
+        if ($request->has('pdf')) {
+            return $this->generatePdf($sellers, $totals, $request);
+        }
+
         return view('sellers.report', compact('sellers', 'totals'));
+    }
+
+    /**
+     * Gera um PDF do relatório de vendedores.
+     */
+    public function generatePdf($sellers, $totals, $request)
+    {
+        // Garante que as consultas serão executadas para o PDF
+        if ($sellers instanceof \Illuminate\Pagination\LengthAwarePaginator) {
+            $sellers = $sellers->getCollection();
+        }
+        
+        $data = [
+            'sellers' => $sellers,
+            'totals' => $totals,
+            'filters' => (object)[
+                'nome' => $request->nome,
+                'status' => $request->status,
+                'data_inicio' => $request->filled('data_inicio') ? \Carbon\Carbon::parse($request->data_inicio) : null,
+                'data_fim' => $request->filled('data_fim') ? \Carbon\Carbon::parse($request->data_fim) : null,
+                'comissao_min' => $request->comissao_min,
+                'comissao_max' => $request->comissao_max,
+                'periodo_inicio' => $request->filled('periodo_inicio') ? \Carbon\Carbon::parse($request->periodo_inicio) : null,
+                'periodo_fim' => $request->filled('periodo_fim') ? \Carbon\Carbon::parse($request->periodo_fim) : null,
+            ]
+        ];
+        
+        // Opções personalizadas para o PDF
+        $options = [
+            'defaultFont' => 'DejaVu Sans',
+            'isHtml5ParserEnabled' => true,
+            'isRemoteEnabled' => true,
+            'isPhpEnabled' => true,
+            'isJavascriptEnabled' => true,
+            'dpi' => 150,
+            'defaultEncoding' => 'UTF-8',
+            'isFontSubsettingEnabled' => true,
+            'enable_remote' => true,
+            'enable_php' => true,
+            'enable_javascript' => true,
+            'images' => true,
+            'tempDir' => storage_path('app/pdf-temp'),
+            'chroot' => public_path(),
+            'logOutputFile' => storage_path('logs/pdf.log'),
+            'debugPng' => false,
+            'debugKeepTemp' => false,
+        ];
+
+        return \App\Helpers\PdfHelper::generate('sellers.pdf', $data, 'relatorio_vendedores.pdf', 'portrait', $options);
     }
 
     /**
@@ -233,7 +288,7 @@ class SellerController extends Controller
      */
     public function regions()
     {
-        $sellers = Seller::where('ativo', true)->get();
+        $sellers = Seller::where('ativo', true)->paginate(10);
         
         // Agrupar vendedores por região (estado)
         $regions = DB::table('sellers')

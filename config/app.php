@@ -8,6 +8,7 @@ return [
     'timezone' => 'America/Sao_Paulo',
     'locale' => 'pt_BR',
     'fallback_locale' => 'en',
+    'faker_locale' => 'pt_BR',
     'key' => env('APP_KEY'),
     'cipher' => 'AES-256-CBC',
 
@@ -69,6 +70,6 @@ return [
         'URL' => Illuminate\Support\Facades\URL::class,
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
-        'PDF' => Barryvdh\DomPDF\Facade::class,
+        'PDF' => Barryvdh\DomPDF\Facade\Pdf::class,
     ],
 ]; 

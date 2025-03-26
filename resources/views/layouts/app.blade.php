@@ -182,6 +182,40 @@
             </ul>
         </li>
         
+        <li>
+            <ul class="collapsible collapsible-accordion">
+                <li>
+                    <a class="collapsible-header waves-effect">
+                        <i class="material-icons">local_shipping</i>
+                        <span style="margin-left: 8px;">Fornecedores</span>
+                        <i class="fas fa-chevron-down right"></i>
+                    </a>
+                    <div class="collapsible-body">
+                        <ul>
+                            <li>
+                                <a href="{{ route('suppliers.index') }}" class="waves-effect">
+                                    <i class="material-icons">list</i>
+                                    <span>Cadastro</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ route('suppliers.report') }}" class="waves-effect">
+                                    <i class="material-icons">assessment</i>
+                                    <span>Relatório</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ route('suppliers.regions') }}" class="waves-effect">
+                                    <i class="material-icons">map</i>
+                                    <span>Regiões</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+        </li>
+        
         <li><a href="{{ route('financial.budgets.index') }}" class="waves-effect">
             <i class="material-icons">description</i>Orçamentos
         </a></li>
