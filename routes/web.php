@@ -28,6 +28,10 @@ use App\Http\Controllers\Financial\PaymentPlanController;
 use App\Http\Controllers\Financial\AgentController;
 use App\Http\Controllers\Financial\Reports\FinancialAgentReportController;
 use App\Http\Controllers\SellerController;
+use App\Http\Controllers\RegionController;
+use App\Http\Controllers\LocationController;
+use App\Http\Controllers\EstablishmentTypeController;
+use App\Http\Controllers\ServiceAreaController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -196,6 +200,32 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/products/{product}/ajustar-estoque', [ProductController::class, 'ajustarEstoque'])
         ->name('products.ajustar-estoque');
+
+    // Rotas para Localidades
+    Route::middleware(['auth'])->group(function () {
+        // Dashboard de Localidades
+        Route::get('/locations/dashboard', [LocationController::class, 'dashboard'])
+            ->name('locations.dashboard');
+        
+        // CRUD de Localidades
+        Route::resource('locations', LocationController::class);
+        
+        // Rotas auxiliares de Localidades
+        Route::get('/locations/map', [LocationController::class, 'map'])
+            ->name('locations.map');
+        Route::get('/locations/import', [LocationController::class, 'import'])
+            ->name('locations.import');
+        Route::post('/locations/import', [LocationController::class, 'processImport'])
+            ->name('locations.process-import');
+        
+        // APIs de Localidades
+        Route::get('/locations/cities/{state}', [LocationController::class, 'getCities'])
+            ->name('locations.cities');
+        Route::get('/locations/neighborhoods/{state}/{city}', [LocationController::class, 'getNeighborhoods'])
+            ->name('locations.neighborhoods');
+        Route::get('/locations/geocode/{state}/{city}/{neighborhood}', [LocationController::class, 'getGeocode'])
+            ->name('locations.geocode');
+    });
 });
 
 // Rotas de diagnóstico do sistema
@@ -221,4 +251,23 @@ Route::get('/novo-orcamento-v2', function () {
 // Rota de teste para verificar o logo
 Route::get('/test-logo', function () {
     return view('test-logo');
-}); 
+});
+
+// Rotas para Regiões
+Route::resource('regions', RegionController::class);
+Route::patch('/regions/{region}/toggle-status', [RegionController::class, 'toggleStatus'])->name('regions.toggle-status');
+
+// Rota para verificar se já existe vendedor para região
+Route::get('/api/check-region-seller/{regionId}', [App\Http\Controllers\SellerController::class, 'checkRegionSeller'])->name('sellers.check-region');
+
+// Rotas para Tipos de Estabelecimento
+Route::resource('establishment-types', EstablishmentTypeController::class);
+Route::get('/establishment-types-dashboard', [EstablishmentTypeController::class, 'dashboard'])->name('establishment-types.dashboard');
+
+// Rotas para Áreas de Atendimento
+Route::resource('service-areas', ServiceAreaController::class);
+Route::get('/service-areas-map', [ServiceAreaController::class, 'map'])->name('service-areas.map');
+Route::get('/service-areas-dashboard', [ServiceAreaController::class, 'dashboard'])->name('service-areas.dashboard');
+
+// API para verificação de área de atendimento
+Route::get('/api/check-service-area', [ServiceAreaController::class, 'checkServiceArea'])->name('service-areas.check');

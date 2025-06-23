@@ -39,7 +39,8 @@ class SellerController extends Controller
      */
     public function create()
     {
-        return view('sellers.form');
+        $regions = \App\Models\Region::where('status', 'active')->orderBy('name')->get();
+        return view('sellers.form', compact('regions'));
     }
 
     /**
@@ -64,7 +65,8 @@ class SellerController extends Controller
             'data_admissao' => 'nullable|date',
             'data_demissao' => 'nullable|date',
             'observacoes' => 'nullable|string',
-            'ativo' => 'boolean'
+            'ativo' => 'boolean',
+            'region_id' => 'nullable|exists:regions,id'
         ]);
         
         try {
@@ -101,7 +103,8 @@ class SellerController extends Controller
      */
     public function edit(Seller $seller)
     {
-        return view('sellers.form', compact('seller'));
+        $regions = \App\Models\Region::where('status', 'active')->orderBy('name')->get();
+        return view('sellers.form', compact('seller', 'regions'));
     }
 
     /**
@@ -126,7 +129,8 @@ class SellerController extends Controller
             'data_admissao' => 'nullable|date',
             'data_demissao' => 'nullable|date',
             'observacoes' => 'nullable|string',
-            'ativo' => 'boolean'
+            'ativo' => 'boolean',
+            'region_id' => 'nullable|exists:regions,id'
         ]);
         
         try {
@@ -288,15 +292,41 @@ class SellerController extends Controller
      */
     public function regions()
     {
-        $sellers = Seller::where('ativo', true)->paginate(10);
+        $sellers = Seller::with('region')->where('ativo', true)->paginate(10);
         
-        // Agrupar vendedores por região (estado)
-        $regions = DB::table('sellers')
+        // Agrupar vendedores por estado
+        $stateRegions = DB::table('sellers')
             ->select('estado', DB::raw('count(*) as total'))
             ->whereNotNull('estado')
             ->groupBy('estado')
             ->get();
-            
-        return view('sellers.regions', compact('sellers', 'regions'));
+        
+        // Agrupar vendedores por região cadastrada
+        $customRegions = DB::table('sellers')
+            ->join('regions', 'sellers.region_id', '=', 'regions.id')
+            ->select('regions.name', 'regions.state', DB::raw('count(*) as total'))
+            ->whereNotNull('sellers.region_id')
+            ->groupBy('regions.id', 'regions.name', 'regions.state')
+            ->get();
+        
+        // Obter todas as regiões cadastradas
+        $allRegions = \App\Models\Region::where('status', 'active')->get();
+        
+        return view('sellers.regions', compact('sellers', 'stateRegions', 'customRegions', 'allRegions'));
+    }
+
+    // Método para verificar se já existe vendedor para a região (para AJAX)
+    public function checkRegionSeller($regionId)
+    {
+        $seller = Seller::where('region_id', $regionId)
+                   ->where('ativo', true)
+                   ->first();
+        
+        return response()->json([
+            'seller' => $seller ? [
+                'id' => $seller->id,
+                'name' => $seller->nome
+            ] : null
+        ]);
     }
 }

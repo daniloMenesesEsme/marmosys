@@ -2,23 +2,59 @@
 
 namespace App\Rules;
 
-use Closure;
-use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Contracts\Validation\Rule;
 
-class ValidPhone implements ValidationRule
+class ValidPhone implements Rule
 {
     /**
-     * Run the validation rule.
+     * Determine if the validation rule passes.
      *
-     * @param  \Closure(string): \Illuminate\Translation\PotentiallyTranslatedString  $fail
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @return bool
      */
-    public function validate(string $attribute, mixed $value, Closure $fail): void
+    public function passes($attribute, $value)
     {
+        // Remove tudo que não for número
         $value = preg_replace('/[^0-9]/', '', $value);
         
-        // Verifica se é um número de telefone válido (8 a 11 dígitos)
-        if (!empty($value) && !preg_match('/^(?:(?:[14689][1-9]|2[12478]|3[1234578]|5[1345]|7[134579])9\d{8}|(?:[14689][1-9]|2[12478]|3[1234578]|5[1345]|7[134579])\d{7})$/', $value)) {
-            $fail('O número de telefone informado não é válido.');
+        // Verifica se está vazio
+        if (empty($value)) {
+            return false;
         }
+        
+        // Verifica o tamanho (8 para fixo antigo, 9 para celular + 2 do DDD = 10 ou 11)
+        $length = strlen($value);
+        if ($length < 10 || $length > 11) {
+            return false;
+        }
+        
+        // Verifica DDD válido (11 a 99)
+        $ddd = substr($value, 0, 2);
+        if ($ddd < 11 || $ddd > 99) {
+            return false;
+        }
+        
+        // Se for celular (11 dígitos), primeiro dígito deve ser 9
+        if ($length == 11 && substr($value, 2, 1) != '9') {
+            return false;
+        }
+        
+        // Verifica se todos os dígitos são iguais
+        if (preg_match('/^(\d)\1+$/', $value)) {
+            return false;
+        }
+        
+        return true;
+    }
+
+    /**
+     * Get the validation error message.
+     *
+     * @return string
+     */
+    public function message()
+    {
+        return 'O :attribute informado não é válido.';
     }
 }

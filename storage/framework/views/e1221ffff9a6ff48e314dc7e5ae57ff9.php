@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
-    <title><?php echo e(config('app.name')); ?> - <?php echo $__env->yieldContent('title'); ?></title>
+    <title><?php echo e(config('app.name', 'Marmosys')); ?> - <?php echo $__env->yieldContent('title'); ?></title>
     
     <!-- CSS -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -68,10 +68,10 @@
         }
         
         .sidenav li > a {
-            font-size: 16px !important;
+            font-size: 15px !important;
             height: 50px !important;
             line-height: 50px !important;
-            padding: 0 16px !important;
+            padding: 0 18px !important;
         }
         
         .sidenav .collapsible-header {
@@ -108,20 +108,33 @@
                 padding-left: 0;
             }
         }
+
+        .mb-0 { margin-bottom: 0 !important; }
+        .card { margin: 1rem 0 !important; }
+        .toast { background-color: #323232; }
+        .toast.green { background-color: #4CAF50 !important; }
+        .toast.red { background-color: #F44336 !important; }
+        .toast.orange { background-color: #FF9800 !important; }
+        .toast.blue { background-color: #2196F3 !important; }
     </style>
     <?php echo $__env->yieldPushContent('styles'); ?>
 </head>
 <body>
     <!-- Navbar fixa -->
-    <nav class="blue darken-2">
-        <div class="nav-wrapper">
-            <a href="#" data-target="slide-out" class="sidenav-trigger"><i class="material-icons">menu</i></a>
-            <a href="<?php echo e(url('/dashboard')); ?>" class="brand-logo"><?php echo e(config('app.name')); ?></a>
-            <ul class="right">
-                <li><a href="<?php echo e(route('logout')); ?>" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                    <i class="material-icons left">exit_to_app</i>Sair
-                </a></li>
-            </ul>
+    <nav class="blue darken-1">
+        <div class="nav-wrapper container">
+            <a href="<?php echo e(route('dashboard')); ?>" class="brand-logo"><?php echo e(config('app.name', 'Marmosys')); ?></a>
+            <a href="#" data-target="mobile-nav" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+            
+            <?php if(auth()->guard()->check()): ?>
+                <ul class="right hide-on-med-and-down">
+                    <li><a href="<?php echo e(route('dashboard')); ?>">Dashboard</a></li>
+                    <li><a href="<?php echo e(route('clients.index')); ?>">Clientes</a></li>
+                    <li><a href="<?php echo e(route('logout')); ?>" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                        Sair
+                    </a></li>
+                </ul>
+            <?php endif; ?>
         </div>
     </nav>
 
@@ -171,9 +184,55 @@
                                 </a>
                             </li>
                             <li>
-                                <a href="<?php echo e(route('sellers.regions')); ?>" class="waves-effect">
+                                <a href="<?php echo e(route('regions.index')); ?>" class="waves-effect">
                                     <i class="material-icons">map</i>
                                     <span>Regiões</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+        </li>
+        
+        <li>
+            <ul class="collapsible collapsible-accordion">
+                <li>
+                    <a class="collapsible-header waves-effect">
+                        <i class="material-icons">place</i>
+                        <span style="margin-left: 8px;">Área de Atendimento</span>
+                        <i class="fas fa-chevron-down right"></i>
+                    </a>
+                    <div class="collapsible-body">
+                        <ul>
+                            <li>
+                                <a href="<?php echo e(route('locations.index')); ?>" class="waves-effect">
+                                    <i class="material-icons">location_on</i>
+                                    <span>Localidades</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="<?php echo e(route('establishment-types.index')); ?>" class="waves-effect">
+                                    <i class="material-icons">store</i>
+                                    <span>Tipos de Estabelecimento</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="<?php echo e(route('service-areas.index')); ?>" class="waves-effect">
+                                    <i class="material-icons">grid_on</i>
+                                    <span>Áreas de Atendimento</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="<?php echo e(route('service-areas.map')); ?>" class="waves-effect">
+                                    <i class="material-icons">map</i>
+                                    <span>Mapa de Cobertura</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="<?php echo e(route('service-areas.dashboard')); ?>" class="waves-effect">
+                                    <i class="material-icons">dashboard</i>
+                                    <span>Dashboard</span>
                                 </a>
                             </li>
                         </ul>
@@ -367,6 +426,7 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+    <script src="https://unpkg.com/imask"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             M.AutoInit();
@@ -381,6 +441,12 @@
                     e.stopPropagation();
                 });
             });
+
+            // Configura os toasts para durarem mais tempo
+            M.toast.defaultOptions = {
+                displayLength: 6000,
+                classes: ''
+            };
         });
     </script>
     <?php echo $__env->yieldPushContent('scripts'); ?>

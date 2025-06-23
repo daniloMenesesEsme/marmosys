@@ -25,14 +25,22 @@ class Client extends Model
         'estado',
         'cep',
         'observacoes',
-        'ativo'
+        'ativo',
+        'latitude',
+        'longitude',
+        'empresa',
+        'contato',
+        'location_id',
+        'establishment_type_id'
     ];
 
     protected $casts = [
         'ativo' => 'boolean',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
-        'deleted_at' => 'datetime'
+        'deleted_at' => 'datetime',
+        'latitude' => 'decimal:8',
+        'longitude' => 'decimal:8'
     ];
 
     // Formatar CPF/CNPJ para exibição
@@ -136,5 +144,63 @@ class Client extends Model
     public function budgets()
     {
         return $this->hasMany(Budget::class);
+    }
+
+    /**
+     * Obtém a localidade deste cliente
+     */
+    public function location()
+    {
+        return $this->belongsTo(Location::class);
+    }
+
+    /**
+     * Obtém o tipo de estabelecimento deste cliente
+     */
+    public function establishmentType()
+    {
+        return $this->belongsTo(EstablishmentType::class);
+    }
+
+    /**
+     * Verifica se o cliente pertence a área de atendimento de um vendedor
+     */
+    public function belongsToSellerArea($sellerId)
+    {
+        if (!$this->location_id) {
+            return false;
+        }
+        
+        return ServiceArea::where('location_id', $this->location_id)
+            ->where('seller_id', $sellerId)
+            ->where(function($query) {
+                if ($this->establishment_type_id) {
+                    $query->where('establishment_type_id', $this->establishment_type_id)
+                        ->orWhereNull('establishment_type_id');
+                }
+            })
+            ->exists();
+    }
+
+    /**
+     * Obtém o vendedor responsável pela área deste cliente
+     */
+    public function getResponsibleSellerAttribute()
+    {
+        if (!$this->location_id) {
+            return null;
+        }
+        
+        $serviceArea = ServiceArea::where('location_id', $this->location_id)
+            ->where(function($query) {
+                if ($this->establishment_type_id) {
+                    $query->where('establishment_type_id', $this->establishment_type_id)
+                        ->orWhereNull('establishment_type_id');
+                }
+            })
+            ->where('status', 'active')
+            ->first();
+            
+        return $serviceArea ? $serviceArea->seller : null;
     }
 } 

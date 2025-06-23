@@ -173,6 +173,22 @@
                                 @enderror
                             </div>
                             
+                            <div class="input-field col s12 m6">
+                                <i class="material-icons prefix">explore</i>
+                                <select name="region_id" id="region_id" class="validate">
+                                    <option value="" disabled {{ !isset($seller->region_id) ? 'selected' : '' }}>Selecione uma região</option>
+                                    @foreach($regions as $region)
+                                        <option value="{{ $region->id }}" {{ (isset($seller->region_id) && $seller->region_id == $region->id) ? 'selected' : '' }}>
+                                            {{ $region->name }} ({{ $region->state }})
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <label for="region_id">Região de Atendimento</label>
+                                @error('region_id')
+                                    <span class="red-text text-darken-1">{{ $message }}</span>
+                                @enderror
+                            </div>
+                            
                             <div class="input-field col s12">
                                 <i class="material-icons prefix">note</i>
                                 <textarea name="observacoes" id="observacoes" class="materialize-textarea">{{ old('observacoes', $seller->observacoes ?? '') }}</textarea>
@@ -217,6 +233,19 @@
         </div>
     </div>
 </div>
+
+<!-- Modal de Alerta para Região já com Vendedor -->
+<div id="modal-region-alert" class="modal">
+    <div class="modal-content">
+        <h4 class="red-text"><i class="material-icons left">warning</i>Atenção!</h4>
+        <p>Já existe um vendedor ativo associado a esta região: <strong id="existing-seller-name"></strong></p>
+        <p>Deseja continuar mesmo assim?</p>
+    </div>
+    <div class="modal-footer">
+        <a href="#!" class="modal-close waves-effect waves-red btn-flat">Cancelar</a>
+        <a href="#!" id="confirm-continue" class="waves-effect waves-green btn">Sim, continuar</a>
+    </div>
+</div>
 @endsection
 
 @push('scripts')
@@ -224,6 +253,12 @@
     document.addEventListener('DOMContentLoaded', function() {
         // Inicializa Materialize
         M.updateTextFields();
+        var elems = document.querySelectorAll('select');
+        var instances = M.FormSelect.init(elems);
+        
+        // Inicializar o modal
+        var modalElem = document.querySelector('#modal-region-alert');
+        var modalInstance = M.Modal.init(modalElem);
         
         // Máscaras para inputs
         $('.cpf').mask('000.000.000-00');
@@ -247,6 +282,50 @@
                     }
                 });
             }
+        });
+        
+        // Verificação de região com vendedor existente
+        var regionSelect = document.getElementById('region_id');
+        var originalRegionId = '{{ $seller->region_id ?? '' }}';
+        var continueWithRegion = false;
+        
+        // Verificar quando a região for alterada
+        regionSelect.addEventListener('change', function() {
+            var selectedRegion = this.value;
+            
+            // Não verificar se for a região original do vendedor em edição
+            if (selectedRegion == originalRegionId) {
+                return;
+            }
+            
+            // Verificar se já existe vendedor para esta região
+            fetch('/api/check-region-seller/' + selectedRegion)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.seller) {
+                        // Preencher informações do vendedor existente
+                        document.getElementById('existing-seller-name').textContent = data.seller.name;
+                        
+                        // Abrir o modal
+                        modalInstance.open();
+                    }
+                });
+        });
+        
+        // Quando o usuário confirmar que quer continuar
+        document.getElementById('confirm-continue').addEventListener('click', function() {
+            continueWithRegion = true;
+            modalInstance.close();
+        });
+        
+        // Quando o modal for fechado sem confirmar
+        document.querySelector('.modal-close').addEventListener('click', function() {
+            if (!continueWithRegion) {
+                // Reverter para seleção anterior
+                regionSelect.value = originalRegionId || '';
+                M.FormSelect.init(regionSelect);
+            }
+            continueWithRegion = false;
         });
     });
 </script>

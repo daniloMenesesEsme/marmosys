@@ -28,7 +28,8 @@ class Seller extends Model
         'data_admissao',
         'data_demissao',
         'observacoes',
-        'ativo'
+        'ativo',
+        'region_id'
     ];
 
     protected $casts = [
@@ -64,6 +65,68 @@ class Seller extends Model
     public function budgets()
     {
         return $this->hasMany(Budget::class);
+    }
+
+    public function region()
+    {
+        return $this->belongsTo(Region::class);
+    }
+
+    /**
+     * Obtém as áreas de atendimento deste vendedor
+     */
+    public function serviceAreas()
+    {
+        return $this->hasMany(ServiceArea::class);
+    }
+
+    /**
+     * Obtém as localidades atendidas por este vendedor
+     */
+    public function locations()
+    {
+        return $this->hasManyThrough(
+            Location::class,
+            ServiceArea::class,
+            'seller_id',
+            'id',
+            'id',
+            'location_id'
+        );
+    }
+
+    /**
+     * Obtém os tipos de estabelecimento atendidos por este vendedor
+     */
+    public function establishmentTypes()
+    {
+        return $this->hasManyThrough(
+            EstablishmentType::class,
+            ServiceArea::class,
+            'seller_id',
+            'id',
+            'id',
+            'establishment_type_id'
+        );
+    }
+
+    /**
+     * Verifica se o vendedor atende uma determinada localidade
+     */
+    public function servesLocation($locationId, $establishmentTypeId = null)
+    {
+        $query = $this->serviceAreas()
+            ->where('location_id', $locationId)
+            ->where('status', 'active');
+            
+        if ($establishmentTypeId) {
+            $query->where(function($q) use ($establishmentTypeId) {
+                $q->where('establishment_type_id', $establishmentTypeId)
+                  ->orWhereNull('establishment_type_id');
+            });
+        }
+        
+        return $query->exists();
     }
 
     // Escopos

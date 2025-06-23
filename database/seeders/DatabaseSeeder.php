@@ -12,7 +12,10 @@ use Illuminate\Support\Facades\DB;
 
 class DatabaseSeeder extends Seeder
 {
-    public function run()
+    /**
+     * Seed the application's database.
+     */
+    public function run(): void
     {
         $this->call([
             UserSeeder::class,
@@ -22,6 +25,7 @@ class DatabaseSeeder extends Seeder
             BankSeeder::class,
             PaymentMethodSeeder::class,
             FinancialCategorySeeder::class,
+            LocationSeeder::class,
         ]);
 
         try {

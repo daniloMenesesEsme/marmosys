@@ -1,5 +1,3 @@
-
-
 <?php $__env->startSection('title', 'Categorias Financeiras'); ?>
 
 <?php $__env->startSection('content'); ?>
